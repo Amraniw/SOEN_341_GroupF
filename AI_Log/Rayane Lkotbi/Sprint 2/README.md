@@ -1,1 +1,1 @@
-## AI Log for Sprint 2
+## AI Log Sprint 2

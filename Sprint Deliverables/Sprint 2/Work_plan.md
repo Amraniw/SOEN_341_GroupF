@@ -1,1 +1,1 @@
-# What each member worked on
+# What each member has done for this sprint
