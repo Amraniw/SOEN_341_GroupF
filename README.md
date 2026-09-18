@@ -42,7 +42,7 @@ Recruiters will also be able to create and manage job postings.
 
 ## Team Members
 
-- Rayane Lkotbi
+- Rayane Lkotbi | 40330437
 - [Team Member 2]
 - [Team Member 3]
 - [Team Member 4]
