@@ -1,19 +1,12 @@
 # AI Logs Sprint 1
 
 ### Prompt 1
-Create a clear and professional main `README.md` for the CareerConnect project based on the Sprint 1 requirements.
+Here is our current draft for the main CareerConnect README. (Picture Inserted)
 
-It should include:
-- Project description
-- Identified problem
-- Proposed solution
-- Main users
-- Proposed features
-- Team members
-- Technologies used
-- Setup instructions
+Review it for clarity, organization, grammar, and completeness based on the Sprint 1 requirements.
 
-Keep the wording concise and suitable for a GitHub repository.
+Suggest improvements without changing the meaning of the team's content.
+
 
 ---
 
@@ -60,10 +53,9 @@ Keep the stories focused on user needs rather than implementation details.
 ---
 
 ### Prompt 6
-Create text for the GitHub Wiki for CareerConnect.
+Here is our current draft for the CareerConnect GitHub Wiki. (Picture Inserted)
 
-I want:
-- a short Home page introduction,
-- a page describing the CareerConnect project,
-- and a Sprint 1 page summarizing the Sprint 1 goal and required deliverables.
+Review the Home page, project description, and Sprint 1 page for clarity, organization, and consistency.
+
+Suggest improvements to the wording and structure while keeping the team's original content and decisions.
 
