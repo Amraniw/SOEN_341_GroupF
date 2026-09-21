@@ -40,4 +40,4 @@
 - Failing on communicaiting with the team.
 
 ## Next Meeting
-- Friday 25th, 12:00pm
+- Friday September 25th, 12:00pm
