@@ -32,4 +32,4 @@
 
 
 ## Next Meeting
-- 
+- Friday September 25th, 12:00pm
