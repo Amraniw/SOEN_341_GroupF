@@ -25,15 +25,17 @@ List possible risks and how the team plans to handle them.
 
 | Issue # | Issue Title | Issue Type | Responsible Member | Target Date | Priority | Status |
 |---|---|---|---|---|---|---|
-| #1 | User Registration | User Story | Member Name | Sept. XX | High | In Progress |
-| #2 | User Login | User Story | Member Name | Sept. XX | High | Not Started |
-
+| #1 | User Registration | User Story | Member Name | Sept. 25 | High | In Progress |
+| #2 | User Login | User Story | Member Name | Sept. 25 | High | In Progress |
+| #3 | Backend  | User Story | Member Name | Sept. 25 | High | In Progress |
+| #4 | Resume | User Story | Member Name | Sept. 25 | High | In Progress |
 This section summarizes the GitHub issues planned for Sprint 1.
+### MAY NEED TO ADD ADDITIONAL ROW OR TASK + MODIFY TITLES
 
 
 ## 3. Team Contributions
 
-### Member 1
+### Rayane Lkotbi
 - Work completed:
 - Issues worked on:
 - Pull requests / commits:
