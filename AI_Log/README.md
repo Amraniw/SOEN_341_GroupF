@@ -1,5 +1,5 @@
 # AI Usage Logs
-### Must be submitted has PDF
+### Must be submitted has PDF + Must follow Outline AI format
 
 This folder contains the AI usage records for each team member.
 
