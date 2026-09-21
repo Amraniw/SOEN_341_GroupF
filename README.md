@@ -51,6 +51,11 @@ Recruiters will also be able to create and manage job postings.
 ## Technologies
 
 The technology stack will be finalized by the team during Sprint 1.
+- Version Control: GitHub
+- Frontend:
+- Backend:
+- Database:
+- AI: Claude, ChatGPT
 
 ## Setup Instructions
 
