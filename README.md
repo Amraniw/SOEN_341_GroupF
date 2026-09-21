@@ -44,7 +44,7 @@ Recruiters will also be able to create and manage job postings.
 
 - Rayane Lkotbi | 40330437
 - Carla Sophia Reis Lopez | 40262300
-- [Team Member 3]
+- Wassim Amrani | 40282136
 - [Team Member 4]
 - [Add remaining members]
 
