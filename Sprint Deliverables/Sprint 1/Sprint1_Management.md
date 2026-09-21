@@ -29,7 +29,7 @@ List possible risks and how the team plans to handle them.
 | #2 | User Login | User Story | Member Name | Sept. 25 | High | In Progress |
 | #3 | Backend  | User Story | Member Name | Sept. 25 | High | In Progress |
 | #4 | Resume | User Story | Member Name | Sept. 25 | High | In Progress |
-This section summarizes the GitHub issues planned for Sprint 1.
+- This section summarizes the GitHub issues planned for Sprint 1.
 ### MAY NEED TO ADD ADDITIONAL ROW OR TASK + MODIFY TITLES
 
 
