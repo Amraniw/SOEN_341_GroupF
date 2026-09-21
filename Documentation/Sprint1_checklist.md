@@ -4,7 +4,7 @@
 ## 1. Project Setup
 - [x] Create and organize GitHub repository
 - [x] Confirm all 6 members have access
-- [ ] Create GitHub Project board
+- [x] Create GitHub Project board
 - [ ] Finalize technology stack and development environment
 
 ## 2. README
