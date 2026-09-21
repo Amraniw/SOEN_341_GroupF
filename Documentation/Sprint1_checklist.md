@@ -1,100 +1,48 @@
 # Sprint 1 Master Checklist
 **Deadline:** September 28, 2026
 
-## 1. GitHub Setup
-- [x] Create GitHub repository
-- [x] Add initial repository folders
-- [ ] Confirm all 6 team members have repository access
-- [ ] Create/configure GitHub Project board
-- [ ] Organize documentation folders
-- [ ] Organize meeting minutes folder
-- [ ] Organize AI logs folder
-- [ ] Organize Sprint deliverables folder
+## 1. Project Setup
+- [x] Create and organize GitHub repository
+- [x] Confirm all 6 members have access
+- [ ] Create GitHub Project board
+- [ ] Finalize technology stack and development environment
 
 ## 2. README
-- [x] Project description
-- [x] Identified problem
-- [x] Proposed solution
-- [ ] Add all 6 team members
-- [ ] Finalize technologies
-- [ ] Add development/setup instructions
-- [x] Proposed features
-- [ ] Include working GitHub repository link as required for submission
+- [ ] Complete team member information
+- [ ] Finalize technologies and setup instructions
+- [ ] Final review of README
 
-## 3. User Stories & Tasks
-- [ ] Generate 10 user stories using AI
-- [ ] Review/validate the AI-generated stories
-- [ ] Clearly identify AI-generated user stories
-- [ ] Conduct team brainstorming for original stories/features
-- [ ] Clearly separate team-generated stories/features from AI-generated ones
-- [ ] Have at least 15 user stories total as GitHub Issues
-- [ ] Break user stories into associated development tasks
-- [ ] Use appropriate GitHub labels
-- [ ] Assign relevant work to team members
+## 3. User Stories & Requirements
+- [ ] Generate and review 10 AI user stories
+- [ ] Brainstorm original team-generated stories/features
+- [ ] Create at least 15 total user stories as GitHub Issues
+- [ ] Add tasks, labels and assignments to the user stories
 
 ## 4. Sprint Planning
 - [ ] Create Sprint 1 backlog
-- [ ] Define priorities
-- [ ] Estimate effort
-- [ ] Determine team capacity
-- [ ] Identify Sprint risks
-- [ ] Assign Sprint work
-- [ ] Schedule Sprint work
+- [ ] Define priorities and effort estimates
+- [ ] Determine team capacity and risks
+- [ ] Assign and schedule Sprint 1 work
+- [ ] Complete Appendix A Sprint 1 Work Plan
 
-## 5. Team Development Process
-- [ ] Define team workflow
-- [ ] Define Git branching strategy
-- [ ] Define pull request process
-- [ ] Define code review process
-- [ ] Define Definition of Ready
-- [ ] Define Definition of Done
+## 5. Team Process
+- [ ] Define Git workflow and branching strategy
+- [ ] Define pull request and code review process
+- [ ] Define Definition of Ready and Definition of Done
 
-## 6. Meeting Minutes
-- [ ] Record meeting attendance
-- [ ] Record important discussions
-- [ ] Record team decisions
-- [ ] Record action items
-- [ ] Record Sprint discussions
-- [ ] Maintain minutes for team meetings throughout Sprint 1
+## 6. Project Documentation
+- [ ] Maintain meeting minutes
+- [ ] Maintain individual AI usage logs
+- [ ] Maintain team member contribution records
 
-## 7. AI Usage
-- [ ] Create AI_Log directory
-- [ ] Create a personal subdirectory for each team member
-- [ ] Each member maintains their Sprint 1 AI usage
-- [ ] Each AI entry includes required validation/decision/reflection information
-- [ ] Each member prepares/uploads their Sprint 1 AI report PDF
+## 7. Implementation
+- [ ] Select two basic Sprint 1 features
+- [ ] Implement and test Feature #1
+- [ ] Implement and test Feature #2
+- [ ] Prepare project demonstration
 
-## 8. Sprint 1 Implementation
-- [ ] Select at least TWO basic features
-- [ ] Implement Feature #1
-- [ ] Test Feature #1
-- [ ] Implement Feature #2
-- [ ] Test Feature #2
-- [ ] Prepare both features for demonstration
-
-## 9. Contribution Tracking
-- [ ] Maintain visible GitHub activity
-- [ ] Team members make appropriate commits
-- [ ] Use pull requests according to team process
-- [ ] Perform code reviews according to team process
-- [ ] Maintain detailed record of each team member's contribution
-
-## 10. Sprint 1 Work Plan — Appendix A
-For each planned item, include:
-- [ ] Issue number
-- [ ] Issue title
-- [ ] Issue type (User Story or Task)
-- [ ] Responsible member
-- [ ] Target completion date
-- [ ] Priority (High / Medium / Low)
-- [ ] Current status (Not Started / In Progress / Completed)
-
-## 11. Final Sprint 1 Submission
-- [ ] Cover page
-- [ ] Project title
-- [ ] Names of all group members
-- [ ] Copy of README
-- [ ] Working GitHub repository link
-- [ ] Verify instructor can access repository
-- [ ] Check professional formatting/organization
-- [ ] Final Sprint 1 demo ready
+## 8. Final Submission
+- [ ] Prepare Sprint 1 submission document
+- [ ] Include cover page, team members, README and GitHub link
+- [ ] Final repository and documentation review
+- [ ] Confirm demo and submission are ready
