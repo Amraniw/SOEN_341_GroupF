@@ -1,4 +1,5 @@
 # AI Usage Logs
+### Must be submitted has PDF
 
 This folder contains the AI usage records for each team member.
 
