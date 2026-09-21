@@ -48,7 +48,6 @@ Recruiters will also be able to create and manage job postings.
 - Suheil Almouhassel 40285426
 - Adam El Fadil | 40340176
 - Sadek Massinissa Abderaouf | 40327548
-- [6th Team Member]
 
 ## Technologies
 
