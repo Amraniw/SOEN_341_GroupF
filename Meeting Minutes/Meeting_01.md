@@ -30,14 +30,6 @@
 - Work on the required documentation.
 - Identify the missing features to be implemented.
 
-## Team Capacity
-- Each memeber will work on their task based on their availability.
-- Workload was distributed fairly among the team members.
-
-## Risks
-- Delays if tasks are not completed on time.
-- Issues when combining progress done by any member.
-- Failing on communicaiting with the team.
 
 ## Next Meeting
 - 
