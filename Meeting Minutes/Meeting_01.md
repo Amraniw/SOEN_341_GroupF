@@ -17,4 +17,8 @@
 
 ## Actions Items
 
+## Team Capacity
+
+## Risks
+
 ## Next Meeting
