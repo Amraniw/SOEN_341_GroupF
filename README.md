@@ -46,7 +46,7 @@ Recruiters will also be able to create and manage job postings.
 - Carla Sophia Reis Lopez | 40262300
 - Wassim Amrani | 40282136
 - Suheil Almouhassel 40285426
-- [Add remaining members]
+- Adam El Fadil | 40340176
 
 ## Technologies
 
