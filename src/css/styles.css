@@ -1,0 +1,453 @@
+/*
+  Base Styling
+  - Global reset and typography defaults used site-wide.
+  - Keeps a consistent visual baseline across pages.
+*/
+
+/* Reset default browser spacing and keep sizing predictable */
+* {
+  /* border-box prevents padding/borders from unexpectedly growing components. */
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Global body theme (font + background + default text color) */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #2e2e2e;
+  color: #c5c5c5;
+}
+
+/* Shared page wrapper that limits line length and centers content */
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Links inherit text color so components control their own styling */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Default spacing below primary headings */
+h1 {
+  margin-bottom: 1rem;
+  color: #2d0080;
+}
+
+/* Improves body text readability */
+p {
+  line-height: 1.6;
+  color: #c5c5c5;
+}
+
+/*
+  Components Styling
+  - Reusable visual pieces specific to the landing page UI.
+  - Contains hero presentation, tagline animation, and action button style.
+*/
+
+/* Brand text in header */
+.site-logo {
+  font-size: 2rem;
+  color: #2d0080;
+  font-weight: bold;
+}
+
+/* Header navigation link spacing + base color */
+nav a {
+  margin: 0 1rem;
+  color: #c5c5c5;
+  font-weight: 600;
+}
+
+/* Subtle brand color cue on hover */
+nav a:hover {
+  color: #2d0080;
+}
+
+/* Hero content card inside main area */
+.hero {
+  position: relative;
+  overflow: hidden;
+  background-color: #2e2e2e;
+  padding: 5rem 0;
+  text-align: center;
+}
+
+/* Keep hero foreground content above decorative grid background */
+.hero .container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Main hero title */
+.hero h1 {
+  font-size: 5rem;
+  color: #2d0080;
+}
+
+/* Generic hero paragraph style */
+.hero p {
+  font-size: 1.2rem;
+  color: #c5c5c5;
+}
+
+/*
+  Container for rotating taglines.
+  min-height reserves vertical space so layout does not jump during animation.
+*/
+.hero-tagline-rotator {
+  position: relative;
+  min-height: 3.6rem;
+  width: min(95%, 860px);
+  margin: 0 auto;
+}
+
+/* Tagline lines are stacked in the exact same position */
+.hero-tagline {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 100%;
+  text-align: center;
+  transform: translate(-50%, 0);
+}
+
+/* First line starts visible, then fades/slides out in a loop */
+.hero-tagline-first {
+  opacity: 1;
+  animation: heroMessagePrimaryCycle 5.6s ease-in-out infinite;
+}
+
+/* Second line starts hidden, then fades/slides in opposite to first */
+.hero-tagline-second {
+  opacity: 0;
+  animation: heroMessageSecondaryCycle 5.6s ease-in-out infinite;
+}
+
+/* Timeline for first tagline */
+@keyframes heroMessagePrimaryCycle {
+  0%,
+  31.25% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  50%,
+  81.25% {
+    opacity: 0;
+    transform: translate(-50%, -8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* Timeline for second tagline (inverse of first) */
+@keyframes heroMessageSecondaryCycle {
+  0%,
+  31.25% {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+  }
+  50%,
+  81.25% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+  }
+}
+
+/* CTA row below the rotating tagline */
+.hero-cta-row {
+  margin-top: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Prevent CTA text from wrapping to a second line */
+.hero-cta-row .action-button {
+  align-self: center;
+  white-space: nowrap;
+}
+
+/* Login panel card styled to match landing page look-and-feel */
+.auth-panel {
+  width: min(92%, 520px);
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #e9e9e9;
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: left;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.08);
+}
+
+.auth-panel h1 {
+  font-size: 2.4rem;
+  color: #2d0080;
+  margin-bottom: 0.5rem;
+}
+
+.auth-subtext {
+  color: #c5c5c5;
+  margin-bottom: 1.25rem;
+}
+
+.auth-subtext--small {
+  margin-top: 1rem;
+  margin-bottom: 0;
+  text-align: center;
+}
+
+.auth-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.auth-field {
+  display: grid;
+  gap: 0.45rem;
+  font-weight: 600;
+  color: #c5c5c5;
+}
+
+.auth-input {
+  border: 1px solid #d5d5d5;
+  border-radius: 10px;
+  padding: 0.75rem 0.9rem;
+  font-size: 1rem;
+  outline: none;
+  background: #fff;
+}
+
+.auth-input:focus {
+  border-color: #2d0080;
+  box-shadow: 0 0 0 3px rgba(45, 0, 128, 0.12);
+}
+
+.auth-field small {
+  color: #8b8b8b;
+  font-weight: 400;
+}
+
+.auth-error {
+  margin-bottom: 1rem;
+  border-radius: 10px;
+  border: 1px solid #f2b4b4;
+  background: #fff1f1;
+  color: #9b1c1c;
+  padding: 0.7rem 0.85rem;
+}
+
+/*----------------------------*/
+/* 
+# Adapted from: https://uiverse.io/shah1345/spicy-liger-32
+# Author: Shah Newaz (shah1345)
+# Accessed: February 27, 2026
+# Changes made: Changed colors to match landing page theme, added full-width variant
+*/
+
+/*
+  Shared action button style
+  - Used for header auth links and hero call-to-action.
+  - Includes gradient-like bubble hover effect via pseudo-elements.
+*/
+.action-button {
+  display: inline-block;
+  transition: all 0.2s ease-in;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  color: #090909;
+  padding: 0.7em 1.7em;
+  cursor: pointer;
+  font-size: 18px;
+  border-radius: 0.5em;
+  background: #e8e8e8;
+  border: 1px solid #e8e8e8;
+  box-shadow:
+    6px 6px 12px ,
+    -6px -6px 12px ;
+}
+
+.action-button--full {
+  width: 100%;
+  text-align: center;
+}
+
+/* Pressed state */
+.action-button:active {
+  color: #666;
+  box-shadow:
+    4px 4px 12px #c5c5c5,
+    -4px -4px 12px #ffffff;
+}
+
+/* Upper hover bubble */
+.action-button:before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%) scaleY(1) scaleX(1.25);
+  top: 100%;
+  width: 140%;
+  height: 180%;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 50%;
+  display: block;
+  transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+  z-index: -1;
+}
+
+/* Lower hover bubble */
+.action-button:after {
+  content: '';
+  position: absolute;
+  left: 55%;
+  transform: translateX(-50%) scaleY(1) scaleX(1.45);
+  top: 180%;
+  width: 160%;
+  height: 190%;
+  background-color: #2d0080;
+  border-radius: 50%;
+  display: block;
+  transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+  z-index: -1;
+}
+
+/* Main hover color transition */
+.action-button:hover {
+  color: #ffffff;
+  border: 1px solid #2d0080;
+}
+
+/* Animate upper bubble into view */
+.action-button:hover:before {
+  top: -35%;
+  background-color: #2d0080;
+  transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
+}
+
+/* Animate lower bubble into view */
+.action-button:hover:after {
+  top: -45%;
+  background-color: #2d0080;
+  transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
+}
+
+/*----------------------------*/
+/* 
+# Adapted from: https://uiverse.io/Gautammsharma/perfect-insect-42
+# Author: Gautam Sharma (Gautammsharma)
+# Accessed: March 2, 2026
+# Changes made: Made to fit as body background
+*/
+
+/*
+  Full-bleed decorative layer inside `.hero`.
+  - `absolute + inset: 0` makes it cover the entire hero area.
+  - `z-index: 0` keeps it behind the hero foreground content.
+  - `pointer-events: none` prevents it from blocking clicks.
+*/
+.grid-wrapper {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/*
+  Actual grid drawing surface.
+  Uses two linear-gradients to create vertical/horizontal lines,
+  then masks them with a radial fade for a softer visual.
+*/
+.grid-background {
+  /* Fixed cell size keeps the pattern subtle and consistent across screen sizes. */
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 0;
+  background-image:
+    linear-gradient(to right, #3c3c3d 1px, transparent 1px),
+    linear-gradient(to bottom, #3c3c3d 1px, transparent 1px);
+  background-size: 20px 30px;
+  -webkit-mask-image: radial-gradient(
+    ellipse 70% 60% at 50% 0%,
+    #000 60%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 60%, transparent 100%);
+}
+
+/*
+  Layout Styling
+  - Handles page-level structure (header/main/footer regions).
+  - Defines spacing around the main hero area.
+*/
+
+/* Full-height page so footer can stay at bottom naturally */
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+/* Vertical page flow: header -> main (flexes) -> footer */
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+/*
+  Main region expands to consume remaining height.
+  Padding creates equal outer spacing around the hero block.
+*/
+main {
+  flex-grow: 1;
+  padding: 3rem;
+}
+
+/* Footer presentation */
+footer {
+  background-color: #2d0080;
+  color: white;
+  text-align: center;
+  padding: 1rem 0;
+  margin-top: 0;
+}
+
+/* Header presentation */
+header {
+  background-color: #2e2e2e;
+  padding: 1.5rem 0;
+  
+}
+
+/* Header inner alignment: logo left, nav right */
+header .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #2e2e2e;
+}
+
+/* Hero fills the main area and centers its internal content */
+main > .hero {
+  /* Lets each page-specific hero decide its internal max-width and card layout. */
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
