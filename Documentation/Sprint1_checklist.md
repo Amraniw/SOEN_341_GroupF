@@ -13,7 +13,7 @@
 - [ ] Final review of README
 
 ## 3. User Stories & Requirements
-- [ ] Generate and review 10 AI user stories
+- [x] Generate and review 10 AI user stories
 - [ ] Brainstorm original team-generated stories/features
 - [ ] Create at least 15 total user stories as GitHub Issues
 - [ ] Add tasks, labels and assignments to the user stories
