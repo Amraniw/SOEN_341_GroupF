@@ -31,10 +31,10 @@ List possible risks and how the team plans to handle them.
 | #4 | Resume Upload Interface | User Story | Adam, Suheil | Sept. 26 | High | In Progress |
 | #5 | Resume Storage and Backend Integration | Task | Rayane, Amran | Sept. 26 | Medium | In Progress |
 | #6 | Define Team Process | Task | Massi | Sept. 23 | High | Completed |
-| #7 | Sprint 1 Documentation and Submission Preparation | Task | Massi, Carla | Sept. 27 | Medium | In Progress |
+| #7 | Complete Sprint Planning and Project Documentation | Task | Massi, Carla | Sept. 26 | High | In Progress |
+| #8 | Sprint 1 Submission Preparation | Task | Massi, Carla | Sept. 27 | Medium | In Progress |
 
-This section summarizes the GitHub issues planned for Sprint 1, including backend development, frontend implementation, team process definition, and submission preparation.
-
+This section summarizes the GitHub issues planned for Sprint 1, including backend development, frontend implementation, team process definition, sprint planning, project documentation, and final submission preparation.
 
 ## 3. Team Contributions
 
