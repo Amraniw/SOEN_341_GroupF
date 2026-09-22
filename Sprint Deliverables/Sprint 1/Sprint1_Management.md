@@ -25,12 +25,15 @@ List possible risks and how the team plans to handle them.
 
 | Issue # | Issue Title | Issue Type | Responsible Member | Target Date | Priority | Status |
 |---|---|---|---|---|---|---|
-| #1 | User Registration | User Story | Member Name | Sept. 25 | High | In Progress |
-| #2 | User Login | User Story | Member Name | Sept. 25 | High | In Progress |
-| #3 | Backend  | User Story | Member Name | Sept. 25 | High | In Progress |
-| #4 | Resume | User Story | Member Name | Sept. 25 | High | In Progress |
-- This section summarizes the GitHub issues planned for Sprint 1.
-### MAY NEED TO ADD ADDITIONAL ROW OR TASK + MODIFY TITLES
+| #1 | User Registration and Login | User Story | Rayane, Amran | Sept. 24 | High | In Progress |
+| #2 | Backend Setup and Database Integration | Task | Rayane, Amran | Sept. 25 | High | In Progress |
+| #3 | Registration and Login Interface | Task | Adam, Suheil | Sept. 25 | High | In Progress |
+| #4 | Resume Upload Interface | User Story | Adam, Suheil | Sept. 26 | High | In Progress |
+| #5 | Resume Storage and Backend Integration | Task | Rayane, Amran | Sept. 26 | Medium | In Progress |
+| #6 | Define Team Process | Task | Massi | Sept. 23 | High | Completed |
+| #7 | Sprint 1 Documentation and Submission Preparation | Task | Massi, Carla | Sept. 27 | Medium | In Progress |
+
+This section summarizes the GitHub issues planned for Sprint 1, including backend development, frontend implementation, team process definition, and submission preparation.
 
 
 ## 3. Team Contributions
