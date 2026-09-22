@@ -26,9 +26,9 @@
 - [ ] Complete Appendix A Sprint 1 Work Plan
 
 ## 5. Team Process
-- [ ] Define Git workflow and branching strategy
-- [ ] Define pull request and code review process
-- [ ] Define Definition of Ready and Definition of Done
+- [x] Define Git workflow and branching strategy
+- [x] Define pull request and code review process
+- [x] Define Definition of Ready and Definition of Done
 
 ## 6. Project Documentation
 - [x] Maintain meeting minutes
