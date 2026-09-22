@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Standard document metadata for encoding + responsive scaling -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Browser tab title -->
+    <title>CareerConnect</title>
+
+    <!-- CSS load order: base resets, reusable components, then page layout -->
+    <link rel="stylesheet" href="../../css/styles.css" />
+   
+  </head>
+  <body>
+    <!-- Header: branding + primary navigation actions -->
+    <header>
+      <div class="container">
+        <!-- Brand / home link -->
+        <a href="./index.html" class="site-logo">CareerConnect</a>
+
+        <!-- Entry-point actions for auth -->
+        <nav>
+          <a href="../auth/login.html" class="action-button">Log In</a>
+          <a href="../auth/signup.html" class="action-button">Sign Up</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Main: hero card with rotating tagline + primary CTA -->
+    <main>
+      <section class="hero">
+        <!-- Decorative background layer for the hero (sits behind all hero content) -->
+        <div class="grid-wrapper">
+          <!-- Grid pattern element rendered inside the background layer -->
+          <div class="grid-background"></div>
+        </div>
+        <div class="container">
+          <!-- Primary product heading -->
+          <h1>CareerConnect</h1>
+
+           <!-- Rotating tagline area (two lines animate in the same position) -->
+          <div class="hero-tagline-rotator" aria-live="polite">
+            <p class="hero-tagline hero-tagline-first">Connect To Your Future</p>
+            <p class="hero-tagline hero-tagline-second">
+              Find Your Dream Career
+            </p>
+          </div>
+
+
+          <!-- Main call-to-action row -->
+          <div class="hero-cta-row">
+            <a href="../auth/signup.html" class="action-button"
+              >Get Started</a
+            >
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer: project/course attribution -->
+    <footer>
+      <div class="container">
+        <p>&copy; 2026 • SOEN341 • Concordia University</p>
+      </div>
+    </footer>
+  </body>
+</html>
