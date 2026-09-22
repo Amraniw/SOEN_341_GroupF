@@ -7,9 +7,7 @@ Claude
 September 21st, 2026
 
 ## Purpose
-- Needed the use of Claude to assist me with comments and the CSS.
-
-- Needed the use of Claude to assist with the small javaScript section in the signup page.
+1. Needed the use of Claude to assist with the small javaScript section in the signup page.
 
 ## Prompts Used
-2
+1. https://claude.ai/share/42743e52-3438-41b2-b368-99c7ac06f264

@@ -121,8 +121,8 @@
                 </div>
 
                 <!-- hidden by default, shown only when admin is selected -->
-                <div id="adminKeyField" hidden>
-                  <input type="password" id="adminKey" placeholder="Admin secret key" class="auth-input" />
+                <div id="recruiterField" hidden>
+                  <input type="password" id="companyKey" placeholder="Company Secret Key" class="auth-input" />
                 </div>
 
               <!-- Primary action button -->
@@ -147,18 +147,13 @@
       </div>
     </footer>
     <script>
-  const roleRadios = document.querySelectorAll('input[name="role"]');
-  const adminKeyField = document.getElementById('adminKeyField');
-
-  function toggleAdminKeyField() {
-    const selected = document.querySelector('input[name="role"]:checked');
-    adminKeyField.hidden = !(selected && selected.value === 'recruiter');
-  }
-
-  roleRadios.forEach((radio) => radio.addEventListener('change', toggleAdminKeyField));
-
-  // Run once on load in case "Recruiter" is pre-checked or the page is reloaded with state
-  toggleAdminKeyField();
+      // Toggle visibility of the recruiter field based on the selected role
+    document.querySelectorAll('input[name="role"]').forEach((radio) => {
+    radio.addEventListener('change', (e) => {
+      const recruiterField = document.getElementById('recruiterField');
+      recruiterField.hidden = e.target.value !== 'recruiter';
+    });
+  });
 </script>
   </body>
 </html>
