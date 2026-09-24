@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Standard metadata for character encoding and responsive layout -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Browser tab title -->
+    <title>My Resume • CareerConnect</title>
+
+    <!-- Shared styles: base reset, reusable components, then page layout -->
+    <link rel="stylesheet" href="../../css/styles.css" />
+
+    <!-- Page-specific styles for the resume section -->
+    <style>
+      /* Make the hidden attribute win over display rules like .auth-form's grid */
+      [hidden] {
+        display: none !important;
+      }
+
+      /* Long filenames wrap instead of stretching the card */
+      .resume-name {
+        overflow-wrap: anywhere;
+        margin-bottom: 1rem;
+      }
+
+      /* Replace/Remove buttons wrap onto a new line on small screens */
+      .resume-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Header: brand + navigation back to the home page -->
+    <header>
+      <div class="container">
+        <a href="../index/index.html" class="site-logo">CareerConnect</a>
+        <nav>
+          <a href="../index/index.html" class="action-button">Home</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Main: hero shell reused from the auth pages, with the resume card -->
+    <main>
+      <section class="hero">
+        <!-- Decorative background layer shown behind the content -->
+        <div class="grid-wrapper">
+          <div class="grid-background"></div>
+        </div>
+
+        <!-- Foreground content container -->
+        <div class="container">
+          <!-- Resume panel/card -->
+          <div class="auth-panel">
+            <h1>My Resume</h1>
+            <p class="auth-subtext">
+              Upload the PDF resume you will use when applying for jobs.
+            </p>
+
+            <!-- Hidden error box, shown by the script when a file is rejected -->
+            <div class="auth-error" id="errorBox" hidden></div>
+
+            <!-- Upload form (shown while no resume is stored) -->
+            <form id="uploadForm" class="auth-form">
+              <label class="auth-field">
+                <span>Resume (PDF only)</span>
+                <input id="resumeFile" class="auth-input" type="file" accept=".pdf" />
+              </label>
+
+              <button class="action-button action-button--full" type="submit">
+                Upload Resume
+              </button>
+            </form>
+
+            <!-- Current resume (shown after a successful upload) -->
+            <div id="resumeItem" hidden>
+              <p class="resume-name">
+                Current resume: <strong id="resumeName"></strong>
+              </p>
+
+              <div class="resume-actions">
+                <button class="action-button" id="replaceButton" type="button">Replace</button>
+                <button class="action-button" id="removeButton" type="button">Remove</button>
+              </div>
+
+              <!-- Hidden file picker opened by the Replace button -->
+              <input id="replaceFile" type="file" accept=".pdf" hidden />
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer: project attribution -->
+    <footer>
+      <div class="container">
+        <p>&copy; 2026 • SOEN 341 • Concordia University</p>
+      </div>
+    </footer>
+
+    <script>
+      // hardcoded
+      let currentResume = null;
+
+      const uploadForm = document.getElementById('uploadForm');
+      const resumeFile = document.getElementById('resumeFile');
+      const replaceFile = document.getElementById('replaceFile');
+      const resumeItem = document.getElementById('resumeItem');
+      const resumeName = document.getElementById('resumeName');
+      const errorBox = document.getElementById('errorBox');
+
+      // accept .pdf in any letter case (.pdf, .PDF, ...)
+      function isPdf(file) {
+        return file.name.toLowerCase().endsWith('.pdf');
+      }
+
+      // show a message in the error box, or hide the box when the message is empty
+      function showError(message) {
+        errorBox.textContent = message;
+        errorBox.hidden = !message;
+      }
+
+      // store a resume (or null) and update the page to match
+      function setResume(file) {
+        currentResume = file;
+        resumeName.textContent = currentResume ? currentResume.name : '';
+        resumeItem.hidden = currentResume === null;
+        uploadForm.hidden = currentResume !== null;
+        showError('');
+      }
+
+      // upload: check the chosen file, then store and display it
+      uploadForm.addEventListener('submit', (event) => {
+        event.preventDefault(); // stay on this page instead of submitting the form
+        const file = resumeFile.files[0];
+
+        if (!file) {
+          showError('Please choose a resume to upload.');
+        } else if (!isPdf(file)) {
+          showError('Only PDF files are accepted.');
+        } else {
+          setResume(file);
+          resumeFile.value = '';
+        }
+      });
+
+      // replace: open the hidden picker; choosing a PDF swaps the resume right away
+      document.getElementById('replaceButton').addEventListener('click', () => {
+        replaceFile.click();
+      });
+
+      replaceFile.addEventListener('change', () => {
+        const file = replaceFile.files[0];
+        replaceFile.value = ''; // lets the same file be picked again later
+
+        if (!file) return;
+
+        if (isPdf(file)) {
+          setResume(file);
+        } else {
+          showError('Only PDF files are accepted.');
+        }
+      });
+
+      // remove: forget the stored resume and show the upload form again
+      document.getElementById('removeButton').addEventListener('click', () => {
+        setResume(null);
+      });
+    </script>
+  </body>
+</html>
