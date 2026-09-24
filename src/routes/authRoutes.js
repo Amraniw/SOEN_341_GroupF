@@ -135,6 +135,8 @@ function createAuthRouter(database) {
         return response.status(401).json({ error: 'Invalid email or password.' });
       }
 
+      request.session = { userId: user.id };
+
       return response.status(200).json({
         message: 'Login successful.',
         user: toPublicUser(user),

@@ -110,6 +110,7 @@ describe('Feature 1: User registration and login', () => {
     assert.equal(response.status, 200);
     assert.equal(response.body.message, 'Login successful.');
     assert.equal(response.body.user.email, validUser.email);
+    assert.ok(response.headers['set-cookie']);
   });
 
   test('8. wrong password login fails', async () => {
