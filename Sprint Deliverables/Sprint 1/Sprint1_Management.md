@@ -25,8 +25,8 @@ List possible risks and how the team plans to handle them.
 
 | Issue # | Issue Title | Issue Type | Responsible Member | Target Date | Priority | Status |
 |---|---|---|---|---|---|---|
-| #1 | User Registration and Login | User Story | Rayane, Amran | Sept. 24 | High | In Progress |
-| #2 | Backend Setup and Database Integration | Task | Rayane, Amran | Sept. 25 | High | In Progress |
+| #1 | User Registration and Login | User Story | Rayane, Wassim | Sept. 24 | High | Completed |
+| #2 | Backend Setup and Database Integration | Task | Rayane, Wassim | Sept. 25 | High | Completed |
 | #3 | Registration and Login Interface | Task | Adam, Suheil | Sept. 25 | High | In Progress |
 | #4 | Resume Upload Interface | User Story | Adam, Suheil | Sept. 26 | High | In Progress |
 | #5 | Resume Storage and Backend Integration | Task | Rayane, Amran | Sept. 26 | Medium | In Progress |
