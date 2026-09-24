@@ -44,7 +44,7 @@ This section summarizes the GitHub issues planned for Sprint 1, including backen
 - Pull requests / commits:
 - Reviews or testing performed:
 
-### Member 2
+### Wassim Amrani
 - Work completed:
 - Issues worked on:
 - Pull requests / commits:
