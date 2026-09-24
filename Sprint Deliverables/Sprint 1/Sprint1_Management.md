@@ -3,23 +3,35 @@
 ## 1. Sprint Planning
 
 ### Sprint Goal
-Briefly describe what the team intends to accomplish during Sprint 1.
+The goal for this sprint is to establish a foundation of the web page by setting up the project structure and  implementing the initial front-end and back-end components. The main focus is to implement the users registration and log in for the web page, which allows the users to create an account and later on be able to access it at any time.
 
 ### Sprint Backlog
-List the main user stories/tasks selected for Sprint 1.
+| User Story | Description |
+|---|---|
+| US-01 User Registration | Allows new users to create an account. | 
+| US-02 User Login | Allows old users to log into the web page. |
 
 ### Priorities
-Identify which items are High, Medium, or Low priority.
+| User Story | Priority | Why |
+|---|---|---|
+| User Registration | HIgh | Necessary for new users to create an account. |
+| User Login | HIgh | Necessary for users to be able to access their account at any time. |
 
 ### Effort Estimation
-Estimate the effort required for the selected work.
 
 ### Team Capacity
-Describe the number of team members, availability, and how work is distributed.
+The team consists of 6 memebers. Team members will work in pairs to complete their assigned tasks and divide the workload accordingly. Each pair will manage their time and work on completing their tasks by Friday September 25th. Once all parts are finished, all memebers will meet to review the work and address any issue as well as to ensure all parts work accordingly.
+
+| Pair | Task |
+|---|---|
+| 1 | Front-end: work on styling the web page and user interface, inlcuding the setions needed for user registration and login. | 
+| 2 | Back-end: work on the funtionality required for registration and login of users. |
+| 3 | Documentation: Spring planning, meeting minutes, team process |
 
 ### Risks
-List possible risks and how the team plans to handle them.
-
+- Not finishing on time for submission.
+- Back-end and front-end not merging correctly.
+- Communication issues between team members.
 
 ## 2. Sprint 1 Work Plan
 
@@ -51,5 +63,15 @@ This section summarizes the GitHub issues planned for Sprint 1, including backen
 - Pull requests / commits:
 - Reviews or testing performed:
 
-### Member 3
-...
+### Carla Reis
+- Work completed:
+  - Finished the meeting minutes for the first team meeting
+  - Worked on the documentation for the sprint planning
+- Issues worked on:
+  - Sprint Planning
+  - Meeting Minutes
+  - Documentation
+- Pull Requests / Commits:
+  - j
+
+### Memeber
