@@ -33,16 +33,17 @@ List possible risks and how the team plans to handle them.
 | #6 | Define Team Process | Task | Massi | Sept. 23 | High | Completed |
 | #7 | Complete Sprint Planning and Project Documentation | Task | Massi, Carla | Sept. 26 | High | In Progress |
 | #8 | Sprint 1 Submission Preparation | Task | Massi, Carla | Sept. 27 | Medium | In Progress |
+| #9 | Create and Organize All 15 User Story Issues | Task | Rayane | Sept. 22 | High | Completed |
 
 This section summarizes the GitHub issues planned for Sprint 1, including backend development, frontend implementation, team process definition, sprint planning, project documentation, and final submission preparation.
 
 ## 3. Team Contributions
 
 ### Rayane Lkotbi
-- Work completed:
-- Issues worked on:
-- Pull requests / commits:
-- Reviews or testing performed:
+- **Work completed:** Set up the repository structure, README, documentation, AI logs, sprint files, GitHub Issues, labels, and user stories. Assisted with backend planning and design decisions.
+- **Issues worked on:** Repository setup, Sprint 1 planning, user registration, authentication, and resume management.
+- **Pull requests / commits:** Approximately 50 commits involving repository organization, README updates, sprint planning, checklists, and documentation.
+- **Reviews or testing performed:** Reviewed the backend implementation and verified all 20 registration, login, authentication, and resume-upload tests passed.
 
 ### Wassim Amrani
 - Work completed:
