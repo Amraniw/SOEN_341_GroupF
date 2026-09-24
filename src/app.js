@@ -1,5 +1,6 @@
 const crypto = require('node:crypto');
 const express = require('express');
+const path = require('node:path');
 const cookieSession = require('cookie-session');
 const multer = require('multer');
 const { createAuthRouter } = require('./routes/authRoutes');
@@ -32,6 +33,13 @@ function createApp(database, options = {}) {
     '/api/resumes',
     createResumeRouter(database, { uploadDirectory: options.uploadDirectory })
   );
+
+  app.use(express.static(path.join(__dirname, 'pages')));
+
+
+  app.get('/', (request, response) => {
+    response.sendFile(path.join(__dirname, 'pages', 'index', 'index.html'));
+  });
 
   app.use((request, response) => {
     response.status(404).json({ error: 'Route not found.' });
