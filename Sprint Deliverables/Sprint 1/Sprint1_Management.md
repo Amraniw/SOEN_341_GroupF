@@ -23,6 +23,7 @@ The effort  needed for each task to be completed is based on a scale from 1 to 5
 |---|---|
 | User Registration | 3 |
 | User Login | 3 |
+
 Both user registration and login require back-end work as well as front-end for their implementation. Therefore, both tasks have a moderate level of effort.
 
 ### Team Capacity
