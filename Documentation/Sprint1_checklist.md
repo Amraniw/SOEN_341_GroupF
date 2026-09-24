@@ -5,10 +5,10 @@
 - [x] Create and organize GitHub repository
 - [x] Confirm all 6 members have access
 - [x] Create GitHub Project board
-- [ ] Finalize technology stack and development environment
+- [x] Finalize technology stack and development environment
 
 ## 2. README
-- [ ] Complete team member information
+- [x] Complete team member information
 - [x] Finalize technologies and setup instructions
 - [ ] Final review of README
 
@@ -42,7 +42,7 @@
 - [ ] Prepare project demonstration
 
 ## 8. Final Submission
-- [ ] Prepare Sprint 1 submission document
+- [x] Prepare Sprint 1 submission document
 - [ ] Include cover page, team members, README and GitHub link
 - [ ] Final repository and documentation review
 - [ ] Confirm demo and submission are ready
