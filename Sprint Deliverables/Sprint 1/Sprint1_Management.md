@@ -18,14 +18,20 @@ The goal for this sprint is to establish a foundation of the web page by setting
 | User Login | HIgh | Necessary for users to be able to access their account at any time. |
 
 ### Effort Estimation
+The effort  needed for each task to be completed is based on a scale from 1 to 5. 1 represents low effort and 5 means that it is very complex therefore it represents high effort required for completion.
+| User Story | Estimated Effort |
+|---|---|
+| User Registration | 3 |
+| User Login | 3 |
+Both user registration and login require back-end work as well as front-end for their implementation. Therefore, both tasks have a moderate level of effort.
 
 ### Team Capacity
-The team consists of 6 memebers. Team members will work in pairs to complete their assigned tasks and divide the workload accordingly. Each pair will manage their time and work on completing their tasks by Friday September 25th. Once all parts are finished, all memebers will meet to review the work and address any issue as well as to ensure all parts work accordingly.
+The team consists of 6 members. Team members will work in pairs to complete their assigned tasks and divide the workload accordingly. Each pair will manage their time and work on completing their tasks by Friday September 25th. Once all parts are finished, all members will meet to review the work and address any issue as well as to ensure all parts work accordingly.
 
 | Pair | Task |
 |---|---|
-| 1 | Front-end: work on styling the web page and user interface, inlcuding the setions needed for user registration and login. | 
-| 2 | Back-end: work on the funtionality required for registration and login of users. |
+| 1 | Front-end: work on styling the web page and user interface, including the sections needed for user registration and login. | 
+| 2 | Back-end: work on the functionality required for registration and login of users. |
 | 3 | Documentation: Spring planning, meeting minutes, team process |
 
 ### Risks
@@ -74,4 +80,4 @@ This section summarizes the GitHub issues planned for Sprint 1, including backen
 - Pull Requests / Commits:
   - j
 
-### Memeber
+### Member
