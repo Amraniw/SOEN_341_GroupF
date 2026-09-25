@@ -7,42 +7,117 @@ fieldset.form-field {
 
 fieldset.form-field legend {
   padding: 0;
-  margin-bottom: 6px;
+  margin-bottom: 9px;
   font-size: 13px;
   font-weight: 650;
   color: var(--ink);
 }
 
 .role-options {
-  display: flex;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
 }
 
-.role-option {
+.form-field .role-option {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  font-weight: 500;
+  gap: 11px;
+  min-height: 72px;
+  margin: 0;
+  padding: 13px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
   color: var(--ink);
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgb(22 55 47 / 4%);
   cursor: pointer;
+  transition:
+    border-color var(--motion-fast) var(--ease-standard),
+    background-color var(--motion-fast) var(--ease-standard),
+    box-shadow var(--motion-fast) var(--ease-standard),
+    transform var(--motion-fast) var(--ease-standard);
+}
+
+.form-field .role-option:hover {
+  border-color: #9db8ad;
+  background: #fbfdfc;
+  transform: translateY(-1px);
+}
+
+.form-field .role-option:has(input:checked) {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  box-shadow: 0 0 0 1px var(--brand), 0 5px 16px rgb(23 100 87 / 8%);
+}
+
+.form-field .role-option:has(input:focus-visible) {
+  outline: 3px solid rgb(38 126 174 / 24%);
+  outline-offset: 2px;
 }
 
 .role-option input[type='radio'] {
-  width: 17px;
-  height: 17px;
+  position: absolute;
+  width: 1px;
+  min-height: 1px;
   margin: 0;
-  accent-color: var(--brand);
-  cursor: pointer;
-  transition: box-shadow var(--motion-fast) var(--ease-standard);
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
 }
 
-.role-option input[type='radio']:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgb(23 100 87 / 10%);
+.role-option__indicator {
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 1.5px solid #9aaba3;
   border-radius: 50%;
+  background: var(--surface);
+  transition:
+    border-color var(--motion-fast) var(--ease-standard),
+    background-color var(--motion-fast) var(--ease-standard),
+    box-shadow var(--motion-fast) var(--ease-standard);
 }
 
-.role-option:hover {
-  color: var(--brand);
+.role-option input:checked + .role-option__indicator {
+  border-color: var(--brand);
+  background: var(--brand);
+  box-shadow: inset 0 0 0 5px var(--surface);
+}
+
+.role-option__copy {
+  min-width: 0;
+}
+
+.role-option__copy strong,
+.role-option__copy small {
+  display: block;
+}
+
+.role-option__copy strong {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.role-option__copy small {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+@media (max-width: 430px) {
+  .role-options {
+    grid-template-columns: 1fr;
+  }
+
+  .form-field .role-option {
+    min-height: 66px;
+  }
 }
