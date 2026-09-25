@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="CareerConnect — your professional account and resume, in one career workspace."
+    />
+    <title>My account | CareerConnect</title>
+    <link rel="icon" href="/assets/brand.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/assets/styles.css" />
+    <script type="module" src="/assets/profile.js"></script>
+  </head>
+  <body data-page="profile">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <noscript
+      ><p class="noscript-message">
+        JavaScript is required to open your workspace. Enable it, then
+        <a href="/auth/login.html">sign in</a>.
+      </p></noscript
+    >
+    <div data-workspace hidden>
+      <header class="workspace-header" id="workspace-header"></header>
+      <div class="workspace-layout">
+        <aside
+          class="workspace-sidebar"
+          id="workspace-sidebar"
+          aria-label="Workspace navigation"
+        ></aside>
+        <main class="workspace-main" id="main" tabindex="-1">
+          <div class="breadcrumb">
+            <a href="/dashboard/index.html">Workspace</a
+            ><span aria-hidden="true">/</span><span>My account</span>
+          </div>
+
+          <div class="page-heading">
+            <h1>My account</h1>
+            <p>The essentials behind your professional identity.</p>
+          </div>
+          <div class="content-grid">
+            <div class="stack">
+              <section class="panel profile-panel">
+                <div class="profile-banner"></div>
+                <div class="profile-identity">
+                  <div
+                    class="avatar"
+                    id="profile-avatar"
+                    aria-hidden="true"
+                  ></div>
+                  <h2 class="break-word" id="profile-name"></h2>
+                  <p class="break-word" id="profile-email"></p>
+                  <span class="badge badge-neutral">CareerConnect member</span>
+                </div>
+              </section>
+              <section class="panel">
+                <div class="panel-heading">
+                  <h2>Account information</h2>
+                  <span class="badge badge-neutral">View only</span>
+                </div>
+                <dl class="details-list">
+                  <div>
+                    <dt>Full name</dt>
+                    <dd id="account-name"></dd>
+                  </div>
+                  <div>
+                    <dt>Email address</dt>
+                    <dd id="account-email"></dd>
+                  </div>
+                  <div>
+                    <dt>Member since</dt>
+                    <dd id="account-created"></dd>
+                  </div>
+                </dl>
+                <p class="help-note">
+                  Account editing is not available yet. Your details are shown
+                  as provided at sign-in.
+                </p>
+              </section>
+              <section class="panel">
+                <div class="panel-heading">
+                  <h2>Your resume</h2>
+                  <span data-icon="file"></span>
+                </div>
+                <p>Keep a copy of your experience with your account.</p>
+                <a class="text-link" href="/resume/index.html"
+                  >Go to resume <span data-icon="arrow"></span
+                ></a>
+              </section>
+              <section class="panel">
+                <h2>Account access</h2>
+                <p class="help-note">
+                  Sign-out is not available in this release. The server session
+                  expires after 24 hours; closing this tab clears the details
+                  displayed here, but does not end that session.
+                </p>
+                <a class="text-link" href="/auth/login.html"
+                  >Sign in to another account <span data-icon="arrow"></span
+                ></a>
+              </section>
+            </div>
+            <aside class="panel">
+              <span class="icon-tile" data-icon="user"></span>
+              <h2>Start with who you are.</h2>
+              <p>A complete professional story takes shape over time.</p>
+              <p class="help-note">
+                Headlines, experience, education, and profile editing are
+                planned for a future release.
+              </p>
+            </aside>
+          </div>
+          <footer class="workspace-footer">
+            <span>© 2026 CareerConnect</span
+            ><span>A considered next step.</span>
+          </footer>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

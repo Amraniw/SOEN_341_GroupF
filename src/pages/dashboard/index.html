@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="CareerConnect — your professional account and resume, in one career workspace."
+    />
+    <title>Overview | CareerConnect</title>
+    <link rel="icon" href="/assets/brand.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/assets/styles.css" />
+    <script type="module" src="/assets/dashboard.js"></script>
+  </head>
+  <body data-page="dashboard">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <noscript
+      ><p class="noscript-message">
+        JavaScript is required to open your workspace. Enable it, then
+        <a href="/auth/login.html">sign in</a>.
+      </p></noscript
+    >
+    <div data-workspace hidden>
+      <header class="workspace-header" id="workspace-header"></header>
+      <div class="workspace-layout">
+        <aside
+          class="workspace-sidebar"
+          id="workspace-sidebar"
+          aria-label="Workspace navigation"
+        ></aside>
+        <main class="workspace-main" id="main" tabindex="-1">
+          <div class="breadcrumb">
+            <a href="/dashboard/index.html">Workspace</a
+            ><span aria-hidden="true">/</span><span>Overview</span>
+          </div>
+
+          <div class="page-heading page-heading-row">
+            <div>
+              <h1>Welcome, <span id="welcome-name"></span>.</h1>
+              <p>A little preparation today. More possibilities tomorrow.</p>
+            </div>
+            <span class="badge badge-neutral">Your career workspace</span>
+          </div>
+          <div class="dashboard-grid">
+            <div class="stack">
+              <section class="next-card">
+                <p class="eyebrow">YOUR NEXT STEP</p>
+                <h2 id="next-title">
+                  Good things start<br />with being prepared.
+                </h2>
+                <p id="next-copy">
+                  Bring your experience into focus. Add your resume to your
+                  account and get ready for your next opportunity.
+                </p>
+                <a class="button" id="next-action" href="/resume/index.html"
+                  >Upload resume <span data-icon="arrow"></span
+                ></a>
+              </section>
+              <section class="panel">
+                <div class="setup-header">
+                  <h2>Your starting point</h2>
+                  <span id="setup-count">1 of 2 steps completed</span>
+                </div>
+                <progress
+                  id="setup-progress"
+                  max="2"
+                  value="1"
+                  aria-label="Account setup progress"
+                >
+                  1 of 2
+                </progress>
+                <div class="setup-step">
+                  <span class="step-icon complete" data-icon="check"></span>
+                  <div>
+                    <h3>Create your account</h3>
+                    <p>Your career workspace is ready.</p>
+                  </div>
+                  <span class="badge badge-success">Complete</span>
+                </div>
+                <div class="setup-step" id="resume-step">
+                  <span class="step-icon">2</span>
+                  <div>
+                    <h3>Add your resume</h3>
+                    <p>Upload a PDF of your experience.</p>
+                  </div>
+                  <a class="text-link" href="/resume/index.html"
+                    >Get started <span data-icon="arrow"></span
+                  ></a>
+                </div>
+                <p class="help-note">
+                  Setup progress reflects this sign-in. Earlier uploads are not
+                  included.
+                </p>
+              </section>
+            </div>
+            <div class="stack dashboard-secondary">
+              <section class="panel">
+                <div class="panel-heading">
+                  <h2>My account</h2>
+                  <span data-icon="user"></span>
+                </div>
+                <div class="account-summary" id="account-summary"></div>
+                <p>Your account details, all in one place.</p>
+                <a class="text-link" href="/profile/index.html"
+                  >View account <span data-icon="arrow"></span
+                ></a>
+              </section>
+              <section class="panel resume-summary">
+                <div class="panel-heading"><h2>My resume</h2></div>
+                <div id="resume-summary"></div>
+              </section>
+            </div>
+          </div>
+          <section class="roadmap">
+            <div class="roadmap-header">
+              <h2>More room to grow.</h2>
+              <span class="badge badge-upcoming">Coming later</span>
+            </div>
+            <div class="roadmap-grid">
+              <div class="roadmap-item">
+                <span data-icon="briefcase"></span>
+                <h3>Find your next role</h3>
+                <p>Explore opportunities that fit your direction.</p>
+              </div>
+              <div class="roadmap-item">
+                <span data-icon="file"></span>
+                <h3>Keep track of applications</h3>
+                <p>Follow every opportunity in one place.</p>
+              </div>
+              <div class="roadmap-item">
+                <span data-icon="building"></span>
+                <h3>Get to know employers</h3>
+                <p>Discover the teams behind the work.</p>
+              </div>
+            </div>
+          </section>
+          <footer class="workspace-footer">
+            <span>© 2026 CareerConnect</span
+            ><span>A considered next step.</span>
+          </footer>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>
