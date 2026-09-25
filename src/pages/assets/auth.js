@@ -6,13 +6,14 @@ const form = document.querySelector('[data-auth-form]');
 const signup = form.dataset.authForm === 'signup';
 const submit = form.querySelector('[type="submit"]');
 const notice = document.querySelector('#form-notice');
-const fields = [...form.querySelectorAll('input')];
+const fields = [...form.querySelectorAll('input[data-label]')];
 const originalButton = signup
   ? `Create account ${icon('arrow')}`
   : `Sign in ${icon('arrow')}`;
 
 function validationMessage(input) {
   const value = input.value;
+  if (!input.required && !value.trim()) return '';
   if (!value.trim()) return `${input.dataset.label} is required.`;
   if (
     input.name === 'email' &&
