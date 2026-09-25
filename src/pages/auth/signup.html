@@ -1,159 +1,113 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <!-- Standard metadata for character encoding and responsive layout -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <!-- Browser tab title -->
-    <title>Sign Up • CareerConnect</title>
-
-    <!-- Shared styles: base reset, reusable components, then page layout -->
-    <link rel="stylesheet" href="../../css/styles.css" />
+    <meta name="api-base" content="" />
+    <meta name="description" content="Create your CareerConnect account and begin organizing your career journey." />
+    <title>Create your account — CareerConnect</title>
+    <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../css/styles.css?v=3" />
+    <script src="../../js/site.js" defer></script>
+    <script src="../../js/api.js" defer></script>
+    <script src="../../js/auth.js" defer></script>
   </head>
+  <body class="auth-page" data-auth-page="signup">
+    <a class="skip-link" href="#auth-form">Skip to registration</a>
+    <div class="auth-shell">
+      <aside class="auth-story auth-story--signup" aria-label="CareerConnect introduction">
+        <a class="brand brand--inverse" href="../index/index.html" aria-label="CareerConnect home">
+          <span class="brand__mark" aria-hidden="true"><svg viewBox="0 0 40 36"><path d="M30.5 8.2a12.8 12.8 0 1 0 0 19.6"/><path d="M26.2 13a6.7 6.7 0 1 0 0 10"/></svg></span>
+          <span class="brand__name">CareerConnect</span>
+        </a>
 
-  <body>
-    <!-- Header: brand + quick navigation to log in -->
-    <header>
-      <div class="container">
-        <a href="../index/index.html" class="site-logo">CareerConnect</a>
-        <nav>
-          <a href="./login.html" class="action-button">Log In</a>
-        </nav>
-      </div>
-    </header>
-
-    <!-- Main: hero shell reused from landing page, with auth card content -->
-    <main>
-      <section class="hero">
-        <!-- Decorative background layer shown behind auth content -->
-        <div class="grid-wrapper">
-          <div class="grid-background"></div>
+        <div class="auth-story__content">
+          <span class="auth-story__kicker">Your career workspace</span>
+          <h1>Build momentum with everything in its place.</h1>
+          <p>Create a secure account, add your resume, and start shaping a more intentional job search.</p>
+          <ul class="auth-benefits">
+            <li><span><svg aria-hidden="true" viewBox="0 0 20 20"><path d="m4 10 4 4 8-8" /></svg></span><div><strong>Stay organized</strong><small>Keep important career materials together.</small></div></li>
+            <li><span><svg aria-hidden="true" viewBox="0 0 20 20"><path d="m4 10 4 4 8-8" /></svg></span><div><strong>Move with confidence</strong><small>Always know your next best action.</small></div></li>
+            <li><span><svg aria-hidden="true" viewBox="0 0 20 20"><path d="m4 10 4 4 8-8" /></svg></span><div><strong>Your data, protected</strong><small>Secure authentication keeps access personal.</small></div></li>
+          </ul>
         </div>
 
-        <!-- Foreground content container -->
-        <div class="container">
-          <!-- Sign-up panel/card -->
-          <div class="auth-panel">
-            <h1>Sign Up</h1>
-            <p class="auth-subtext">
-              Create your account to start connecting with your future career opportunities.
-            </p>
+        <p class="auth-story__footer">Designed for ambitious people building what comes next.</p>
+      </aside>
 
-            <!-- Hidden error box toggled by form validation/auth logic -->
-            <div class="auth-error" id="errorBox" hidden>
-              Please review the highlighted fields.
+      <main class="auth-main auth-main--signup">
+        <div class="auth-mobile-header">
+          <a class="brand" href="../index/index.html"><span class="brand__mark" aria-hidden="true"><svg viewBox="0 0 40 36"><path d="M30.5 8.2a12.8 12.8 0 1 0 0 19.6"/><path d="M26.2 13a6.7 6.7 0 1 0 0 10"/></svg></span><span class="brand__name">CareerConnect</span></a>
+        </div>
+
+        <section class="auth-card" aria-labelledby="signup-title">
+          <div class="auth-card__heading">
+            <span class="section-kicker">Get started</span>
+            <h2 id="signup-title">Create your account</h2>
+            <p>Build your personal career workspace in less than a minute.</p>
+          </div>
+
+          <div class="alert" id="formStatus" role="status" aria-live="polite" hidden></div>
+
+          <form id="auth-form" class="form-stack" novalidate>
+            <div class="form-field">
+              <label for="name">Full name</label>
+              <div class="input-wrap">
+                <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M4 21c1-5 4-7 8-7s7 2 8 7" /></svg>
+                <input id="name" type="text" name="name" placeholder="Your full name" autocomplete="name" maxlength="100" required aria-describedby="nameError" />
+              </div>
+              <span class="field-error" id="nameError"></span>
             </div>
 
-            <!-- Sign-up form with browser validation hints -->
-            <form id="signupForm" class="auth-form" novalidate>
-              <!-- Full name -->
-              <label class="auth-field">
-                <span>Full Name</span>
-                <input
-                  id="fullName"
-                  class="auth-input"
-                  type="text"
-                  name="fullName"
-                  placeholder="Jane Doe"
-                  autocomplete="name"
-                  required
-                />
-                <small id="nameHint" hidden>Please enter your full name.</small>
-              </label>
+            <div class="form-field">
+              <label for="email">Email address</label>
+              <div class="input-wrap">
+                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 6h18v12H3zM3 7l9 7 9-7" /></svg>
+                <input id="email" type="email" name="email" placeholder="you@example.com" autocomplete="email" required aria-describedby="emailError" />
+              </div>
+              <span class="field-error" id="emailError"></span>
+            </div>
 
-              <!-- Email -->
-              <label class="auth-field">
-                <span>Email</span>
-                <input
-                  id="email"
-                  class="auth-input"
-                  type="email"
-                  name="email"
-                  placeholder="name@example.com"
-                  autocomplete="email"
-                  required
-                />
-                <small id="emailHint" hidden>Please enter a valid email.</small>
-              </label>
-
-              <!-- Password -->
-              <label class="auth-field">
-                <span>Password</span>
-                <input
-                  id="password"
-                  class="auth-input"
-                  type="password"
-                  name="password"
-                  placeholder="••••••••"
-                  autocomplete="new-password"
-                  minlength="8"
-                  required
-                />
-                <small id="passHint" hidden
-                  >Password must be at least 8 characters.</small
-                >
-              </label>
-
-              <!-- Password confirmation -->
-              <label class="auth-field">
-                <span>Confirm Password</span>
-                <input
-                  id="confirmPassword"
-                  class="auth-input"
-                  type="password"
-                  name="confirmPassword"
-                  placeholder="••••••••"
-                  autocomplete="new-password"
-                  minlength="6"
-                  required
-                />
-                <small id="confirmHint" hidden>Passwords must match.</small>
-              </label>
-
-                <div>
-                  <label >
-                    <input type="radio" name="role" value="seeker" checked /> Job Seeker
-                  </label>
-                  <label >
-                    <input type="radio" name="role" value="recruiter"  /> Recruiter
-                  </label>
+            <div class="form-grid form-grid--two">
+              <div class="form-field">
+                <label for="password">Password</label>
+                <div class="input-wrap input-wrap--password">
+                  <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 11V8a5 5 0 0 1 10 0v3M5 11h14v10H5z" /></svg>
+                  <input id="password" type="password" name="password" placeholder="8+ characters" autocomplete="new-password" minlength="8" required aria-describedby="passwordError passwordHelp" />
+                  <button class="password-toggle" type="button" aria-label="Show password" data-password-toggle="password">
+                    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6S2 12 2 12Z" /><circle cx="12" cy="12" r="2.5" /></svg>
+                  </button>
                 </div>
+                <span class="field-error" id="passwordError"></span>
+              </div>
 
-                <!-- hidden by default, shown only when admin is selected -->
-                <div id="recruiterField" hidden>
-                  <input type="password" id="companyKey" placeholder="Company Secret Key" class="auth-input" />
+              <div class="form-field">
+                <label for="confirmPassword">Confirm password</label>
+                <div class="input-wrap input-wrap--password">
+                  <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 11V8a5 5 0 0 1 10 0v3M5 11h14v10H5z" /></svg>
+                  <input id="confirmPassword" type="password" name="confirmPassword" placeholder="Repeat password" autocomplete="new-password" minlength="8" required aria-describedby="confirmPasswordError" />
+                  <button class="password-toggle" type="button" aria-label="Show confirmation password" data-password-toggle="confirmPassword">
+                    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6S2 12 2 12Z" /><circle cx="12" cy="12" r="2.5" /></svg>
+                  </button>
                 </div>
+                <span class="field-error" id="confirmPasswordError"></span>
+              </div>
+            </div>
 
-              <!-- Primary action button -->
-              <button class="action-button action-button--full" type="submit">
-                Create Account
-              </button>
-            </form>
+            <div class="password-guidance" id="passwordHelp">
+              <span data-password-rule="length"><i></i>At least 8 characters</span>
+              <span data-password-rule="number"><i></i>Includes a number</span>
+            </div>
 
-            <!-- Secondary navigation for existing users -->
-            <p class="auth-subtext auth-subtext--small">
-              Already have an account? <a href="./login.html">Log in</a>
-            </p>
-          </div>
-        </div>
-      </section>
-    </main>
+            <button class="button button--primary button--full button--submit" type="submit">
+              <span data-button-label>Create my workspace</span><span class="button-spinner" aria-hidden="true"></span>
+            </button>
+          </form>
 
-    <!-- Footer: project attribution -->
-    <footer>
-      <div class="container">
-        <p>&copy; 2026 • SOEN 341 • Concordia University</p>
-      </div>
-    </footer>
-    <script>
-      // Toggle visibility of the recruiter field based on the selected role
-    document.querySelectorAll('input[name="role"]').forEach((radio) => {
-    radio.addEventListener('change', (e) => {
-      const recruiterField = document.getElementById('recruiterField');
-      recruiterField.hidden = e.target.value !== 'recruiter';
-    });
-  });
-</script>
+          <p class="auth-switch">Already have an account? <a href="./login.html">Sign in instead</a></p>
+          <p class="form-disclaimer">By creating an account, you agree to use CareerConnect responsibly.</p>
+        </section>
+      </main>
+    </div>
   </body>
 </html>

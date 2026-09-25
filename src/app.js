@@ -34,8 +34,10 @@ function createApp(database, options = {}) {
     createResumeRouter(database, { uploadDirectory: options.uploadDirectory })
   );
 
+  app.use('/assets', express.static(path.join(__dirname, 'assets')));
+  app.use('/css', express.static(path.join(__dirname, 'css')));
+  app.use('/js', express.static(path.join(__dirname, 'js')));
   app.use(express.static(path.join(__dirname, 'pages')));
-
 
   app.get('/', (request, response) => {
     response.sendFile(path.join(__dirname, 'pages', 'index', 'index.html'));

@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="api-base" content="" />
+    <meta name="description" content="Manage your CareerConnect resume and career workspace." />
+    <title>Your workspace — CareerConnect</title>
+    <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../css/styles.css?v=3" />
+    <script src="../../js/site.js" defer></script>
+    <script src="../../js/api.js" defer></script>
+    <script src="../../js/dashboard.js" defer></script>
+  </head>
+  <body class="dashboard-page">
+    <a class="skip-link" href="#workspace-main">Skip to workspace</a>
+
+    <header class="workspace-header">
+      <div class="workspace-header__brand">
+        <a class="brand" href="../index/index.html" aria-label="CareerConnect home">
+          <span class="brand__mark" aria-hidden="true"><svg viewBox="0 0 40 36"><path d="M30.5 8.2a12.8 12.8 0 1 0 0 19.6"/><path d="M26.2 13a6.7 6.7 0 1 0 0 10"/></svg></span><span class="brand__name">CareerConnect</span>
+        </a>
+      </div>
+      <div class="workspace-header__context"><span>Career workspace</span><span class="workspace-header__divider"></span><strong>Overview</strong></div>
+      <div class="workspace-header__account">
+        <a class="icon-button" href="../index/index.html" aria-label="Return to homepage">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 12 12 5l8 7M6 10v10h12V10" /></svg>
+        </a>
+        <div class="account-chip">
+          <span class="avatar" data-user-initials>CC</span>
+          <span><strong data-user-display>CareerConnect user</strong><small>Personal workspace</small></span>
+        </div>
+      </div>
+    </header>
+
+    <div class="workspace-shell">
+      <aside class="workspace-sidebar" aria-label="Workspace navigation">
+        <nav>
+          <a class="workspace-nav__item workspace-nav__item--active" href="#overview" aria-current="page">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z" /></svg><span>Overview</span>
+          </a>
+          <a class="workspace-nav__item" href="#resume-upload">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7zM14 3v5h5M10 13h5M10 17h5" /></svg><span>My resume</span>
+          </a>
+          <span class="workspace-nav__item workspace-nav__item--disabled" aria-disabled="true">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 19V9l8-5 8 5v10M8 19v-6h8v6" /></svg><span>Opportunities</span><em>Soon</em>
+          </span>
+          <span class="workspace-nav__item workspace-nav__item--disabled" aria-disabled="true">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 5h14v16H5zM8 3v4M16 3v4M8 11h8M8 15h5" /></svg><span>Applications</span><em>Soon</em>
+          </span>
+        </nav>
+
+        <div class="sidebar-support">
+          <span class="sidebar-support__icon"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM12 17v.01M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .8-1 1.7" /></svg></span>
+          <div><strong>Need a hand?</strong><p>Your workspace is designed to stay simple.</p></div>
+        </div>
+      </aside>
+
+      <main class="workspace-main" id="workspace-main">
+        <section class="workspace-intro" id="overview">
+          <div>
+            <span class="section-kicker">Your workspace</span>
+            <h1>Welcome back, <span data-user-first-name>there</span>.</h1>
+            <p>Keep your professional materials current and ready for the right opportunity.</p>
+          </div>
+          <div class="workspace-date"><span>Today</span><strong data-current-date>September 24, 2026</strong></div>
+        </section>
+
+        <section class="workspace-summary" aria-label="Workspace summary">
+          <article class="summary-card summary-card--accent">
+            <span class="summary-card__icon"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7zM14 3v5h5M10 13h5M10 17h5" /></svg></span>
+            <div><span>Resume status</span><strong data-resume-status>Ready to upload</strong></div>
+            <a href="#resume-upload" aria-label="Go to resume upload">→</a>
+          </article>
+          <article class="summary-card">
+            <span class="summary-card__icon summary-card__icon--green"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM8 12l3 3 5-6" /></svg></span>
+            <div><span>Account</span><strong>Secure and active</strong></div>
+          </article>
+          <article class="summary-card">
+            <span class="summary-card__icon summary-card__icon--slate"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3v18M3 12h18" /></svg></span>
+            <div><span>Next milestone</span><strong>Add your resume</strong></div>
+          </article>
+        </section>
+
+        <div class="workspace-content-grid">
+          <section class="workspace-card upload-card" id="resume-upload" aria-labelledby="resume-title">
+            <div class="workspace-card__heading">
+              <div><span class="section-kicker">Resume workspace</span><h2 id="resume-title">Add your professional resume</h2><p>Upload a polished PDF to keep your profile ready for future opportunities.</p></div>
+              <span class="secure-badge"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 5 3 8 7 10 4-2 7-5 7-10V6zM9 12l2 2 4-4" /></svg>Secure upload</span>
+            </div>
+
+            <div class="alert" id="uploadStatus" role="status" aria-live="polite" hidden></div>
+
+            <form id="resumeForm" novalidate>
+              <label class="drop-zone" id="dropZone" for="resumeFile">
+                <input id="resumeFile" name="resume" type="file" accept="application/pdf,.pdf" />
+                <span class="drop-zone__icon"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 16V4m0 0L7 9m5-5 5 5M5 15v5h14v-5" /></svg></span>
+                <strong>Drop your resume here</strong>
+                <span>or <u>browse your files</u></span>
+                <small>PDF only · Maximum file size 5 MB</small>
+              </label>
+
+              <div class="selected-file" id="selectedFile" hidden>
+                <span class="selected-file__type">PDF</span>
+                <div><strong data-file-name>resume.pdf</strong><small data-file-size>0 KB</small></div>
+                <button type="button" class="icon-button" data-remove-file aria-label="Remove selected file">
+                  <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" /></svg>
+                </button>
+              </div>
+
+              <div class="upload-actions">
+                <p><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 5 3 8 7 10 4-2 7-5 7-10V6z" /></svg>Your file is associated only with your authenticated account.</p>
+                <button class="button button--primary" id="uploadButton" type="submit" disabled>
+                  <span data-button-label>Upload resume</span><span class="button-spinner" aria-hidden="true"></span>
+                </button>
+              </div>
+            </form>
+
+            <article class="uploaded-resume" id="uploadedResume" hidden>
+              <div class="uploaded-resume__icon"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7zM14 3v5h5M10 13h5M10 17h4" /></svg></div>
+              <div><span>Uploaded resume</span><strong data-uploaded-name></strong><small data-uploaded-time></small></div>
+              <span class="status-pill"><span></span> Ready</span>
+            </article>
+          </section>
+
+          <aside class="workspace-side-stack">
+            <section class="workspace-card readiness-card">
+              <div class="readiness-ring" aria-label="Profile readiness: 60 percent"><span>60<small>%</small></span></div>
+              <div><span class="section-kicker">Profile readiness</span><h2>A strong start</h2><p>Upload your resume to complete the foundation of your CareerConnect profile.</p></div>
+              <ul><li class="is-complete">Account created</li><li class="is-complete">Secure access enabled</li><li data-resume-check>Resume uploaded</li></ul>
+            </section>
+
+            <section class="workspace-card privacy-card">
+              <span class="privacy-card__icon"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 5 3 8 7 10 4-2 7-5 7-10V6zM9 12l2 2 4-4" /></svg></span>
+              <div><h3>Your privacy matters</h3><p>Resume files are validated and stored under a unique filename tied to your authenticated account.</p></div>
+            </section>
+          </aside>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>
