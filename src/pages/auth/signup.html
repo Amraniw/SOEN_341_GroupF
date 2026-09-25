@@ -10,6 +10,7 @@
     <title>Create account | CareerConnect</title>
     <link rel="icon" href="/assets/brand.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/assets/styles.css" />
+    <link rel="stylesheet" href="/assets/role.css" />
     <script type="module" src="/assets/auth.js"></script>
   </head>
   <body>
@@ -124,6 +125,40 @@
                 spellcheck="false"
               /><span class="field-error" id="email-error"></span>
             </div>
+
+            <fieldset class="form-field">
+              <legend>I am a</legend>
+              <div class="role-options">
+                <label class="role-option"
+                  ><input
+                    type="radio"
+                    name="role"
+                    value="seeker"
+                    checked
+                  />Job Seeker</label
+                ><label class="role-option"
+                  ><input
+                    type="radio"
+                    name="role"
+                    value="recruiter"
+                  />Recruiter</label
+                >
+              </div>
+            </fieldset>
+
+            <div class="form-field" id="recruiterField" hidden>
+              <label for="companyName">Company name</label
+              ><input
+                id="companyName"
+                name="companyName"
+                type="text"
+                autocomplete="organization"
+                data-label="Company name"
+                aria-describedby="companyName-error"
+                maxlength="100"
+              /><span class="field-error" id="companyName-error"></span>
+            </div>
+
             <div class="form-field">
               <label for="password">Password</label>
               <div class="password-control">
@@ -193,5 +228,35 @@
         </div>
       </main>
     </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const recruiterField = document.getElementById("recruiterField");
+        const companyNameInput = document.getElementById("companyName");
+
+        function syncRecruiterField(role) {
+          const isRecruiter = role === "recruiter";
+          recruiterField.hidden = !isRecruiter;
+          companyNameInput.required = isRecruiter;
+          if (!isRecruiter) {
+            companyNameInput.value = "";
+          }
+        }
+
+        document
+          .querySelectorAll('input[name="role"]')
+          .forEach((radio) => {
+            radio.addEventListener("change", (e) => {
+              syncRecruiterField(e.target.value);
+            });
+          });
+
+        // Set initial state in case a role was pre-selected (e.g. back/forward nav)
+        const checkedRole = document.querySelector(
+          'input[name="role"]:checked'
+        );
+        if (checkedRole) syncRecruiterField(checkedRole.value);
+      });
+    </script>
   </body>
 </html>

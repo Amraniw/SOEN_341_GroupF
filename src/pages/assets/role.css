@@ -1,0 +1,48 @@
+fieldset.form-field {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+fieldset.form-field legend {
+  padding: 0;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--ink);
+}
+
+.role-options {
+  display: flex;
+  gap: 20px;
+}
+
+.role-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.role-option input[type='radio'] {
+  width: 17px;
+  height: 17px;
+  margin: 0;
+  accent-color: var(--brand);
+  cursor: pointer;
+  transition: box-shadow var(--motion-fast) var(--ease-standard);
+}
+
+.role-option input[type='radio']:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgb(23 100 87 / 10%);
+  border-radius: 50%;
+}
+
+.role-option:hover {
+  color: var(--brand);
+}
