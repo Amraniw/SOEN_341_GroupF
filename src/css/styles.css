@@ -55,10 +55,11 @@ button { border: 0; }
 
 /* Brand and buttons */
 .brand { display: inline-flex; align-items: center; gap: 10px; min-width: max-content; }
-.brand__mark { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 10px 10px 10px 3px; color: white; background: var(--brand-600); font-size: 18px; font-weight: 800; letter-spacing: -0.04em; box-shadow: 0 7px 18px rgba(54, 89, 227, 0.24); }
+.brand__mark { display: grid; width: 38px; height: 34px; place-items: center; color: var(--brand-600); }
+.brand__mark svg { width: 100%; height: 100%; overflow: visible; fill: none; stroke: currentColor; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
 .brand__name { color: var(--ink-950); font-size: 18px; font-weight: 760; letter-spacing: -0.035em; }
 .brand--inverse .brand__name, .brand--footer .brand__name { color: white; }
-.brand--inverse .brand__mark, .brand--footer .brand__mark { color: var(--ink-950); background: white; box-shadow: none; }
+.brand--inverse .brand__mark, .brand--footer .brand__mark { color: white; }
 .button { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 9px; padding: 10px 18px; border: 1px solid transparent; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 700; line-height: 1.2; transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease, border-color 160ms ease, color 160ms ease; }
 .button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .button:hover:not(:disabled) { transform: translateY(-1px); }
@@ -117,7 +118,8 @@ button { border: 0; }
 .avatar--small { width: 27px; height: 27px; justify-self: end; font-size: 9px; }
 .product-window__body { display: grid; grid-template-columns: 54px 1fr; min-height: 396px; }
 .product-sidebar { display: flex; flex-direction: column; align-items: center; gap: 18px; padding-top: 17px; border-right: 1px solid #e9ecf1; background: #f8f9fb; }
-.mini-brand { display: grid; width: 27px; height: 27px; margin-bottom: 10px; place-items: center; border-radius: 8px 8px 8px 3px; color: white; background: var(--brand-600); font-size: 11px; font-weight: 800; }
+.mini-brand { display: grid; width: 27px; height: 27px; margin-bottom: 10px; place-items: center; color: var(--brand-600); }
+.mini-brand svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
 .mini-nav { width: 17px; height: 17px; border: 2px solid #bdc5d1; border-radius: 5px; }
 .mini-nav--active { border-color: var(--brand-600); background: var(--brand-100); }
 .product-content { padding: 28px 26px; background: #fcfdff; }
@@ -479,7 +481,7 @@ button { border: 0; }
   .shell { width: min(calc(100% - 28px), var(--shell)); }
   .site-header__inner { min-height: 64px; }
   .brand__name { font-size: 16px; }
-  .brand__mark { width: 32px; height: 32px; }
+  .brand__mark { width: 35px; height: 32px; }
   .site-nav { top: 64px; }
   .hero-section { padding: 56px 0 65px; }
   .hero-copy h1 { font-size: 43px; }
