@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="CareerConnect — your professional account and resume, in one career workspace."
+    />
+    <title>Create account | CareerConnect</title>
+    <link rel="icon" href="/assets/brand.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/assets/styles.css" />
+    <script type="module" src="/assets/auth.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="public-header">
+      <div class="container">
+        <a class="brand" href="/index.html"
+          ><img
+            src="/assets/brand.svg"
+            width="36"
+            height="36"
+            alt=""
+          />CareerConnect<span class="brand-dot">.</span></a
+        ><a class="text-link header-actions" href="/index.html"
+          >Back to home <span data-icon="arrow"></span
+        ></a>
+      </div>
+    </header>
+    <div class="auth-layout">
+      <aside class="auth-aside">
+        <div>
+          <p class="eyebrow">A PLACE FOR YOUR NEXT CHAPTER</p>
+          <h2>
+            Your experience.<br />Your ambitions.<br />One place to begin.
+          </h2>
+          <p>
+            Bring your career essentials together, starting with your account
+            and resume.
+          </p>
+          <div class="auth-journey" aria-label="Career essentials: step 1 of 2">
+            <p class="journey-label">CAREER ESSENTIALS <span>01 / 02</span></p>
+            <ol>
+              <li class="is-current">
+                <span class="journey-number">01</span
+                ><span class="journey-copy"
+                  ><strong>Account</strong
+                  ><small>Create your professional identity</small></span
+                ><span class="journey-status">Current</span>
+              </li>
+              <li>
+                <span class="journey-number">02</span
+                ><span class="journey-copy"
+                  ><strong>Resume</strong
+                  ><small>Add your experience</small></span
+                ><span class="journey-status">Next</span>
+              </li>
+            </ol>
+          </div>
+        </div>
+        <div class="auth-aside-footer">
+          Built for professionals.<br />Designed around your next step.
+        </div>
+      </aside>
+      <main class="auth-main" id="main" tabindex="-1">
+        <div class="auth-content">
+          <div
+            class="auth-mobile-progress"
+            aria-label="Step 1 of 2: Account, then Resume"
+          >
+            <strong>1&nbsp; Account</strong><span aria-hidden="true">→</span
+            ><span>2&nbsp; Resume</span>
+          </div>
+          <p class="eyebrow">START WITH THE ESSENTIALS</p>
+          <h1>Create your account</h1>
+          <p>A few details now. A foundation for what comes next.</p>
+          <noscript
+            ><p class="noscript-message">
+              Enable JavaScript to use this form.
+            </p></noscript
+          >
+          <div class="notice-region">
+            <div
+              id="form-notice"
+              role="alert"
+              aria-live="polite"
+              tabindex="-1"
+              hidden
+            ></div>
+          </div>
+          <form
+            class="auth-form"
+            data-auth-form="signup"
+            method="post"
+            action="/api/register"
+            novalidate
+          >
+            <div class="form-field">
+              <label for="name">Full name</label
+              ><input
+                id="name"
+                name="name"
+                type="text"
+                autocomplete="name"
+                data-label="Full name"
+                required
+                aria-describedby="name-error"
+                maxlength="100"
+              /><span class="field-error" id="name-error"></span>
+            </div>
+            <div class="form-field">
+              <label for="email">Email address</label
+              ><input
+                id="email"
+                name="email"
+                type="email"
+                autocomplete="email"
+                data-label="Email address"
+                required
+                aria-describedby="email-error"
+                maxlength="254"
+                autocapitalize="none"
+                spellcheck="false"
+              /><span class="field-error" id="email-error"></span>
+            </div>
+            <div class="form-field">
+              <label for="password">Password</label>
+              <div class="password-control">
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autocomplete="new-password"
+                  data-label="Password"
+                  required
+                  aria-describedby="password-error password-hint"
+                /><button
+                  class="password-toggle"
+                  type="button"
+                  data-toggle-password="password"
+                  aria-label="Show password"
+                  aria-pressed="false"
+                >
+                  Show
+                </button>
+              </div>
+              <small
+                class="password-requirement"
+                id="password-hint"
+                data-password-requirement
+                ><span class="requirement-mark" aria-hidden="true">○</span
+                ><span>At least 8 characters</span></small
+              ><span class="field-error" id="password-error"></span>
+            </div>
+            <div class="form-field">
+              <label for="confirm">Confirm password</label>
+              <div class="password-control">
+                <input
+                  id="confirm"
+                  name="confirm"
+                  type="password"
+                  autocomplete="new-password"
+                  data-label="Confirm password"
+                  required
+                  aria-describedby="confirm-error"
+                /><button
+                  class="password-toggle"
+                  type="button"
+                  data-toggle-password="confirm"
+                  aria-label="Show confirm password"
+                  aria-pressed="false"
+                >
+                  Show
+                </button>
+              </div>
+              <span class="field-error" id="confirm-error"></span>
+            </div>
+            <button type="submit" class="button button-wide">
+              Create account <span data-icon="arrow"></span>
+            </button>
+          </form>
+          <p class="auth-security">
+            <span data-icon="lock"></span>Your password is never stored in this
+            browser by CareerConnect.
+          </p>
+          <div class="auth-bottom">
+            Already have an account?
+            <a class="text-link" href="/auth/login.html"
+              >Sign in <span data-icon="arrow"></span
+            ></a>
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

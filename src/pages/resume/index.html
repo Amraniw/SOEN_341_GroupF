@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="CareerConnect — your professional account and resume, in one career workspace."
+    />
+    <title>Resume | CareerConnect</title>
+    <link rel="icon" href="/assets/brand.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/assets/styles.css" />
+    <script type="module" src="/assets/resume.js"></script>
+  </head>
+  <body data-page="resume">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <noscript
+      ><p class="noscript-message">
+        JavaScript is required to open your workspace. Enable it, then
+        <a href="/auth/login.html">sign in</a>.
+      </p></noscript
+    >
+    <div data-workspace hidden>
+      <header class="workspace-header" id="workspace-header"></header>
+      <div class="workspace-layout">
+        <aside
+          class="workspace-sidebar"
+          id="workspace-sidebar"
+          aria-label="Workspace navigation"
+        ></aside>
+        <main class="workspace-main" id="main" tabindex="-1">
+          <div class="breadcrumb">
+            <a href="/dashboard/index.html">Workspace</a
+            ><span aria-hidden="true">/</span><span>Resume</span>
+          </div>
+
+          <div class="page-heading page-heading-row">
+            <div>
+              <h1>Your experience, on file.</h1>
+              <p>Keep your resume ready for future applications.</p>
+            </div>
+            <span class="badge badge-neutral">PDF · Up to 5 MB</span>
+          </div>
+          <div class="content-grid">
+            <div class="stack">
+              <section class="panel">
+                <div class="panel-heading">
+                  <h2>Upload resume</h2>
+                  <span data-icon="file"></span>
+                </div>
+                <div id="upload-notice" role="alert" tabindex="-1" hidden></div>
+                <form id="resume-form">
+                  <div
+                    class="drop-zone"
+                    id="drop-zone"
+                    data-upload-state="empty"
+                  >
+                    <span class="icon-tile" data-icon="upload"></span>
+                    <h3>Give your experience a home.</h3>
+                    <p id="file-help">
+                      Drop one PDF here, or choose a file.<br />PDF format only.
+                      Maximum file size: 5 MB.
+                    </p>
+                    <label class="file-picker"
+                      ><span class="button button-secondary"
+                        >Choose PDF <span data-icon="file"></span></span
+                      ><input
+                        id="resume-file"
+                        type="file"
+                        accept=".pdf,application/pdf"
+                        aria-label="Choose resume PDF"
+                        aria-describedby="file-help"
+                    /></label>
+                  </div>
+                  <div class="selected-file" id="selected-file" hidden></div>
+                  <div
+                    class="upload-progress"
+                    id="upload-progress"
+                    role="status"
+                    aria-live="polite"
+                    hidden
+                  >
+                    <span></span><span>Uploading securely…</span>
+                  </div>
+                  <span
+                    id="selection-status"
+                    class="sr-only"
+                    role="status"
+                  ></span>
+                  <div class="upload-actions">
+                    <button
+                      type="submit"
+                      id="upload-button"
+                      class="button"
+                      disabled
+                    >
+                      <span data-icon="upload"></span>Upload resume
+                    </button>
+                  </div>
+                </form>
+                <p class="help-note">
+                  Each upload saves a separate copy to your account. Replacing,
+                  downloading, and deleting uploaded files are not available
+                  yet.
+                </p>
+              </section>
+              <section class="panel receipts-panel">
+                <div class="panel-heading">
+                  <h2>Upload confirmations</h2>
+                  <span class="badge badge-neutral">This sign-in</span>
+                </div>
+                <p>
+                  Receipts for uploads made during this sign-in. Previously
+                  uploaded files cannot be retrieved in this release.
+                </p>
+                <div class="empty-state" id="receipt-empty">
+                  <span class="icon-tile" data-icon="file"></span>
+                  <div>
+                    <h3>No uploads in this sign-in</h3>
+                    <p>
+                      Choose your resume above. Your confirmation will appear
+                      here after it is uploaded.
+                    </p>
+                  </div>
+                </div>
+                <ul
+                  class="receipt-list"
+                  id="receipt-list"
+                  aria-label="Confirmed uploads"
+                ></ul>
+              </section>
+            </div>
+            <aside class="panel">
+              <p class="eyebrow">BEFORE YOU UPLOAD</p>
+              <h2>Make a clear impression.</h2>
+              <ul class="upload-guidance">
+                <li>
+                  <span data-icon="check"></span>
+                  <div>
+                    <strong>Keep it current</strong>
+                    <p>
+                      Include your latest experience and up-to-date contact
+                      details.
+                    </p>
+                  </div>
+                </li>
+                <li>
+                  <span data-icon="check"></span>
+                  <div>
+                    <strong>Give it a clear name</strong>
+                    <p>
+                      A filename like Firstname_Lastname_Resume.pdf is easy to
+                      recognize.
+                    </p>
+                  </div>
+                </li>
+                <li>
+                  <span data-icon="check"></span>
+                  <div>
+                    <strong>Review your PDF</strong>
+                    <p>
+                      Check that the text is readable and the layout looks as
+                      expected.
+                    </p>
+                  </div>
+                </li>
+              </ul>
+            </aside>
+          </div>
+          <footer class="workspace-footer">
+            <span>© 2026 CareerConnect</span
+            ><span>A considered next step.</span>
+          </footer>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>
