@@ -1,68 +1,211 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <!-- Standard document metadata for encoding + responsive scaling -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <!-- Browser tab title -->
-    <title>CareerConnect</title>
-
-    <!-- CSS load order: base resets, reusable components, then page layout -->
+    <meta name="description" content="CareerConnect helps ambitious professionals organize their job search, manage resumes, and move forward with clarity." />
+    <title>CareerConnect — Your career, clearly organized</title>
+    <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="../../css/styles.css" />
-   
+    <script src="../../js/site.js" defer></script>
   </head>
-  <body>
-    <!-- Header: branding + primary navigation actions -->
-    <header>
-      <div class="container">
-        <!-- Brand / home link -->
-        <a href="./index.html" class="site-logo">CareerConnect</a>
+  <body class="landing-page">
+    <a class="skip-link" href="#main-content">Skip to content</a>
 
-        <!-- Entry-point actions for auth -->
-        <nav>
-          <a href="../auth/login.html" class="action-button">Log In</a>
-          <a href="../auth/signup.html" class="action-button">Sign Up</a>
+    <header class="site-header" data-site-header>
+      <div class="shell site-header__inner">
+        <a class="brand" href="./index.html" aria-label="CareerConnect home">
+          <span class="brand__mark" aria-hidden="true">C</span>
+          <span class="brand__name">CareerConnect</span>
+        </a>
+
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" data-menu-toggle>
+          <span class="sr-only">Open navigation</span>
+          <span></span><span></span><span></span>
+        </button>
+
+        <nav class="site-nav" id="primary-navigation" aria-label="Primary navigation" data-site-nav>
+          <a href="#platform">Platform</a>
+          <a href="#how-it-works">How it works</a>
+          <a href="#why-careerconnect">Why CareerConnect</a>
         </nav>
+
+        <div class="site-header__actions">
+          <a class="button button--quiet" href="../auth/login.html">Log in</a>
+          <a class="button button--primary button--small" href="../auth/signup.html">Create account</a>
+        </div>
       </div>
     </header>
 
-    <!-- Main: hero card with rotating tagline + primary CTA -->
-    <main>
-      <section class="hero">
-        <!-- Decorative background layer for the hero (sits behind all hero content) -->
-        <div class="grid-wrapper">
-          <!-- Grid pattern element rendered inside the background layer -->
-          <div class="grid-background"></div>
+    <main id="main-content">
+      <section class="hero-section">
+        <div class="hero-orb hero-orb--one" aria-hidden="true"></div>
+        <div class="hero-orb hero-orb--two" aria-hidden="true"></div>
+        <div class="shell hero-layout">
+          <div class="hero-copy">
+            <div class="eyebrow"><span class="eyebrow__dot" aria-hidden="true"></span>Built for focused career growth</div>
+            <h1>Turn your job search into a clear path forward.</h1>
+            <p class="hero-copy__lead">CareerConnect brings your profile, resumes, opportunities, and progress into one thoughtfully organized workspace.</p>
+            <div class="hero-actions">
+              <a class="button button--primary button--large" href="../auth/signup.html">
+                Start building your future
+                <svg aria-hidden="true" viewBox="0 0 20 20"><path d="M4 10h11M11 6l4 4-4 4" /></svg>
+              </a>
+              <a class="button button--secondary button--large" href="#platform">Explore platform</a>
+            </div>
+            <div class="hero-proof" aria-label="CareerConnect benefits">
+              <div><svg aria-hidden="true" viewBox="0 0 20 20"><path d="m4 10 4 4 8-8" /></svg>One organized workspace</div>
+              <div><svg aria-hidden="true" viewBox="0 0 20 20"><path d="m4 10 4 4 8-8" /></svg>Private by design</div>
+            </div>
+          </div>
+
+          <div class="hero-product" aria-label="CareerConnect workspace preview">
+            <div class="product-window">
+              <div class="product-window__topbar">
+                <div class="window-controls" aria-hidden="true"><span></span><span></span><span></span></div>
+                <div class="product-window__label">Career workspace</div>
+                <div class="avatar avatar--small">WA</div>
+              </div>
+              <div class="product-window__body">
+                <aside class="product-sidebar" aria-hidden="true">
+                  <div class="mini-brand">C</div><span class="mini-nav mini-nav--active"></span><span class="mini-nav"></span><span class="mini-nav"></span><span class="mini-nav"></span>
+                </aside>
+                <div class="product-content">
+                  <div class="product-greeting">
+                    <div><span class="mock-label">YOUR WORKSPACE</span><h2>Good morning, Wassim.</h2></div>
+                    <span class="status-pill"><span></span> Profile active</span>
+                  </div>
+                  <div class="metric-grid">
+                    <article class="metric-card">
+                      <span class="metric-card__icon metric-card__icon--blue"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7zM14 3v5h5M10 13h5M10 17h5" /></svg></span>
+                      <div><strong>1</strong><span>Resume ready</span></div>
+                    </article>
+                    <article class="metric-card">
+                      <span class="metric-card__icon metric-card__icon--green"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 19V9l8-5 8 5v10M8 19v-6h8v6" /></svg></span>
+                      <div><strong>12</strong><span>Saved roles</span></div>
+                    </article>
+                    <article class="metric-card">
+                      <span class="metric-card__icon metric-card__icon--amber"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 18V9m6 9V5m6 13v-7m4 7H2" /></svg></span>
+                      <div><strong>4</strong><span>In progress</span></div>
+                    </article>
+                  </div>
+                  <div class="mock-workspace-grid">
+                    <article class="resume-preview-card">
+                      <div class="card-heading">
+                        <div><span class="mock-label">PRIMARY RESUME</span><h3>Wassim_Resume.pdf</h3></div>
+                        <span class="document-icon"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7zM14 3v5h5M10 13h5M10 17h4" /></svg></span>
+                      </div>
+                      <div class="resume-status-row"><span>Ready to share</span><strong>PDF · 842 KB</strong></div>
+                      <div class="progress-track"><span></span></div>
+                    </article>
+                    <article class="next-step-card">
+                      <span class="mock-label">NEXT STEP</span><h3>Keep your profile current</h3>
+                      <p>Your resume is ready. Add opportunities when you find the right fit.</p>
+                      <span class="text-link">View workspace <span>→</span></span>
+                    </article>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="floating-card floating-card--resume">
+              <span class="floating-card__icon"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 16V4m0 0L7 9m5-5 5 5M5 15v5h14v-5" /></svg></span>
+              <span><strong>Resume uploaded</strong><small>Securely saved</small></span>
+              <svg class="floating-check" aria-hidden="true" viewBox="0 0 20 20"><path d="m4 10 4 4 8-8" /></svg>
+            </div>
+          </div>
         </div>
-        <div class="container">
-          <!-- Primary product heading -->
-          <h1>CareerConnect</h1>
+      </section>
 
-           <!-- Rotating tagline area (two lines animate in the same position) -->
-          <div class="hero-tagline-rotator" aria-live="polite">
-            <p class="hero-tagline hero-tagline-first">Connect To Your Future</p>
-            <p class="hero-tagline hero-tagline-second">
-              Find Your Dream Career
-            </p>
+      <section class="trust-strip" aria-label="Platform qualities">
+        <div class="shell trust-strip__inner">
+          <p>One focused platform for every step of your search</p>
+          <div class="trust-items"><span>Organized</span><span>Secure</span><span>Candidate-first</span><span>Built for progress</span></div>
+        </div>
+      </section>
+
+      <section class="section" id="platform">
+        <div class="shell">
+          <div class="section-heading section-heading--centered">
+            <span class="section-kicker">A smarter foundation</span>
+            <h2>Everything important, finally in one place.</h2>
+            <p>Less time managing scattered files and tabs. More time making thoughtful career moves.</p>
           </div>
-
-
-          <!-- Main call-to-action row -->
-          <div class="hero-cta-row">
-            <a href="../auth/signup.html" class="action-button"
-              >Get Started</a
-            >
+          <div class="feature-grid">
+            <article class="feature-card feature-card--large">
+              <div class="feature-icon"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7zM14 3v5h5M10 13h5M10 17h5" /></svg></div>
+              <span class="feature-card__tag">Resume workspace</span>
+              <h3>Your strongest story, ready when opportunity calls.</h3>
+              <p>Upload and securely organize your professional resume in a dedicated career workspace.</p>
+              <div class="feature-visual feature-visual--document" aria-hidden="true">
+                <div class="document-sheet"><span class="document-sheet__avatar"></span><div><i></i><i></i><i></i></div><b></b><b></b><b></b><b></b></div>
+                <span class="document-badge">PDF</span>
+              </div>
+            </article>
+            <article class="feature-card">
+              <div class="feature-icon feature-icon--green"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM8 12l3 3 5-6" /></svg></div>
+              <span class="feature-card__tag">Confident access</span><h3>A secure account that keeps your work connected.</h3>
+              <p>Simple registration and protected sign-in keep your career information tied to you.</p>
+            </article>
+            <article class="feature-card">
+              <div class="feature-icon feature-icon--amber"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 18V9m6 9V5m6 13v-7m4 7H2" /></svg></div>
+              <span class="feature-card__tag">Progress visibility</span><h3>See momentum, not just another to-do list.</h3>
+              <p>A calm dashboard makes the next meaningful action obvious as your search evolves.</p>
+            </article>
           </div>
+        </div>
+      </section>
+
+      <section class="section section--tinted" id="how-it-works">
+        <div class="shell process-layout">
+          <div class="section-heading">
+            <span class="section-kicker">Designed around you</span><h2>From first sign-in to your next opportunity.</h2>
+            <p>CareerConnect keeps the essential workflow straightforward, so you can focus on the decisions that matter.</p>
+            <a class="text-button" href="../auth/signup.html">Create your workspace <span>→</span></a>
+          </div>
+          <ol class="process-list">
+            <li><span class="process-number">01</span><div><h3>Create your account</h3><p>Set up a secure personal workspace in moments.</p></div></li>
+            <li><span class="process-number">02</span><div><h3>Upload your resume</h3><p>Add a polished PDF and keep it connected to your profile.</p></div></li>
+            <li><span class="process-number">03</span><div><h3>Build your momentum</h3><p>Return to one organized place as your career search grows.</p></div></li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="section" id="why-careerconnect">
+        <div class="shell values-layout">
+          <div class="values-panel">
+            <span class="section-kicker section-kicker--light">Why CareerConnect</span><h2>Your career data deserves a workspace built with care.</h2>
+            <p>Clear information architecture, thoughtful privacy, and focused tools make every interaction feel purposeful.</p>
+            <div class="values-stats"><div><strong>5 MB</strong><span>Secure PDF uploads</span></div><div><strong>24/7</strong><span>Your workspace, ready</span></div><div><strong>1 place</strong><span>For your career journey</span></div></div>
+          </div>
+          <div class="values-list">
+            <article><span>01</span><div><h3>Focused by default</h3><p>No noisy feeds or distractions—only the tools that move your search forward.</p></div></article>
+            <article><span>02</span><div><h3>Trust at every step</h3><p>Your account and resume are protected through secure authentication and validation.</p></div></article>
+            <article><span>03</span><div><h3>Built to grow with you</h3><p>A clear foundation for applications, opportunities, and future career intelligence.</p></div></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="closing-section">
+        <div class="shell closing-card">
+          <div><span class="section-kicker section-kicker--light">Your next chapter</span><h2>Move forward with clarity.</h2><p>Create your CareerConnect workspace and keep your next opportunity within reach.</p></div>
+          <a class="button button--light button--large" href="../auth/signup.html">Get started free<svg aria-hidden="true" viewBox="0 0 20 20"><path d="M4 10h11M11 6l4 4-4 4" /></svg></a>
         </div>
       </section>
     </main>
 
-    <!-- Footer: project attribution -->
-    <footer>
-      <div class="container">
-        <p>&copy; 2026 • SOEN341 • Concordia University</p>
+    <footer class="site-footer">
+      <div class="shell site-footer__main">
+        <div>
+          <a class="brand brand--footer" href="./index.html"><span class="brand__mark" aria-hidden="true">C</span><span class="brand__name">CareerConnect</span></a>
+          <p>A clearer way to manage the work behind your next career move.</p>
+        </div>
+        <div class="footer-links">
+          <div><strong>Platform</strong><a href="#platform">Features</a><a href="#how-it-works">How it works</a></div>
+          <div><strong>Account</strong><a href="../auth/login.html">Log in</a><a href="../auth/signup.html">Create account</a></div>
+          <div><strong>Project</strong><span>SOEN 341</span><span>Concordia University</span></div>
+        </div>
       </div>
+      <div class="shell site-footer__bottom"><p>© <span data-current-year>2026</span> CareerConnect. Built with purpose in Montréal.</p><p>Professional opportunity, thoughtfully organized.</p></div>
     </footer>
   </body>
 </html>
