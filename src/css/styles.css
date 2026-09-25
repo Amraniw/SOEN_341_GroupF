@@ -354,7 +354,7 @@ button { border: 0; }
 .summary-card__icon--slate { color: var(--ink-600); background: var(--surface-tint); }
 .summary-card__icon svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; }
 .summary-card div { min-width: 0; flex: 1; }
-.summary-card span, .summary-card strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.summary-card div span, .summary-card strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .summary-card div span { margin-bottom: 4px; color: var(--ink-400); font-size: 9px; text-transform: uppercase; letter-spacing: 0.07em; }
 .summary-card strong { color: var(--ink-800); font-size: 13px; }
 .summary-card > a { display: grid; width: 28px; height: 28px; place-items: center; border-radius: 8px; color: var(--brand-700); background: var(--brand-100); font-weight: 800; }
