@@ -219,4 +219,193 @@ describe('Feature 2: Resume upload', () => {
     assert.equal(loginResponse.body.message, 'Login successful.');
     assert.ok(loginResponse.headers['set-cookie']);
   });
+
+  test('11. current resume endpoint returns an empty state for a new user', async () => {
+    const { agent } = await createLoggedInAgent();
+
+    const response = await agent.get('/api/resumes/current');
+
+    assert.equal(response.status, 200);
+    assert.equal(response.body.resume, null);
+  });
+
+  test('12. current resume endpoint restores the latest uploaded resume', async () => {
+    const { agent } = await createLoggedInAgent();
+
+    await agent
+      .post('/api/resumes')
+      .attach('resume', validPdf, {
+        filename: 'first.pdf',
+        contentType: 'application/pdf',
+      })
+      .expect(201);
+    const latestUpload = await agent
+      .post('/api/resumes')
+      .attach('resume', validPdf, {
+        filename: 'latest.pdf',
+        contentType: 'application/pdf',
+      })
+      .expect(201);
+
+    const response = await agent.get('/api/resumes/current');
+
+    assert.equal(response.status, 200);
+    assert.equal(response.body.resume.id, latestUpload.body.resume.id);
+    assert.equal(response.body.resume.originalName, 'latest.pdf');
+    assert.ok(response.body.resume.uploadedAt);
+    assert.equal(response.body.resume.storedName, undefined);
+  });
+
+  test('13. current resume endpoint requires authentication', async () => {
+    const response = await request(app).get('/api/resumes/current');
+
+    assert.equal(response.status, 401);
+    assert.equal(response.body.error, 'Authentication required.');
+  });
+
+  test('14. users cannot read another account resume', async () => {
+    const { agent: firstAgent } = await createLoggedInAgent();
+    await firstAgent
+      .post('/api/resumes')
+      .attach('resume', validPdf, {
+        filename: 'private-resume.pdf',
+        contentType: 'application/pdf',
+      })
+      .expect(201);
+
+    const secondAgent = request.agent(app);
+    await secondAgent.post('/api/register').send({
+      name: 'Second User',
+      email: 'second@example.com',
+      password: 'SecondPass123',
+    }).expect(201);
+    await secondAgent.post('/api/login').send({
+      email: 'second@example.com',
+      password: 'SecondPass123',
+    }).expect(200);
+
+    const response = await secondAgent.get('/api/resumes/current');
+
+    assert.equal(response.status, 200);
+    assert.equal(response.body.resume, null);
+  });
+
+  test('15. deleting a resume removes its metadata and physical file', async () => {
+    const { agent } = await createLoggedInAgent();
+    await agent
+      .post('/api/resumes')
+      .attach('resume', validPdf, {
+        filename: 'delete-me.pdf',
+        contentType: 'application/pdf',
+      })
+      .expect(201);
+
+    const storedResume = await database.get('SELECT stored_name FROM resumes');
+    const response = await agent.delete('/api/resumes/current');
+
+    assert.equal(response.status, 200);
+    assert.equal(response.body.message, 'Resume deleted successfully.');
+    assert.equal(await database.get('SELECT id FROM resumes'), undefined);
+    await assert.rejects(
+      fs.stat(path.join(uploadDirectory, storedResume.stored_name)),
+      { code: 'ENOENT' }
+    );
+  });
+
+  test('16. deletion clears all of the authenticated user resume history', async () => {
+    const { agent } = await createLoggedInAgent();
+
+    for (const filename of ['older.pdf', 'current.pdf']) {
+      await agent
+        .post('/api/resumes')
+        .attach('resume', validPdf, {
+          filename,
+          contentType: 'application/pdf',
+        })
+        .expect(201);
+    }
+
+    await agent.delete('/api/resumes/current').expect(200);
+
+    const currentResponse = await agent.get('/api/resumes/current');
+    assert.equal(currentResponse.body.resume, null);
+    assert.deepEqual(await fs.readdir(uploadDirectory), []);
+  });
+
+  test('17. deleting an empty resume workspace returns a clear error', async () => {
+    const { agent } = await createLoggedInAgent();
+
+    const response = await agent.delete('/api/resumes/current');
+
+    assert.equal(response.status, 404);
+    assert.equal(response.body.error, 'No resume is available to delete.');
+  });
+
+  test('18. unauthenticated users cannot delete resumes', async () => {
+    const response = await request(app).delete('/api/resumes/current');
+
+    assert.equal(response.status, 401);
+    assert.equal(response.body.error, 'Authentication required.');
+  });
+
+  test('19. deleting one account resume does not affect another account', async () => {
+    const { agent: firstAgent } = await createLoggedInAgent();
+    await firstAgent
+      .post('/api/resumes')
+      .attach('resume', validPdf, {
+        filename: 'first-user.pdf',
+        contentType: 'application/pdf',
+      })
+      .expect(201);
+
+    const secondAgent = request.agent(app);
+    await secondAgent.post('/api/register').send({
+      name: 'Second User',
+      email: 'second@example.com',
+      password: 'SecondPass123',
+    }).expect(201);
+    await secondAgent.post('/api/login').send({
+      email: 'second@example.com',
+      password: 'SecondPass123',
+    }).expect(200);
+    await secondAgent
+      .post('/api/resumes')
+      .attach('resume', validPdf, {
+        filename: 'second-user.pdf',
+        contentType: 'application/pdf',
+      })
+      .expect(201);
+
+    await firstAgent.delete('/api/resumes/current').expect(200);
+    const secondUserResponse = await secondAgent.get('/api/resumes/current');
+
+    assert.equal(secondUserResponse.status, 200);
+    assert.equal(secondUserResponse.body.resume.originalName, 'second-user.pdf');
+  });
+
+  test('20. a new resume can be uploaded after deletion', async () => {
+    const { agent } = await createLoggedInAgent();
+    await agent
+      .post('/api/resumes')
+      .attach('resume', validPdf, {
+        filename: 'old-resume.pdf',
+        contentType: 'application/pdf',
+      })
+      .expect(201);
+    await agent.delete('/api/resumes/current').expect(200);
+
+    await agent
+      .post('/api/resumes')
+      .attach('resume', validPdf, {
+        filename: 'replacement-resume.pdf',
+        contentType: 'application/pdf',
+      })
+      .expect(201);
+
+    const currentResponse = await agent.get('/api/resumes/current');
+    const storedFiles = await fs.readdir(uploadDirectory);
+
+    assert.equal(currentResponse.body.resume.originalName, 'replacement-resume.pdf');
+    assert.equal(storedFiles.length, 1);
+  });
 });

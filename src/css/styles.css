@@ -393,13 +393,21 @@ button { border: 0; }
 .uploaded-resume__icon { display: grid; width: 41px; height: 41px; place-items: center; border-radius: 10px; color: var(--teal-700); background: var(--teal-100); }
 .uploaded-resume__icon svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.7; }
 .uploaded-resume > div:nth-child(2) { min-width: 0; flex: 1; }
-.uploaded-resume span, .uploaded-resume strong, .uploaded-resume small { display: block; }
-.uploaded-resume > div span { color: var(--ink-400); font-size: 8px; text-transform: uppercase; letter-spacing: 0.07em; }
+.uploaded-resume > div:nth-child(2) span, .uploaded-resume strong, .uploaded-resume small { display: block; }
+.uploaded-resume > div:nth-child(2) span { color: var(--ink-400); font-size: 8px; text-transform: uppercase; letter-spacing: 0.07em; }
 .uploaded-resume strong { overflow: hidden; margin: 3px 0; color: var(--ink-800); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
 .uploaded-resume small { color: var(--ink-500); font-size: 9px; }
+.uploaded-resume__actions { display: flex; align-items: center; gap: 9px; }
+.resume-delete-button { display: inline-flex; align-items: center; gap: 5px; min-height: 31px; padding: 7px 9px; border: 1px solid #e5caca; border-radius: 8px; color: #9e3e45; background: #fffafa; font: inherit; font-size: 9px; font-weight: 750; cursor: pointer; transition: border-color 160ms ease, background 160ms ease, color 160ms ease; }
+.resume-delete-button:hover { border-color: #dba9ad; color: #852f36; background: #fff2f3; }
+.resume-delete-button:focus-visible { outline: 3px solid rgba(185, 64, 75, 0.16); outline-offset: 2px; }
+.resume-delete-button:disabled { cursor: wait; opacity: 0.65; }
+.resume-delete-button.is-confirming { border-color: #c9555f; color: white; background: #a83e47; }
+.resume-delete-button svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+.resume-delete-button span { display: inline; }
 .workspace-side-stack { display: grid; gap: 20px; }
 .readiness-card { padding: 27px; }
-.readiness-ring { position: relative; display: grid; width: 86px; height: 86px; margin-bottom: 25px; place-items: center; border-radius: 50%; background: conic-gradient(var(--brand-600) 60%, #e8ebf0 0); }
+.readiness-ring { --readiness-progress: 60%; position: relative; display: grid; width: 86px; height: 86px; margin-bottom: 25px; place-items: center; border-radius: 50%; background: conic-gradient(var(--brand-600) var(--readiness-progress), #e8ebf0 0); transition: background 240ms ease; }
 .readiness-ring::before { position: absolute; width: 67px; height: 67px; border-radius: 50%; background: white; content: ""; }
 .readiness-ring span { position: relative; z-index: 1; color: var(--ink-900); font-size: 20px; font-weight: 800; }
 .readiness-ring small { font-size: 10px; }
@@ -537,6 +545,8 @@ button { border: 0; }
   .upload-actions .button { width: 100%; }
   .workspace-side-stack { grid-template-columns: 1fr; }
   .readiness-card { padding: 23px; }
+  .uploaded-resume { align-items: flex-start; flex-wrap: wrap; }
+  .uploaded-resume__actions { width: 100%; justify-content: flex-end; }
 }
 
 @media (prefers-reduced-motion: reduce) {
