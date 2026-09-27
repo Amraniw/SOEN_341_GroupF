@@ -125,16 +125,13 @@ This section summarizes the GitHub issues planned for Sprint 1, including backen
   - Added functionality for uploading, displaying, replacing, and removing resumes.
   - Ensured the resume page matched the existing CareerConnect frontend design and navigation.
   - Tested the resume management flow and frontend behavior.
-  - Completed and maintained my Sprint 1 AI Usage Log.
 
 - Issues worked on:
   - Resume Management / Resume Upload Interface
   - Frontend Development
-  - AI Usage Documentation
 
 - Pull Requests / Commits:
   - Added the Resume Management frontend to the frontend branch.
-  - Added and updated my personal Sprint 1 AI Usage Log.
   - Contributed frontend-related commits during Sprint 1.
 
 - Reviews or testing performed:
