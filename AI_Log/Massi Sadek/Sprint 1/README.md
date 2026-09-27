@@ -102,6 +102,7 @@ The most useful habit I learned was to check `git status` and my current branch 
 **Date:** September 22, 2026  
 **Task ID/Title:** Organizing and Improving the Team Process README  
 **Purpose of AI Use:** Documentation formatting, organization, and minor improvement suggestions.
+**Chat Link:** https://chatgpt.com/share/6ab6c4ea-0e38-83ea-abfb-5c9eb9b795f3 
 
 ### Prompt / Interaction
 
