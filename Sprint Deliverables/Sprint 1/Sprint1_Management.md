@@ -96,4 +96,23 @@ This section summarizes the GitHub issues planned for Sprint 1, including backen
     1. September 25h: Tested the user registration/login. (Verdict: everything works on the client side however the information is not stored in the server yet, so you can only access an account on the device that created that account.)
     2. September 25th: Tested the resume upload. function (Verdict: after signing out of the account, the resume isnt stored.)
     3. September 26th: Tested the company login. (Verdict: main page looks exactly like the job seeker login.) [Note: This will be fixed for Sprint 2]
-### Member
+
+### Massi Sadek
+- Work completed:
+  - Created and organized the Sprint 1 Team Process documentation.
+  - Documented the team's GitHub workflow, branching strategy, Pull Request and review process.
+  - Defined and documented the Definition of Ready (DoR) and Definition of Done (DoD).
+  - Documented team communication, conflict handling, and responsibilities for Sprint 1.
+  - Maintained and updated my personal Sprint 1 AI Usage Log.
+
+- Issues worked on:
+  - Define Team Process
+  - Sprint Planning and Project Documentation
+
+- Pull Requests / Commits:
+  - Created documentation branches and Pull Requests for the Team Process and personal AI Usage Log.
+
+- Reviews or testing performed:
+  - Reviewed the Team Process documentation against our team's actual workflow and Sprint 1 requirements.
+  - Verified Git/GitHub workflows before using them on the shared repository.
+  - Reviewed Sprint 1 documentation 
