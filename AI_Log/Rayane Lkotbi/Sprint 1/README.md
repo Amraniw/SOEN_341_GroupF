@@ -4,7 +4,7 @@ This document summarizes the main AI-assisted activities completed during Sprint
 
 **ChatGPT Chat Link:** [https://chatgpt.com/share/6ab95292-cffc-83ea-8f5c-8053d069a0a0]
 
-**Codex Chat Link:** [Insert Codex chat link]
+**Codex Chat Link:** [https://chatgpt.com/s/cx_6ab961fb745c81919331b0881a8ad0ab]
 
 ---
 
