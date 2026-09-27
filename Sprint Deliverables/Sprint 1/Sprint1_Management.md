@@ -84,7 +84,7 @@ This section summarizes the GitHub issues planned for Sprint 1, including backen
 ### Adam El Fadil
 - Work completed:
     1. V1 of the frontend [HTML/CSS] (we voted between multiple versions of the frontend and chose the most popular)
-    2. Script [JavaScript] for the difference between a seeker login and a recruiter login.
+    2. Script for the difference between a seeker login and a recruiter login. [JavaScript]
 - Issues worked on:
     1. Frontend
     2. Documentation                  
