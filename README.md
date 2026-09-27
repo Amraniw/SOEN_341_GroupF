@@ -63,7 +63,38 @@ The technology stack will be finalized by the team during Sprint 1.
 
 ## Setup Instructions
 
-Development environment and setup instructions will be added once the technology stack and project structure have been finalized.
+Setup Instructions
+
+Prerequisites
+
+- Git
+- Node.js 20 or later
+- npm (included with Node.js)
+
+Installation
+
+Clone the repository:
+
+- git clone https://github.com/Amraniw/SOEN_341_GroupF.git
+cd SOEN_341_GroupF
+
+Install the dependencies:
+
+- npm ci
+
+Running the Application
+
+Start the application normally:
+
+- npm start
+
+Or start it in development mode with automatic server restarts:
+
+- npm run dev
+
+Open the application at:
+
+- http://localhost:3000
 
 ## Project Documentation
 
