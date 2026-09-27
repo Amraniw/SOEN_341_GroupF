@@ -92,10 +92,12 @@ This section summarizes the GitHub issues planned for Sprint 1, including backen
     1. Frontend
     2. Documentation                  
 - Commits: 20+
+    Mainly done for the role selector javascript script during sign up and the html/css for the first version of the frontend 
 - Testing:
     1. September 25h: Tested the user registration/login. (Verdict: everything works on the client side however the information is not stored in the server yet, so you can only access an account on the device that created that account.)
-    2. September 25th: Tested the resume upload. function (Verdict: after signing out of the account, the resume isnt stored.)
+    2. September 25th: Tested the resume upload. (Verdict: after signing out of the account, the resume isnt stored.)
     3. September 26th: Tested the company login. (Verdict: main page looks exactly like the job seeker login.) [Note: This will be fixed for Sprint 2]
+    4. September 27th: Tested the resume upload (Verdict: After the modifications that were made, the resume is now stored and it can also be deleted with a confirmation prompt)
 
 ### Massi Sadek
 - Work completed:
