@@ -81,4 +81,12 @@ This section summarizes the GitHub issues planned for Sprint 1, including backen
 - Pull Requests / Commits:
   - j
 
+### Adam El Fadil
+- Work completed:
+    1. V1 of the frontend [HTML/CSS] (we voted between multiple versions of the frontend and chose the most popular)
+    2. Script [JavaScript] for the difference between a seeker login and a recruiter login. (Currently doesnt do much but will be very useful in the future) 
+- Commits: 10+
+- Testing:
+    1. September 25h: Tested the user registration/login as well as the upload resume function. (Verdict: everything works on the client side however the information is not stored in the server yet.)
+       
 ### Member
