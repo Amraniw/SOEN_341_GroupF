@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="CareerConnect — your professional account and resume, in one career workspace."
+    />
+    <title>Sign in | CareerConnect</title>
+    <link rel="icon" href="/assets/brand.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/assets/styles.css" />
+    <script type="module" src="/assets/auth.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="public-header">
+      <div class="container">
+        <a class="brand" href="/index.html"
+          ><img
+            src="/assets/brand.svg"
+            width="36"
+            height="36"
+            alt=""
+          />CareerConnect<span class="brand-dot">.</span></a
+        ><a class="text-link header-actions" href="/index.html"
+          >Back to home <span data-icon="arrow"></span
+        ></a>
+      </div>
+    </header>
+    <div class="auth-layout">
+      <aside class="auth-aside">
+        <div>
+          <p class="eyebrow">A PLACE FOR YOUR NEXT CHAPTER</p>
+          <h2>
+            Your experience.<br />Your ambitions.<br />One place to begin.
+          </h2>
+          <p>
+            Bring your career essentials together, starting with your account
+            and resume.
+          </p>
+          <div
+            class="auth-journey"
+            aria-label="Career essentials: account complete, resume next"
+          >
+            <p class="journey-label">CAREER ESSENTIALS <span>01 / 02</span></p>
+            <ol>
+              <li class="is-complete">
+                <span class="journey-number" data-icon="check"></span
+                ><span class="journey-copy"
+                  ><strong>Account</strong
+                  ><small>Your professional identity</small></span
+                ><span class="journey-status">Ready</span>
+              </li>
+              <li>
+                <span class="journey-number">02</span
+                ><span class="journey-copy"
+                  ><strong>Resume</strong
+                  ><small>Your next useful step</small></span
+                ><span class="journey-status">Next</span>
+              </li>
+            </ol>
+          </div>
+        </div>
+        <div class="auth-aside-footer">
+          Built for professionals.<br />Designed around your next step.
+        </div>
+      </aside>
+      <main class="auth-main" id="main" tabindex="-1">
+        <div class="auth-content">
+          <div
+            class="auth-mobile-progress"
+            aria-label="Account ready, Resume is step 2"
+          >
+            <strong>✓&nbsp; Account</strong><span aria-hidden="true">→</span
+            ><span>2&nbsp; Resume</span>
+          </div>
+          <p class="eyebrow">YOUR WORKSPACE AWAITS</p>
+          <h1>Welcome back.</h1>
+          <p>Sign in to your CareerConnect account.</p>
+          <noscript
+            ><p class="noscript-message">
+              Enable JavaScript to use this form.
+            </p></noscript
+          >
+          <div class="notice-region">
+            <div
+              id="form-notice"
+              role="alert"
+              aria-live="polite"
+              tabindex="-1"
+              hidden
+            ></div>
+          </div>
+          <form
+            class="auth-form"
+            data-auth-form="login"
+            method="post"
+            action="/api/login"
+            novalidate
+          >
+            <div class="form-field">
+              <label for="email">Email address</label
+              ><input
+                id="email"
+                name="email"
+                type="email"
+                autocomplete="email"
+                data-label="Email address"
+                required
+                aria-describedby="email-error"
+                maxlength="254"
+                autocapitalize="none"
+                spellcheck="false"
+              /><span class="field-error" id="email-error"></span>
+            </div>
+            <div class="form-field">
+              <label for="password">Password</label>
+              <div class="password-control">
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autocomplete="current-password"
+                  data-label="Password"
+                  required
+                  aria-describedby="password-error"
+                /><button
+                  class="password-toggle"
+                  type="button"
+                  data-toggle-password="password"
+                  aria-label="Show password"
+                  aria-pressed="false"
+                >
+                  Show
+                </button>
+              </div>
+              <span class="field-error" id="password-error"></span>
+            </div>
+
+            <button type="submit" class="button button-wide">
+              Sign in <span data-icon="arrow"></span>
+            </button>
+          </form>
+          <p class="auth-security">
+            <span data-icon="lock"></span>Your password is never stored in this
+            browser by CareerConnect.
+          </p>
+          <div class="auth-bottom">
+            New to CareerConnect?
+            <a class="text-link" href="/auth/signup.html"
+              >Create account <span data-icon="arrow"></span
+            ></a>
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

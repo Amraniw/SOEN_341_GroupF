@@ -81,4 +81,16 @@ This section summarizes the GitHub issues planned for Sprint 1, including backen
 - Pull Requests / Commits:
   - j
 
+### Adam El Fadil
+- Work completed:
+    1. V1 of the frontend [HTML/CSS] (we voted between multiple versions of the frontend and chose the most popular)
+    2. Script for the difference between a seeker login and a recruiter login. [JavaScript]
+- Issues worked on:
+    1. Frontend
+    2. Documentation                  
+- Commits: 20+
+- Testing:
+    1. September 25h: Tested the user registration/login. (Verdict: everything works on the client side however the information is not stored in the server yet, so you can only access an account on the device that created that account.)
+    2. September 25th: Tested the resume upload. function (Verdict: after signing out of the account, the resume isnt stored.)
+    3. September 26th: Tested the company login. (Verdict: main page looks exactly like the job seeker login.) [Note: This will be fixed for Sprint 2]
 ### Member
