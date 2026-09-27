@@ -3,19 +3,21 @@
 ## 1. Sprint Planning
 
 ### Sprint Goal
-The goal for this sprint is to establish a foundation of the web page by setting up the project structure and  implementing the initial front-end and back-end components. The main focus is to implement the users registration and log in for the web page, which allows the users to create an account and later on be able to access it at any time.
+The goal for this sprint is to establish the foundation of the CareerConnect web application by setting up the project structure and implementing the initial front-end and back-end components. The main focus is to implement User Registration/Login and Resume Management, allowing users to create an account, access it, and upload their resume.
 
 ### Sprint Backlog
 | User Story | Description |
 |---|---|
 | US-01 User Registration | Allows new users to create an account. | 
 | US-02 User Login | Allows old users to log into the web page. |
+| US-04 Resume Management | Allows users to upload and manage their resume. |
 
 ### Priorities
 | User Story | Priority | Why |
 |---|---|---|
-| User Registration | HIgh | Necessary for new users to create an account. |
-| User Login | HIgh | Necessary for users to be able to access their account at any time. |
+| User Registration | High | Necessary for new users to create an account. |
+| User Login | High | Necessary for users to be able to access their account at any time. |
+| Resume Management | High | Allows authenticated users to upload their resume. |
 
 ### Effort Estimation
 The effort  needed for each task to be completed is based on a scale from 1 to 5. 1 represents low effort and 5 means that it is very complex therefore it represents high effort required for completion.
@@ -23,6 +25,7 @@ The effort  needed for each task to be completed is based on a scale from 1 to 5
 |---|---|
 | User Registration | 3 |
 | User Login | 3 |
+| Resume Management | 4 |
 
 Both user registration and login require back-end work as well as front-end for their implementation. Therefore, both tasks have a moderate level of effort.
 
