@@ -65,10 +65,10 @@ This section summarizes the GitHub issues planned for Sprint 1, including backen
 - **Reviews or testing performed:** Reviewed the backend implementation and verified all 20 registration, login, authentication, and resume-upload tests passed.
 
 ### Wassim Amrani
-- Work completed:
-- Issues worked on:
-- Pull requests / commits:
-- Reviews or testing performed:
+- Work completed: Backend for user registration/login and resume upload, database setup, frontend redesign and frontend/backend integration. Also worked on Sprint 1 planning and some documentation.
+- Issues worked on: User Registration, User Login, Resume Management/Upload.
+- Pull requests / commits: Backend implementation PR (#21), frontend changes, integration work, and Sprint 1 documentation commits.
+- Reviews or testing performed: Tested registration/login and resume upload (20 automated tests passed). Also tested the final frontend/backend flow from registration to resume upload.
 
 ### Carla Reis
 - Work completed:
