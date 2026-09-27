@@ -577,6 +577,53 @@ progress::-moz-progress-bar {
 .resume-receipt .badge {
   margin-left: auto;
 }
+.resume-receipt-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+.resume-delete-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 7px 10px;
+  border: 1px solid #dfc0c3;
+  border-radius: 6px;
+  color: #943a42;
+  background: #fffafa;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    border-color var(--motion-fast) var(--ease-standard),
+    background-color var(--motion-fast) var(--ease-standard),
+    color var(--motion-fast) var(--ease-standard);
+}
+.resume-delete-button:hover {
+  border-color: #ce969b;
+  color: #792c33;
+  background: #fff1f2;
+}
+.resume-delete-button:focus-visible {
+  outline: 3px solid rgba(148, 58, 66, 0.18);
+  outline-offset: 2px;
+}
+.resume-delete-button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+.resume-delete-button.is-confirming {
+  border-color: #943a42;
+  color: white;
+  background: #943a42;
+}
+.resume-delete-button .icon {
+  width: 14px;
+  height: 14px;
+}
 .document-icon {
   display: grid;
   gap: 1px;

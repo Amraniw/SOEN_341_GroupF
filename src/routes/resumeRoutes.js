@@ -37,6 +37,57 @@ function createResumeRouter(database, options = {}) {
   const uploadDirectory = options.uploadDirectory || DEFAULT_UPLOAD_DIRECTORY;
   const upload = createResumeUpload(uploadDirectory);
 
+  function toPublicResume(resume) {
+    return {
+      id: resume.id,
+      originalName: resume.original_name,
+      uploadedAt: resume.uploaded_at,
+    };
+  }
+
+  router.get('/current', authenticateUser, async (request, response, next) => {
+    try {
+      const resume = await database.get(
+        `SELECT id, original_name, uploaded_at
+         FROM resumes
+         WHERE user_id = ?
+         ORDER BY uploaded_at DESC, id DESC
+         LIMIT 1`,
+        request.authenticatedUser.id
+      );
+
+      return response.json({ resume: resume ? toPublicResume(resume) : null });
+    } catch (error) {
+      return next(error);
+    }
+  });
+
+  router.delete('/current', authenticateUser, async (request, response, next) => {
+    try {
+      const resumes = await database.all(
+        'SELECT stored_name FROM resumes WHERE user_id = ?',
+        request.authenticatedUser.id
+      );
+
+      if (resumes.length === 0) {
+        return response.status(404).json({ error: 'No resume is available to delete.' });
+      }
+
+      await database.run(
+        'DELETE FROM resumes WHERE user_id = ?',
+        request.authenticatedUser.id
+      );
+
+      await Promise.all(
+        resumes.map((resume) => removeFile(path.join(uploadDirectory, resume.stored_name)))
+      );
+
+      return response.json({ message: 'Resume deleted successfully.' });
+    } catch (error) {
+      return next(error);
+    }
+  });
+
   router.post('/', authenticateUser, upload.single('resume'), async (request, response, next) => {
     if (!request.file) {
       return response.status(400).json({ error: 'A resume PDF is required.' });
@@ -71,11 +122,7 @@ function createResumeRouter(database, options = {}) {
 
       return response.status(201).json({
         message: 'Resume uploaded successfully.',
-        resume: {
-          id: resume.id,
-          originalName: resume.original_name,
-          uploadedAt: resume.uploaded_at,
-        },
+        resume: toPublicResume(resume),
       });
     } catch (error) {
       return next(error);

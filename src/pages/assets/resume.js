@@ -1,6 +1,6 @@
 import { session } from './workspace.js';
 import { request } from './api.js';
-import { addReceipt, clearDisplaySession, readSession } from './session.js';
+import { clearDisplaySession } from './session.js';
 import {
   escapeHtml,
   icon,
@@ -19,24 +19,70 @@ if (session) {
   const notice = document.querySelector('#upload-notice');
   const progress = document.querySelector('#upload-progress');
   const dropTitle = drop.querySelector('h3');
-  const dropHelp = drop.querySelector('#file-help');
+  const dropHelp = document.querySelector('#file-help');
+  const currentEmpty = document.querySelector('#receipt-empty');
+  const currentList = document.querySelector('#receipt-list');
   let file = null;
+  let currentResume = null;
   let busy = false;
   let selectionVersion = 0;
+  let deleteConfirmationTimeout = null;
 
-  function renderReceipts() {
-    const receipts = readSession()?.receipts || [];
-    document.querySelector('#receipt-empty').hidden = receipts.length > 0;
-    document.querySelector('#receipt-list').innerHTML = receipts
-      .map(
-        (receipt) =>
-          `<li class="resume-receipt"><span class="document-icon">${icon('file')}<span>PDF</span></span><div class="min-width-zero"><h3 class="break-word">${escapeHtml(receipt.originalName)}</h3><p>${escapeHtml(formatSize(receipt.size))} <span aria-hidden="true">·</span> Uploaded ${escapeHtml(formatDate(receipt.uploadedAt))}</p></div><span class="badge badge-success">${icon('check')} Uploaded</span></li>`
-      )
-      .join('');
+  function expireSession() {
+    clearDisplaySession();
+    location.replace('/auth/login.html?reason=expired');
+  }
+
+  function resetDeleteConfirmation() {
+    window.clearTimeout(deleteConfirmationTimeout);
+    deleteConfirmationTimeout = null;
+    const button = currentList.querySelector('[data-delete-resume]');
+    if (!button) return;
+    button.classList.remove('is-confirming');
+    button.querySelector('[data-delete-label]').textContent = 'Delete';
+    button.setAttribute('aria-label', 'Delete uploaded resume');
+  }
+
+  function renderCurrentResume(resume) {
+    currentResume = resume;
+    resetDeleteConfirmation();
+    currentEmpty.hidden = Boolean(resume);
+
+    if (!resume) {
+      currentList.replaceChildren();
+      return;
+    }
+
+    currentList.innerHTML = `<li class="resume-receipt">
+      <span class="document-icon">${icon('file')}<span>PDF</span></span>
+      <div class="min-width-zero">
+        <h3 class="break-word">${escapeHtml(resume.originalName)}</h3>
+        <p>Uploaded ${escapeHtml(formatDate(resume.uploadedAt))}</p>
+      </div>
+      <div class="resume-receipt-actions">
+        <span class="badge badge-success">${icon('check')} Ready</span>
+        <button class="resume-delete-button" type="button" data-delete-resume aria-label="Delete uploaded resume">
+          ${icon('trash')}<span data-delete-label>Delete</span>
+        </button>
+      </div>
+    </li>`;
+  }
+
+  async function loadCurrentResume() {
+    try {
+      const result = await request('/resumes/current', undefined, 'GET');
+      renderCurrentResume(result.resume);
+    } catch (error) {
+      if (error.status === 401) {
+        expireSession();
+        return;
+      }
+      showMessage(notice, error.message);
+    }
   }
 
   function resetSelection() {
-    selectionVersion++;
+    selectionVersion += 1;
     file = null;
     picker.value = '';
     selected.hidden = true;
@@ -97,7 +143,7 @@ if (session) {
   drop.addEventListener('dragenter', (event) => {
     event.preventDefault();
     if (!busy) {
-      dragDepth++;
+      dragDepth += 1;
       drop.classList.add('drag-over');
     }
   });
@@ -106,7 +152,7 @@ if (session) {
     event.dataTransfer.dropEffect = busy ? 'none' : 'copy';
   });
   drop.addEventListener('dragleave', () => {
-    dragDepth--;
+    dragDepth -= 1;
     if (dragDepth <= 0) drop.classList.remove('drag-over');
   });
   drop.addEventListener('drop', (event) => {
@@ -114,6 +160,53 @@ if (session) {
     dragDepth = 0;
     drop.classList.remove('drag-over');
     selectFiles([...event.dataTransfer.files]);
+  });
+
+  currentList.addEventListener('click', async (event) => {
+    const button = event.target.closest('[data-delete-resume]');
+    if (!button || busy || !currentResume) return;
+
+    if (!button.classList.contains('is-confirming')) {
+      button.classList.add('is-confirming');
+      button.querySelector('[data-delete-label]').textContent = 'Confirm delete';
+      button.setAttribute('aria-label', 'Confirm deletion of uploaded resume');
+      deleteConfirmationTimeout = window.setTimeout(
+        resetDeleteConfirmation,
+        5000
+      );
+      return;
+    }
+
+    window.clearTimeout(deleteConfirmationTimeout);
+    busy = true;
+    button.disabled = true;
+    button.setAttribute('aria-busy', 'true');
+    hideMessage(notice);
+    try {
+      await request('/resumes/current', undefined, 'DELETE');
+      renderCurrentResume(null);
+      resetSelection();
+      showMessage(
+        notice,
+        'Resume deleted. Your profile readiness is back to 60%. Upload a new PDF whenever you are ready.',
+        'success'
+      );
+    } catch (error) {
+      if (error.status === 401) {
+        expireSession();
+        return;
+      }
+      if (error.status === 404) renderCurrentResume(null);
+      showMessage(notice, error.message);
+    } finally {
+      busy = false;
+      const activeButton = currentList.querySelector('[data-delete-resume]');
+      if (activeButton) {
+        activeButton.disabled = false;
+        activeButton.removeAttribute('aria-busy');
+      }
+      resetDeleteConfirmation();
+    }
   });
 
   form.addEventListener('submit', async (event) => {
@@ -124,7 +217,6 @@ if (session) {
     upload.disabled = true;
     picker.disabled = true;
     selected.querySelector('button').disabled = true;
-    upload.textContent = 'Uploading…';
     upload.classList.add('is-busy');
     upload.innerHTML =
       '<span class="button-spinner" aria-hidden="true"></span>Uploading…';
@@ -132,7 +224,6 @@ if (session) {
     drop.dataset.uploadState = 'uploading';
     form.setAttribute('aria-busy', 'true');
     const data = new FormData();
-    // Some file pickers omit MIME type. The PDF signature was checked above.
     const pdf = file.type
       ? file
       : new Blob([file], { type: 'application/pdf' });
@@ -141,37 +232,28 @@ if (session) {
       const result = await request('/resumes', data);
       if (!result.resume?.originalName)
         throw new Error(
-          'The upload response was incomplete. Please check with support before uploading again.'
+          'The upload response was incomplete. Please check before uploading again.'
         );
-      let saved = true;
-      try {
-        addReceipt(result.resume, file.size);
-      } catch {
-        saved = false;
-      }
       const uploadedFile = file;
-      selectionVersion++;
+      renderCurrentResume(result.resume);
+      selectionVersion += 1;
       file = null;
       picker.value = '';
       selected.innerHTML = `<span class="document-icon">${icon('file')}<span>PDF</span></span><div class="min-width-zero"><strong class="break-word">${escapeHtml(uploadedFile.name)}</strong><p>${formatSize(uploadedFile.size)} · Uploaded just now</p></div><span class="badge badge-success">${icon('check')} Uploaded</span>`;
       selected.classList.add('is-uploaded');
       selected.hidden = false;
       drop.dataset.uploadState = 'complete';
-      dropTitle.textContent = 'Resume added to your workspace.';
+      dropTitle.textContent = 'Resume saved to your account.';
       dropHelp.innerHTML =
-        'Your confirmation is ready below.<br>Choose another PDF whenever you need to add a new copy.';
-      renderReceipts();
+        'Your profile readiness is now 100%.<br>You can manage the saved resume below.';
       showMessage(
         notice,
-        saved
-          ? 'Resume uploaded successfully. Your confirmation is shown below.'
-          : 'Your resume was uploaded, but this browser could not retain the receipt.',
+        'Resume uploaded successfully. It will remain available after refresh and future sign-ins.',
         'success'
       );
     } catch (error) {
       if (error.status === 401) {
-        clearDisplaySession();
-        location.replace('/auth/login.html?reason=expired');
+        expireSession();
         return;
       }
       showMessage(notice, error.message);
@@ -189,5 +271,6 @@ if (session) {
       form.removeAttribute('aria-busy');
     }
   });
-  renderReceipts();
+
+  loadCurrentResume();
 }

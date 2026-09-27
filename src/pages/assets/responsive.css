@@ -401,6 +401,11 @@
     margin-left: 0;
     justify-self: start;
   }
+  .resume-receipt-actions {
+    grid-column: 2;
+    margin-left: 0;
+    flex-wrap: wrap;
+  }
   .empty-state {
     align-items: start;
   }

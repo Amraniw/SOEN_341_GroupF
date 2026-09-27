@@ -6,16 +6,18 @@ export class ApiError extends Error {
   }
 }
 
-export async function request(path, body) {
+export async function request(path, body, method = 'POST') {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 30000);
   try {
+    const hasBody = body !== undefined;
     const multipart = body instanceof FormData;
     const response = await fetch(`/api${path}`, {
-      method: 'POST',
+      method,
       credentials: 'same-origin',
-      headers: multipart ? undefined : { 'Content-Type': 'application/json' },
-      body: multipart ? body : JSON.stringify(body),
+      headers:
+        hasBody && !multipart ? { 'Content-Type': 'application/json' } : undefined,
+      body: hasBody ? (multipart ? body : JSON.stringify(body)) : undefined,
       signal: controller.signal,
     });
     const data = await response.json().catch(() => null);
