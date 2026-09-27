@@ -115,4 +115,30 @@ This section summarizes the GitHub issues planned for Sprint 1, including backen
 - Reviews or testing performed:
   - Reviewed the Team Process documentation against our team's actual workflow and Sprint 1 requirements.
   - Verified Git/GitHub workflows before using them on the shared repository.
-  - Reviewed Sprint 1 documentation 
+  - Reviewed Sprint 1 documentation
+
+ 
+### Suheil Almouhassel
+
+- Work completed:
+  - Designed and implemented the Resume Management frontend for job seekers.
+  - Added functionality for uploading, displaying, replacing, and removing resumes.
+  - Ensured the resume page matched the existing CareerConnect frontend design and navigation.
+  - Tested the resume management flow and frontend behavior.
+  - Completed and maintained my Sprint 1 AI Usage Log.
+
+- Issues worked on:
+  - Resume Management / Resume Upload Interface
+  - Frontend Development
+  - AI Usage Documentation
+
+- Pull Requests / Commits:
+  - Added the Resume Management frontend to the frontend branch.
+  - Added and updated my personal Sprint 1 AI Usage Log.
+  - Contributed frontend-related commits during Sprint 1.
+
+- Reviews or testing performed:
+  - Tested resume upload with valid and invalid file types.
+  - Tested replacing and removing resumes.
+  - Checked navigation, responsiveness, and compatibility with the existing CareerConnect frontend.
+  - Reviewed the implementation to confirm the Sprint 1 frontend requirements were covered.
