@@ -49,8 +49,8 @@ The team consists of 6 members. Team members will work in pairs to complete thei
 |---|---|---|---|---|---|---|
 | #1 | User Registration and Login | User Story | Rayane, Wassim | Sept. 24 | High | Completed |
 | #2 | Backend Setup and Database Integration | Task | Rayane, Wassim | Sept. 25 | High | Completed |
-| #3 | Registration and Login Interface | Task | Adam, Suheil | Sept. 25 | High | In Progress |
-| #4 | Resume Upload Interface | User Story | Adam, Suheil | Sept. 26 | High | In Progress |
+| #3 | Registration and Login Interface | Task | Adam, Suheil | Sept. 25 | High | Completed |
+| #4 | Resume Upload Interface | User Story | Adam, Suheil | Sept. 26 | High | Completed |
 | #5 | Resume Storage and Backend Integration | Task | Rayane, Wassim | Sept. 26 | Medium | Completed |
 | #6 | Define Team Process | Task | Massi | Sept. 23 | High | Completed |
 | #7 | Complete Sprint Planning and Project Documentation | Task | Massi, Carla | Sept. 26 | High | Completed |
