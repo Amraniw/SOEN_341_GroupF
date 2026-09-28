@@ -32,8 +32,8 @@
 
 ## 6. Project Documentation
 - [x] Maintain meeting minutes
-- [ ] Maintain individual AI usage logs
-- [ ] Maintain team member contribution records
+- [x] Maintain individual AI usage logs
+- [x] Maintain team member contribution records
 
 ## 7. Implementation
 - [x] Select two basic Sprint 1 features
@@ -43,6 +43,6 @@
 
 ## 8. Final Submission
 - [x] Prepare Sprint 1 submission document
-- [ ] Include cover page, team members, README and GitHub link
-- [ ] Final repository and documentation review
+- [x] Include cover page, team members, README and GitHub link
+- [x] Final repository and documentation review
 - [ ] Confirm demo and submission are ready
