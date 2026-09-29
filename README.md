@@ -1,5 +1,14 @@
 # CareerConnect
 
+## Team Members
+
+- Rayane Lkotbi | 40330437
+- Carla Sophia Reis Lopez | 40262300
+- Wassim Amrani | 40282136
+- Suheil Almouhassel 40285426
+- Adam El Fadil | 40340176
+- Sadek Massinissa Abderaouf | 40327548
+
 ## Project Description
 
 CareerConnect is a web-based job search and application tracking platform designed to help job seekers organize and manage their job-search activities in one centralized system.
@@ -39,15 +48,6 @@ Recruiters will also be able to create and manage job postings.
 - Saved jobs and favourites
 - Generative AI-based functionality
 - Additional original team-designed feature
-
-## Team Members
-
-- Rayane Lkotbi | 40330437
-- Carla Sophia Reis Lopez | 40262300
-- Wassim Amrani | 40282136
-- Suheil Almouhassel 40285426
-- Adam El Fadil | 40340176
-- Sadek Massinissa Abderaouf | 40327548
 
 ## Technologies
 
