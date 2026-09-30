@@ -45,4 +45,4 @@
 - [x] Prepare Sprint 1 submission document
 - [x] Include cover page, team members, README and GitHub link
 - [x] Final repository and documentation review
-- [ ] Confirm demo and submission are ready
+- [x] Confirm demo and submission are ready
