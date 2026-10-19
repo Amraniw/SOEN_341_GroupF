@@ -1,143 +1,145 @@
-# Sprint 1 Project Management
+
+# Sprint 2 Project Management
 
 ## 1. Sprint Planning
 
 ### Sprint Goal
-The goal for this sprint is to establish the foundation of the CareerConnect web application by setting up the project structure and implementing the initial front-end and back-end components. The main focus is to implement User Registration/Login and Resume Management, allowing users to create an account, access it, and upload their resume.
+
+The goal of this sprint is to expand the CareerConnect web application by implementing the core job-search and application-management features while refining and integrating the functionalities developed in Sprint 1.
+
+The main focus is to implement User Profile Management, Job Search and Filtering, Job Application Submission, and Application Status Tracking. Additionally, the team will begin developing Recruiter Job Posting Management and implement an Application Dashboard.
+
+Sprint 2 will also focus on acceptance testing, Continuous Integration (CI), and maintaining proper GitHub project management practices.
 
 ### Sprint Backlog
+
 | User Story | Description |
 |---|---|
-| US-01 User Registration | Allows new users to create an account. | 
-| US-02 User Login | Allows old users to log into the web page. |
-| US-04 Resume Management | Allows users to upload and manage their resume. |
+| US-03 Profile Management | Allows job seekers to create, edit, and view their professional profiles. |
+| US-05 Job Search and Filtering | Allows users to browse and search job opportunities using keywords, locations, and categories. |
+| US-06 Job Application Submission | Allows job seekers to apply for jobs and receive confirmation. |
+| US-07 Application Status Tracking | Allows job seekers to track the progress of their applications. |
+| US-09 Job Posting Management | Allows recruiters to create and manage job postings. Development begins in Sprint 2 and may continue into Sprint 3. |
+| US-10 Application Dashboard | Allows users to view their application history and statuses. |
+
+Resume Management (US-04), implemented during Sprint 1, will also be reviewed and integrated with the new functionalities.
 
 ### Priorities
+
 | User Story | Priority | Why |
 |---|---|---|
-| User Registration | High | Necessary for new users to create an account. |
-| User Login | High | Necessary for users to be able to access their account at any time. |
-| Resume Management | High | Allows authenticated users to upload their resume. |
+| Profile Management | High | Allows users to maintain their professional information. |
+| Job Search and Filtering | High | Necessary for users to find available opportunities. |
+| Job Application Submission | High | Allows users to apply for jobs through the platform. |
+| Application Status Tracking | High | Allows users to monitor their applications. |
+| Job Posting Management | Medium | Necessary for recruiters, but full implementation can continue in Sprint 3. |
+| Application Dashboard | Medium | Centralizes application history and tracking. |
 
 ### Effort Estimation
-The effort  needed for each task to be completed is based on a scale from 1 to 5. 1 represents low effort and 5 means that it is very complex therefore it represents high effort required for completion.
+
+The effort needed for each user story is estimated using a scale from 1 to 5. A value of 1 represents low effort, while 5 represents high complexity and development effort.
+
 | User Story | Estimated Effort |
 |---|---|
-| User Registration | 3 |
-| User Login | 3 |
-| Resume Management | 4 |
+| Profile Management | 3 |
+| Job Search and Filtering | 4 |
+| Job Application Submission | 4 |
+| Application Status Tracking | 3 |
+| Job Posting Management | 4 |
+| Application Dashboard | 3 |
 
-Both user registration and login require back-end work as well as front-end for their implementation. Therefore, both tasks have a moderate level of effort.
+Job Search and Filtering, Job Application Submission, and Job Posting Management require both front-end and back-end development, making them relatively complex. The remaining features are expected to require moderate effort.
 
 ### Team Capacity
-The team consists of 6 members. Team members will work in pairs to complete their assigned tasks and divide the workload accordingly. Each pair will manage their time and work on completing their tasks by Friday September 25th. Once all parts are finished, all members will meet to review the work and address any issue as well as to ensure all parts work accordingly.
+
+The team consists of 6 members. As in Sprint 1, members will work in pairs to complete their assigned development and documentation tasks. Each pair will manage their workload and coordinate with other members to ensure successful integration.
 
 | Pair | Task |
 |---|---|
-| 1 | Front-end: work on styling the web page and user interface, including the sections needed for user registration and login. | 
-| 2 | Back-end: work on the functionality required for registration and login of users. |
-| 3 | Documentation: Spring planning, meeting minutes, team process |
+| 1 | Front-end: User interfaces for profile management, job searching, applications, and dashboards. |
+| 2 | Back-end: Database structures, job applications, status tracking, and recruiter functionality. |
+| 3 | Documentation and Testing: Sprint planning, acceptance tests, meeting minutes, CI setup, and project documentation. |
+
+All team members will participate in reviewing and testing the completed functionalities.
 
 ### Risks
-- Not finishing on time for submission.
-- Back-end and front-end not merging correctly.
+
+- Not completing all required features before the Sprint 2 evaluation.
+- Difficulties integrating front-end and back-end components.
+- Database and application-status synchronization issues.
+- Continuous Integration pipeline configuration or testing failures.
+- Insufficient acceptance test coverage.
 - Communication issues between team members.
 
-## 2. Sprint 1 Work Plan
+
+## 2. Sprint 2 Work Plan
 
 | Issue # | Issue Title | Issue Type | Responsible Member | Target Date | Priority | Status |
 |---|---|---|---|---|---|---|
-| #1 | User Registration and Login | User Story | Rayane, Wassim | Sept. 24 | High | Completed |
-| #2 | Backend Setup and Database Integration | Task | Rayane, Wassim | Sept. 25 | High | Completed |
-| #3 | Registration and Login Interface | Task | Adam, Suheil | Sept. 25 | High | Completed |
-| #4 | Resume Upload Interface | User Story | Adam, Suheil | Sept. 26 | High | Completed |
-| #5 | Resume Storage and Backend Integration | Task | Rayane, Wassim | Sept. 26 | Medium | Completed |
-| #6 | Define Team Process | Task | Massi | Sept. 23 | High | Completed |
-| #7 | Complete Sprint Planning and Project Documentation | Task | Massi, Carla | Sept. 26 | High | Completed |
-| #8 | Sprint 1 Submission Preparation | Task | Massi, Carla | Sept. 27 | Medium | Completed |
-| #9 | Create and Organize All 15 User Story Issues | Task | Rayane | Sept. 22 | High | Completed |
+| #3 | Profile Management | User Story | TBD | TBD | High | Not Started |
+| #5 | Job Search | User Story | TBD | TBD | High | Not Started |
+| #6 | Job Application | User Story | TBD | TBD | High | Not Started |
+| #7 | Status Tracking | User Story | TBD | TBD | High | Not Started |
+| #9 | Job Posting | User Story | TBD | TBD | Medium | Not Started |
+| #10 | Application Dashboard | User Story | TBD | TBD | Medium | Not Started |
+| #32–46 | Profile, Search & Application Tasks | Task | TBD | TBD | High | Not Started |
+| #57–72 | Tracking, Posting & Dashboard Tasks | Task | TBD | TBD | High | Not Started |
+| — | Acceptance Tests | Task | TBD | TBD | High | Not Started |
+| — | CI Pipeline | Task | TBD | TBD | High | Not Started |
+| — | Documentation & Planning | Task | TBD | TBD | High | In Progress |
+| — | Sprint 2 Submission | Task | TBD | TBD | Medium | Not Started |
 
-This section summarizes the GitHub issues planned for Sprint 1, including backend development, frontend implementation, team process definition, sprint planning, project documentation, and final submission preparation.
+This work plan summarizes the main Sprint 2 activities. Detailed task breakdowns, assignments, and progress are maintained in the GitHub repository.
+
+
+This section summarizes the GitHub issues planned for Sprint 2, including front-end and back-end development, acceptance testing, CI setup, project management, and documentation. Detailed tasks, assignments, and progress are maintained in the GitHub repository.
 
 ## 3. Team Contributions
 
 ### Rayane Lkotbi
-- **Work completed:** Set up the repository structure, README, documentation, AI logs, sprint files, GitHub Issues, labels, and user stories. Assisted with backend planning and design decisions.
-- **Issues worked on:** Repository setup, Sprint 1 planning, user registration, authentication, and resume management.
-- **Pull requests / commits:** Approximately 50 commits involving repository organization, README updates, sprint planning, checklists, and documentation.
-- **Reviews or testing performed:** Reviewed the backend implementation and verified all 20 registration, login, authentication, and resume-upload tests passed.
+
+- **Work completed:**
+- **Issues worked on:**
+- **Pull requests / commits:**
+- **Reviews or testing performed:**
+- **Time spent:**
 
 ### Wassim Amrani
-- Work completed: Backend for user registration/login and resume upload, database setup, frontend redesign and frontend/backend integration. Also worked on Sprint 1 planning and some documentation.
-- Issues worked on: User Registration, User Login, Resume Management/Upload.
-- Pull requests / commits: Backend implementation PR (#21), frontend changes, integration work, and Sprint 1 documentation commits.
-- Reviews or testing performed: Tested registration/login and resume upload (20 automated tests passed). Also tested the final frontend/backend flow from registration to resume upload.
+
+- **Work completed:**
+- **Issues worked on:**
+- **Pull requests / commits:**
+- **Reviews or testing performed:**
+- **Time spent:**
 
 ### Carla Reis
-- Work completed:
-  - Finished the meeting minutes for the first team meeting
-  - Worked on the documentation for the sprint planning
-- Issues worked on:
-  - Sprint Planning
-  - Meeting Minutes
-  - Documentation
-- Pull Requests / Commits:
-  - j
+
+- **Work completed:**
+- **Issues worked on:**
+- **Pull requests / commits:**
+- **Reviews or testing performed:**
+- **Time spent:**
 
 ### Adam El Fadil
-- Work completed:
-    1. V1 of the frontend [HTML/CSS] (we voted between multiple versions of the frontend and chose the most popular)
-    2. Script for the difference between a seeker login and a recruiter login. [JavaScript]
-- Issues worked on:
-    1. Frontend
-    2. Documentation                  
-- Commits: 20+
-    Mainly done for the role selector javascript script during sign up and the html/css for the first version of the frontend 
-- Testing:
-    1. September 25h: Tested the user registration/login. (Verdict: everything works on the client side however the information is not stored in the server yet, so you can only access an account on the device that created that account.)
-    2. September 25th: Tested the resume upload. (Verdict: after signing out of the account, the resume isnt stored.)
-    3. September 26th: Tested the company login. (Verdict: main page looks exactly like the job seeker login.) [Note: This will be fixed for Sprint 2]
-    4. September 27th: Tested the resume upload (Verdict: After the modifications that were made, the resume is now stored and it can also be deleted with a confirmation prompt)
+
+- **Work completed:**
+- **Issues worked on:**
+- **Pull requests / commits:**
+- **Reviews or testing performed:**
+- **Time spent:**
 
 ### Massi Sadek
-- Work completed:
-  - Created and organized the Sprint 1 Team Process documentation.
-  - Documented the team's GitHub workflow, branching strategy, Pull Request and review process.
-  - Defined and documented the Definition of Ready (DoR) and Definition of Done (DoD).
-  - Documented team communication, conflict handling, and responsibilities for Sprint 1.
-  - Maintained and updated my personal Sprint 1 AI Usage Log.
 
-- Issues worked on:
-  - Define Team Process
-  - Sprint Planning and Project Documentation
+- **Work completed:**
+- **Issues worked on:**
+- **Pull requests / commits:**
+- **Reviews or testing performed:**
+- **Time spent:**
 
-- Pull Requests / Commits:
-  - Created documentation branches and Pull Requests for the Team Process and personal AI Usage Log.
-
-- Reviews or testing performed:
-  - Reviewed the Team Process documentation against our team's actual workflow and Sprint 1 requirements.
-  - Verified Git/GitHub workflows before using them on the shared repository.
-  - Reviewed Sprint 1 documentation
-
- 
 ### Suheil Almouhassel
 
-- Work completed:
-  - Designed and implemented the Resume Management frontend for job seekers.
-  - Added functionality for uploading, displaying, replacing, and removing resumes.
-  - Ensured the resume page matched the existing CareerConnect frontend design and navigation.
-  - Tested the resume management flow and frontend behavior.
-
-- Issues worked on:
-  - Resume Management / Resume Upload Interface
-  - Frontend Development
-
-- Pull Requests / Commits:
-  - Added the Resume Management frontend to the frontend branch.
-  - Contributed frontend-related commits during Sprint 1.
-
-- Reviews or testing performed:
-  - Tested resume upload with valid and invalid file types.
-  - Tested replacing and removing resumes.
-  - Checked navigation, responsiveness, and compatibility with the existing CareerConnect frontend.
-  - Reviewed the implementation to confirm the Sprint 1 frontend requirements were covered.
+- **Work completed:**
+- **Issues worked on:**
+- **Pull requests / commits:**
+- **Reviews or testing performed:**
+- **Time spent:**
