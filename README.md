@@ -118,12 +118,21 @@ See the [stabilization report](Documentation/US-05_Stabilization.md).
 The [account recovery report](Documentation/US-05_Account_Recovery.md) documents
 registration/workspace checks, real retries, and the default-server correction.
 
-To populate a local database with 50 educational demonstration postings, run
-`npm run seed:jobs`. They use real company names but are not verified live
-openings. Normal reruns preserve existing edits. To upgrade the earlier 22-role
+The 50 educational demonstration postings are included in the source code and
+installed automatically when you run `npm start` or `npm run dev`. No separate
+seed command is needed on a new computer. They use real company names but are
+not verified live openings. Each computer keeps its own database; the bundled
+catalog supplies the same initial jobs everywhere, while accounts and future
+applications remain local to that computer.
+
+Startup adds missing demo postings and preserves existing IDs, edits, closed
+postings, unrelated jobs, accounts and resumes. Deleted demo postings are added
+again on the next startup; close a posting to keep it unavailable. Existing
+running servers need one restart to use the automatic setup. You can also run
+`npm run seed:jobs` explicitly. To upgrade the earlier 22-role
 catalog, run `npm run seed:jobs -- --refresh`; this refreshes only the 50 managed
 demo keys, preserving their IDs and unrelated records. The command refuses
-`NODE_ENV=production`. Demo data is never seeded automatically.
+`NODE_ENV=production`, and automatic demo setup is also skipped in production.
 
 See the [visual/content refinement report](Documentation/US-05_Refinement.md)
 for structured details, seed refresh behavior, search semantics and current checks.

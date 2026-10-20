@@ -1,5 +1,6 @@
 const { createApp } = require('./app');
 const { initializeDatabase } = require('./database/database');
+const { seedDemoJobs } = require('./database/seedJobs');
 
 const DEFAULT_PORT = 3000;
 
@@ -13,27 +14,44 @@ function getPort() {
   return port;
 }
 
-async function startServer() {
-  const database = await initializeDatabase();
-  const app = createApp(database);
-  const port = getPort();
-
-  const server = app.listen(port, () => {
-    console.log(`CareerConnect API is running at http://localhost:${port}`);
-  });
-
-  async function shutDown() {
-    server.close(async () => {
-      await database.close();
-      process.exit(0);
+async function startServer({ databasePath, port = getPort() } = {}) {
+  const database = await initializeDatabase(databasePath);
+  try {
+    // The educational catalog ships with the project. Normal seed reruns only
+    // insert missing demo keys, preserving edits, closed jobs and personal data.
+    if (process.env.NODE_ENV !== 'production') {
+      await seedDemoJobs(database);
+    }
+    const app = createApp(database);
+    const server = await new Promise((resolve, reject) => {
+      const listener = app.listen(port, () => resolve(listener));
+      listener.once('error', reject);
     });
+    return { server, database };
+  } catch (error) {
+    await database.close();
+    throw error;
   }
-
-  process.on('SIGINT', shutDown);
-  process.on('SIGTERM', shutDown);
 }
 
-startServer().catch((error) => {
-  console.error('Failed to start CareerConnect API:', error);
-  process.exitCode = 1;
-});
+if (require.main === module) {
+  startServer().then(({ server, database }) => {
+    console.log(`CareerConnect API is running at http://localhost:${server.address().port}`);
+    let stopping = false;
+    function shutDown() {
+      if (stopping) return;
+      stopping = true;
+      server.close(async () => {
+        await database.close();
+        process.exit(0);
+      });
+    }
+    process.on('SIGINT', shutDown);
+    process.on('SIGTERM', shutDown);
+  }).catch((error) => {
+    console.error('Failed to start CareerConnect API:', error);
+    process.exitCode = 1;
+  });
+}
+
+module.exports = { startServer };

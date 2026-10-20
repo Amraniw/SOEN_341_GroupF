@@ -14,7 +14,6 @@ supersedes the first-pass test counts below: **57 tests and 31 syntax checks**.
 
 ```sh
 npm ci
-npm run seed:jobs
 npm start
 ```
 
@@ -23,11 +22,17 @@ Open `/jobs/` from the landing-page header or the workspace's **Find jobs** link
 static server cannot supply search results or resolve the `/jobs/:jobId` route;
 use the Express application for functional review.
 
-The seed command is optional and explicit. It inserts 50 educational demo postings into
-the configured SQLite database (`DB_PATH`, or `data/careerconnect.sqlite`). It
-never runs at server startup, refuses `NODE_ENV=production`, and uses unique
-`demo_key` values and a transaction to remain repeatable. Rerunning it preserves
-existing postings, including edits to seeded records. Tests use their own
+Server startup automatically installs missing records from the 50-job educational
+catalog into the configured SQLite database (`DB_PATH`, or
+`data/careerconnect.sqlite`). This makes the same initial catalog available to
+anyone who runs `npm start` or `npm run dev` after cloning the project. Each
+computer still owns its database; this does not synchronize accounts or edits.
+Automatic setup is skipped for `NODE_ENV=production`, and the optional explicit
+`npm run seed:jobs` command also refuses production. Unique `demo_key` values and
+a transaction keep reruns repeatable. Startup preserves existing postings,
+including IDs, edits and closed status, as well as users and resumes. Missing
+demo records are recreated; close a posting instead of deleting it to keep it
+unavailable across restarts. Tests use their own
 in-memory databases and small fixtures, independently of this dataset.
 Use `npm run seed:jobs -- --refresh` to replace earlier demo copy with the new
 catalog. Refresh updates only the 50 managed keys, retaining IDs and status.

@@ -1,5 +1,10 @@
 # US-05 visual and content refinement — 2026-10-20
 
+Subsequent startup update: `npm start` and `npm run dev` now install missing
+demo postings automatically outside production. The explicit-only seeding notes
+below describe this earlier refinement pass; see the current
+[run instructions](US-05_Job_Discovery.md#run-locally).
+
 ## Scope and branch
 
 The latest supplied prompt explicitly requests `test`. The working checkout was
