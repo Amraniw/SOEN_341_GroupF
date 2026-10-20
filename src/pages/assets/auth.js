@@ -1,5 +1,6 @@
 import { request } from './api.js';
 import { startSession } from './session.js';
+import { workspaceReturnPath } from './job-context.mjs';
 import { hideMessage, icon, showMessage } from './ui.js';
 
 const form = document.querySelector('[data-auth-form]');
@@ -114,13 +115,6 @@ form.addEventListener('submit', async (event) => {
     fields[valid.indexOf(false)].focus();
     return;
   }
-  try {
-    sessionStorage.setItem('careerconnect.storage-check', '1');
-    sessionStorage.removeItem('careerconnect.storage-check');
-  } catch {
-    showMessage(notice, 'Enable session storage in your browser to continue.');
-    return;
-  }
   const email = form.elements.email.value.trim();
   const password = form.elements.password.value;
   submit.disabled = true;
@@ -143,7 +137,8 @@ form.addEventListener('submit', async (event) => {
     startSession(data.user);
     setButtonState('success');
     await new Promise((resolve) => setTimeout(resolve, 320));
-    location.assign('/dashboard/index.html');
+    const next = new URLSearchParams(location.search).get('next');
+    location.assign(workspaceReturnPath(next, location.origin));
   } catch (error) {
     if (registered) {
       form.hidden = true;

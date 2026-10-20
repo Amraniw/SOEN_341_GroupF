@@ -92,6 +92,10 @@ Or start it in development mode with automatic server restarts:
 
 - npm run dev
 
+Use development mode while changing backend routes so Nodemon reloads them.
+If using `npm start`, restart the server after backend changes; a browser refresh
+only reloads frontend files and cannot update the running backend's routes.
+
 Open the application at:
 
 - http://localhost:3000
@@ -99,3 +103,32 @@ Open the application at:
 ## Project Documentation
 
 Additional project documentation, sprint planning, meeting minutes, AI usage logs, user stories, and development-process information will be maintained in this repository and its GitHub Wiki.
+
+## Sprint 2: Job discovery (US-05)
+
+Open **Find jobs** in the landing-page header or workspace navigation to browse,
+search by keyword/location/category, and view complete job descriptions. Search
+criteria are preserved in the URL and when returning from a job.
+
+Public discovery uses `/jobs/`; workspace discovery uses `/workspace/jobs/`
+and retains the workspace sidebar. Both share the same search and details
+implementation. Public navigation recognizes the server session, including
+across landing-page anchors, and Sign out ends that session explicitly.
+See the [stabilization report](Documentation/US-05_Stabilization.md).
+The [account recovery report](Documentation/US-05_Account_Recovery.md) documents
+registration/workspace checks, real retries, and the default-server correction.
+
+To populate a local database with 50 educational demonstration postings, run
+`npm run seed:jobs`. They use real company names but are not verified live
+openings. Normal reruns preserve existing edits. To upgrade the earlier 22-role
+catalog, run `npm run seed:jobs -- --refresh`; this refreshes only the 50 managed
+demo keys, preserving their IDs and unrelated records. The command refuses
+`NODE_ENV=production`. Demo data is never seeded automatically.
+
+See the [visual/content refinement report](Documentation/US-05_Refinement.md)
+for structured details, seed refresh behavior, search semantics and current checks.
+
+Run the regression and job-search integration tests with `npm test`.
+See [the US-05 implementation guide](Documentation/US-05_Job_Discovery.md) for
+API/schema details and [acceptance scenarios](Documentation/Acceptance_Tests/US-05.md)
+for the Sprint 2 GitHub issue handoff.

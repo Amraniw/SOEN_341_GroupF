@@ -1,0 +1,325 @@
+You are continuing CareerConnect development on the existing `test` branch.
+
+This is a focused bug-fix and authentication-stability pass. Do not redesign the application or refactor unrelated systems.
+
+The previous routing/authentication fixes improved navigation, but account creation and workspace initialization are now broken.
+
+Before editing code:
+
+- confirm the current branch is `test`
+- run `git status`
+- preserve existing uncommitted work
+- reproduce the reported failures
+- inspect registration, login, session initialization, auth persistence, account-status checks, redirects, workspace guards/loaders, and error/retry components
+- identify the actual root cause before implementing a fix
+
+Do not bypass authentication checks or hide errors to make the flow appear functional.
+
+
+============================================================
+1. FIX REGISTRATION → WORKSPACE FLOW
+============================================================
+
+Current failure:
+
+After creating an account, the user is redirected to an error state:
+
+"We couldn't open your workspace.
+Your account status could not be checked."
+
+Restore the complete intended flow:
+
+Create account
+→ authentication/session established
+→ account/user state becomes available
+→ workspace authorization/status resolves
+→ user enters workspace successfully
+
+Investigate likely integration points including:
+
+- registration API response
+- session/token creation
+- auth context updates after registration
+- persisted cookies/storage
+- account-status endpoint
+- workspace route guards/loaders
+- redirect timing
+- race conditions between registration completion and workspace initialization
+- incorrect assumptions about user/account data existing immediately
+- malformed or missing IDs
+- stale auth state after redirect
+
+Do not assume any of these is the cause. Trace the actual request/state sequence.
+
+
+============================================================
+2. VERIFY LOGIN STILL WORKS
+============================================================
+
+Existing users must still be able to:
+
+Log in
+→ session initializes
+→ workspace opens
+
+Test both:
+
+- fresh login
+- page refresh after login
+
+A registration fix must not break existing login behavior.
+
+
+============================================================
+3. FIX ACCOUNT-STATUS RETRY BEHAVIOR
+============================================================
+
+The current error screen contains buttons such as:
+
+- Try again
+- Retry account status
+
+They currently appear non-functional.
+
+Every visible button must perform a real action.
+
+If retry is appropriate:
+
+- re-run the actual failed account/session/status request
+- show a loading/disabled state during the retry
+- prevent duplicate requests
+- handle success correctly
+- handle repeated failure correctly
+- preserve the current session when appropriate
+
+Do not implement a fake page reload unless reloading is genuinely the correct recovery mechanism.
+
+
+If retry is NOT meaningful for a particular failure state:
+
+replace it with a useful action.
+
+Examples:
+
+Authenticated but workspace/status unavailable:
+- Retry
+- Back to Home
+- Log out if appropriate
+
+Unauthenticated/session expired:
+- Log in
+- Back to Home
+
+Do not show buttons that cannot resolve the user's current state.
+
+
+============================================================
+4. AUTHENTICATION STATE MUST HAVE ONE SOURCE OF TRUTH
+============================================================
+
+Verify that registration, login, public navigation, workspace navigation, refreshes, and account-status checks all use the same real authentication/session state.
+
+Do not create page-specific fake auth state.
+
+Check whether the previous changes introduced:
+
+- multiple auth providers
+- different auth initialization between public/workspace layouts
+- duplicated session checks
+- redirect loops
+- route guards firing before auth initialization completes
+- anonymous UI appearing while auth is still resolving
+
+Fix the smallest architectural cause rather than layering more conditionals on top.
+
+
+============================================================
+5. HANDLE AUTH INITIALIZATION PROPERLY
+============================================================
+
+The app must distinguish between:
+
+AUTH LOADING
+AUTHENTICATED
+UNAUTHENTICATED
+AUTH/NETWORK FAILURE
+
+Do not treat "not resolved yet" as "logged out."
+
+Likewise, do not treat a temporary status-request failure as proof that the account does not exist.
+
+If initialization is asynchronous, use the existing loading mechanism or implement a small clean one consistent with the current architecture.
+
+
+============================================================
+6. FAILURE SCENARIOS
+============================================================
+
+Handle these intentionally:
+
+Registration succeeds but workspace status request fails
+→ keep the authenticated session if valid
+→ offer a real retry
+
+Session expired
+→ clearly direct user to Log In
+
+Network/API unavailable
+→ useful error + working retry
+
+Invalid/unauthorized session
+→ clear/handle session using the existing auth mechanism
+→ redirect appropriately
+
+Unexpected server error
+→ safe generic message
+→ do not expose internal details
+
+
+============================================================
+7. PRESERVE PREVIOUS FIXES
+============================================================
+
+Do not regress:
+
+- public Find Jobs
+- workspace Find Jobs
+- authentication persistence across public pages
+- How It Works
+- Looking Ahead
+- landing page
+- workspace shell
+- job search/filtering
+- job details
+- responsive layout fixes
+
+Only change shared routing/auth/layout code where required by the root cause.
+
+
+============================================================
+8. TEST THE REAL USER FLOWS
+============================================================
+
+Actually run the app and test:
+
+NEW USER
+Create account
+→ workspace opens
+
+NEW USER + REFRESH
+Create account
+→ workspace
+→ refresh
+→ still authenticated
+
+EXISTING USER
+Log in
+→ workspace
+
+EXISTING USER + REFRESH
+Log in
+→ workspace
+→ refresh
+→ still authenticated
+
+PUBLIC NAVIGATION WHILE AUTHENTICATED
+Workspace
+→ Home
+→ Find Jobs
+→ How It Works
+→ Workspace
+→ still authenticated
+
+FAILED ACCOUNT STATUS
+Simulate/reproduce failure
+→ Retry actually sends a new request
+→ loading state appears
+→ successful retry enters workspace
+
+EXPIRED/INVALID SESSION
+→ appropriate Login action
+→ no useless Retry button
+
+Also verify logout still works.
+
+
+============================================================
+9. BUTTON AUDIT
+============================================================
+
+On every auth/workspace error state touched by this work:
+
+click every visible button.
+
+No dead controls are acceptable.
+
+Verify:
+
+- href/navigation destination
+- click handler
+- loading state
+- disabled state
+- success behavior
+- failure behavior
+
+
+============================================================
+10. TESTS / BUILD
+============================================================
+
+Run all applicable existing:
+
+- auth tests
+- registration tests
+- login tests
+- workspace tests
+- routing tests
+- frontend tests
+- backend tests
+- build
+- lint/type-check
+
+Add focused regression tests where the existing test infrastructure supports them.
+
+At minimum, protect the behavior that caused this regression.
+
+
+============================================================
+11. FINAL CHECK
+============================================================
+
+Do not consider this fixed until:
+
+[ ] registration works end-to-end
+[ ] newly registered users reach the workspace
+[ ] login still works
+[ ] sessions survive refresh
+[ ] public navigation does not log users out
+[ ] account-status retry performs a real retry
+[ ] retry has loading/error handling
+[ ] unauthenticated failures lead to useful Login/Home actions
+[ ] no dead buttons remain
+[ ] no redirect loops exist
+[ ] workspace still loads normally
+[ ] Jobs functionality still works
+[ ] existing tests pass
+[ ] build succeeds
+
+
+============================================================
+12. FINAL RESPONSE
+============================================================
+
+When finished, briefly report:
+
+1. Root cause of registration/workspace failure
+2. Root cause of non-functional retry buttons
+3. Files changed
+4. Authentication/session fix made
+5. User flows tested
+6. Tests/build commands and results
+7. Any genuine remaining limitation
+
+Work only on the `test` branch.
+
+Prioritize a correct and reliable authentication flow over cosmetic workarounds.

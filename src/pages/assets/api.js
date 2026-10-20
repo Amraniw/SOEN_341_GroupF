@@ -15,6 +15,7 @@ export async function request(path, body, method = 'POST') {
     const response = await fetch(`/api${path}`, {
       method,
       credentials: 'same-origin',
+      cache: method === 'GET' ? 'no-store' : undefined,
       headers:
         hasBody && !multipart ? { 'Content-Type': 'application/json' } : undefined,
       body: hasBody ? (multipart ? body : JSON.stringify(body)) : undefined,
@@ -48,7 +49,9 @@ export async function request(path, body, method = 'POST') {
     if (error instanceof ApiError) throw error;
     throw new ApiError(
       error.name === 'AbortError'
-        ? 'The request timed out. It may have completed. Check before trying again.'
+        ? method === 'GET'
+          ? 'The request timed out. Please try again.'
+          : 'The request timed out. It may have completed. Check before trying again.'
         : 'We could not connect. Check your connection and try again.'
     );
   } finally {

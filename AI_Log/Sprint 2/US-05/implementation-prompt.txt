@@ -1,0 +1,2159 @@
+You are acting as the senior full-stack engineer, software architect, frontend engineer, backend/database engineer, UI/UX product designer, and QA engineer responsible for implementing one complete Sprint 2 user story in the existing CareerConnect repository.
+
+You already have access to the repository.
+
+WORK ONLY ON THE `test` BRANCH.
+
+Your assignment is:
+
+SPRINT 2 — US-05: JOB SEARCH AND FILTERING
+
+User Story:
+"As a job seeker, I want to search and filter job postings so that I can quickly find opportunities relevant to me."
+
+GitHub parent issue:
+US-05 — Job Search and Filtering (#5)
+
+Associated sub-issues:
+
+#37 — Design job search interface
+#38 — Implement job search
+#39 — Add filtering options
+#40 — Display matching job postings
+#41 — Test search and filtering
+#73 — Implement job details page
+
+
+============================================================
+1. PRIMARY OBJECTIVE
+============================================================
+
+Implement US-05 as a complete, polished, end-to-end CareerConnect feature.
+
+The result should allow a job seeker to:
+
+- discover the job-search experience from the existing application
+- browse available job postings
+- search for relevant positions
+- filter available jobs
+- understand how many results match
+- combine search criteria and filters
+- clear or modify active filters
+- open an individual job
+- read a professional job-details page
+- return naturally to their previous search state
+- receive useful loading, empty, error, and invalid-job states
+
+This must be FUNCTIONAL software.
+
+Do not create only a visual mockup.
+
+However, do not use this assignment as an excuse to implement unrelated future CareerConnect functionality.
+
+
+============================================================
+2. START BY INSPECTING THE REPOSITORY
+============================================================
+
+DO NOT start coding immediately.
+
+Your first task is repository reconnaissance.
+
+Inspect the actual project before making architectural decisions.
+
+Determine:
+
+FRONTEND
+- framework
+- routing strategy
+- application entry point
+- page structure
+- component conventions
+- state-management approach
+- styling system
+- design tokens
+- responsive conventions
+- animation/motion utilities
+- icon library
+- form/control components
+- current navigation implementation
+
+BACKEND
+- framework
+- route/controller/service structure
+- API conventions
+- error-response conventions
+- authentication middleware
+- validation approach
+
+DATA
+- database technology
+- ORM/query layer
+- migrations
+- existing Job / JobPosting models
+- Company / Recruiter relationships if any
+- existing seed infrastructure
+- enum/domain definitions
+- timestamps
+- IDs
+- database constraints
+
+TESTING
+- unit-test framework
+- backend integration testing
+- frontend testing
+- end-to-end testing if available
+- test-data/fixture conventions
+
+PROJECT
+- README
+- Sprint documentation
+- user-story documentation
+- architecture documentation
+- existing issue/task conventions
+- CI configuration
+- formatting/lint/type-check configuration
+
+Also run:
+
+git status
+git branch --show-current
+
+before modifying anything.
+
+Confirm that the current branch is `test`.
+
+DO NOT:
+- switch to main
+- merge into main
+- reset existing work
+- discard uncommitted changes
+- run git clean
+- overwrite unrelated work
+- rewrite working Sprint 1 functionality
+
+If the repository contains existing uncommitted changes, PRESERVE THEM.
+
+Understand them before touching overlapping files.
+
+
+============================================================
+3. UNDERSTAND EXISTING CAREERCONNECT FIRST
+============================================================
+
+CareerConnect already has an established identity and frontend direction.
+
+Do not redesign the application.
+
+The existing visual language should remain recognizable:
+
+- CareerConnect emerald/green identity
+- premium but restrained appearance
+- clean professional typography
+- generous but intentional spacing
+- subtle depth
+- sophisticated microinteractions
+- restrained motion
+- strong accessibility
+- professional enterprise credibility
+
+The application should feel like one coherent product.
+
+The Jobs experience must look as though it was always intended to exist inside CareerConnect.
+
+Reuse:
+- buttons
+- inputs
+- badges
+- cards
+- layout primitives
+- navigation components
+- design tokens
+- motion primitives
+- loading states
+- error patterns
+
+when they are already suitable.
+
+Do not create a separate visual system just for job search.
+
+
+============================================================
+4. SPRINT 2 SCOPE
+============================================================
+
+CareerConnect Sprint 2 requires a Job Search and Job Listing Interface including:
+
+- available job opportunities
+- search/filtering using keywords, location, or category
+- individual detailed job descriptions
+
+This user story should therefore be implemented end-to-end where required.
+
+Appropriate scope includes:
+
+- persistent job data
+- job-listing API/data-access logic
+- search logic
+- filter logic
+- job discovery frontend
+- job cards/results
+- job detail retrieval
+- job detail UI
+- navigation integration
+- loading/error/empty states
+- responsive behavior
+- automated testing
+
+Do NOT implement:
+
+- AI job recommendations
+- AI matching scores
+- AI resume analysis
+- candidate ranking
+- recommender systems
+- messaging
+- professional networking
+- employer analytics
+- complete ATS functionality
+- recruiter applicant-management systems
+- external job scraping
+- live synchronization with LinkedIn/Indeed/etc.
+- unrelated future features
+
+Another Sprint 2 feature covers job application submission/tracking.
+
+If application functionality ALREADY EXISTS when you inspect the repository, integrate with it naturally.
+
+If it does NOT exist yet:
+
+DO NOT invent a fake application system.
+
+Design the job-details page so the later application feature can connect cleanly, and document the intended integration point.
+
+
+============================================================
+5. PRODUCT DECISIONS FOR THIS IMPLEMENTATION
+============================================================
+
+Use the following product direction unless repository constraints provide a compelling reason to adapt it.
+
+
+------------------------------------------------------------
+A. JOB DISCOVERY ROUTE
+------------------------------------------------------------
+
+CareerConnect should have a first-class job discovery destination.
+
+Use the existing routing architecture.
+
+Conceptually:
+
+/jobs
+
+and:
+
+/jobs/:jobId
+
+or the equivalent convention already used by the repository.
+
+Do not force these exact URLs if the project follows a different routing standard.
+
+
+------------------------------------------------------------
+B. GLOBAL NAVIGATION
+------------------------------------------------------------
+
+Add a clear Jobs / Find Jobs navigation destination.
+
+Prefer a concise label such as:
+
+Find jobs
+
+or:
+
+Jobs
+
+depending on the existing navigation vocabulary.
+
+Do not create an additional navigation system.
+
+Integrate it into the existing header.
+
+If CareerConnect distinguishes authenticated and unauthenticated navigation, integrate the destination appropriately into both where sensible.
+
+Default product preference:
+
+Browsing job listings should not unnecessarily require authentication if the existing architecture makes public browsing straightforward.
+
+Applying for a job may require authentication.
+
+However, do NOT restructure the application's entire authentication model merely to make job browsing public.
+
+Respect the current architecture.
+
+
+============================================================
+6. JOB DATA STRATEGY
+============================================================
+
+Do NOT hardcode twenty job objects directly inside a frontend page.
+
+Job search should operate against the application's real data layer.
+
+FIRST:
+
+Inspect whether Job / JobPosting records and recruiter-created postings already exist.
+
+If usable job data already exists:
+
+USE IT.
+
+Do not create a parallel dataset.
+
+
+------------------------------------------------------------
+IF DEMONSTRATION DATA IS REQUIRED
+------------------------------------------------------------
+
+If the database currently lacks enough jobs to meaningfully demonstrate US-05, create a controlled demonstration dataset using the repository's existing seed/fixture mechanism.
+
+Target approximately:
+
+20–24 well-designed demonstration job postings.
+
+This is enough for Sprint 2 to demonstrate meaningful combinations without creating unnecessary volume.
+
+The dataset must intentionally contain enough variation to exercise searching and filtering.
+
+Include variation across fields that ACTUALLY EXIST or are appropriately justified in the domain model.
+
+At minimum, Sprint 2 needs meaningful variation in:
+
+- title / keywords
+- location
+- category
+
+Where already supported by the model, also vary:
+
+- employment type
+- workplace arrangement
+- experience level
+
+Examples of sensible categories could include:
+
+- Software Engineering
+- Aerospace / Engineering
+- Data / AI
+- Product / Design
+- Business / Operations
+
+Do not blindly introduce these exact categories if the existing domain uses another taxonomy.
+
+
+------------------------------------------------------------
+DEMONSTRATION JOB INTEGRITY
+------------------------------------------------------------
+
+Do NOT invent fake vacancies at real companies such as:
+
+Google
+Microsoft
+Lockheed Martin
+SpaceX
+Amazon
+
+and present them as genuine openings.
+
+Use fictional but realistic organizations for seeded demo postings.
+
+Examples of naming style:
+
+Northstar Aerospace
+Axiom Robotics
+Vertex Systems
+Meridian Technologies
+
+These are examples only.
+
+Create coherent, realistic posting content.
+
+If all visible jobs in the development environment are demonstration data, communicate this unobtrusively in the UI, for example:
+
+"Sample job listings for demonstration purposes."
+
+Do not clutter every card with a giant DEMO badge.
+
+Seed data must be:
+
+- deterministic
+- repeatable
+- idempotent where practical
+- isolated from tests
+- clearly identifiable as development/demo data
+- safe to rerun
+
+Never automatically seed fake jobs into a production environment.
+
+
+============================================================
+7. DATA MODEL
+============================================================
+
+Inspect the existing Job / JobPosting model before changing it.
+
+Do not redesign the schema merely because additional fields would look nice in the UI.
+
+The minimum useful job entity typically requires information equivalent to:
+
+- unique ID
+- title
+- employer/company
+- location
+- category
+- description
+
+Likely useful fields, IF already present or justified:
+
+- employment type
+- workplace arrangement
+- created/posted timestamp
+- status
+- recruiter/company relationship
+
+Do not add:
+
+- salary
+- years of experience
+- employer logos
+- benefits
+- skills
+- company descriptions
+
+solely to make cards visually richer unless those concepts already belong in the repository's data model.
+
+Schema changes are acceptable when required for correct implementation, but must be:
+
+- minimal
+- migrated properly
+- backward compatible where practical
+- consistent with project conventions
+
+
+============================================================
+8. SEARCH ARCHITECTURE
+============================================================
+
+Search should be performed through the real application architecture.
+
+Do NOT:
+
+load all jobs into an unrelated frontend array and pretend that client-side filtering is the application's search system
+
+unless the existing architecture is intentionally frontend-only.
+
+Prefer server/data-layer filtering when a backend and database already exist.
+
+
+------------------------------------------------------------
+KEYWORD QUERY
+------------------------------------------------------------
+
+Provide one primary keyword search field.
+
+It should meaningfully match fields such as:
+
+- job title
+- company/employer name
+- relevant textual keywords
+
+Description matching may be included where appropriate.
+
+Do not implement sophisticated relevance ranking or full-text infrastructure merely for Sprint 2.
+
+A well-designed case-insensitive substring/token search is sufficient.
+
+Examples:
+
+"software"
+
+should reasonably find:
+
+Software Engineer
+Software Engineering Intern
+
+"robotics"
+
+could match a robotics title/company/description where supported.
+
+Normalize:
+
+- leading/trailing whitespace
+- empty queries
+- casing
+
+
+------------------------------------------------------------
+LOCATION
+------------------------------------------------------------
+
+Support searching/filtering by location.
+
+Search should be case-insensitive.
+
+Use the actual format stored in the database.
+
+Do not invent geospatial search.
+
+Do not integrate Google Maps.
+
+Do not implement radius search.
+
+Sprint 2 needs understandable textual location filtering, not geographic infrastructure.
+
+
+------------------------------------------------------------
+CATEGORY
+------------------------------------------------------------
+
+Support category filtering as explicitly required by Sprint 2.
+
+Category values should come from a canonical domain source where possible.
+
+Do not maintain inconsistent duplicate category strings across:
+
+backend
+frontend
+seed data
+
+if an enum/domain definition can be shared or derived.
+
+
+============================================================
+9. OPTIONAL FILTERS
+============================================================
+
+After inspecting the model, determine whether the following already exist and provide genuine value:
+
+- employment type
+- workplace arrangement
+- experience level
+
+Examples:
+
+Employment type:
+- Full-time
+- Part-time
+- Internship
+- Contract
+
+Workplace:
+- On-site
+- Hybrid
+- Remote
+
+Only expose a filter if:
+
+1. the data actually supports it
+2. the filter has meaningful values
+3. the backend can correctly query it
+4. seeded/existing postings contain sufficient variation
+
+Do NOT create schema complexity purely to increase the number of filter controls.
+
+Quality > filter quantity.
+
+
+============================================================
+10. FILTER SEMANTICS
+============================================================
+
+Filters must combine logically.
+
+Use:
+
+AND between filter dimensions.
+
+Example:
+
+keyword = software
+location = Montreal
+category = Software Engineering
+
+means:
+
+jobs matching the software query
+AND Montreal
+AND Software Engineering.
+
+Within a multi-select dimension, if the existing UX supports multi-select, use sensible OR semantics.
+
+Do not create confusing filter behavior.
+
+Blank/unset filters must not restrict results.
+
+
+============================================================
+11. SEARCH API / DATA CONTRACT
+============================================================
+
+Follow existing backend conventions.
+
+Prefer extending an existing job-list endpoint rather than creating redundant APIs.
+
+Conceptually, the behavior might resemble:
+
+GET /jobs
+    ?q=software
+    &location=Montreal
+    &category=SoftwareEngineering
+
+or:
+
+GET /api/jobs?...
+
+Do not copy this route mechanically if the repository uses another pattern.
+
+
+A useful response should expose enough information for:
+
+- job results
+- total matching count
+
+For example conceptually:
+
+{
+  items: [...],
+  total: 12
+}
+
+but use the project's existing API response conventions.
+
+
+------------------------------------------------------------
+IMPLEMENTATION QUALITY
+------------------------------------------------------------
+
+Use:
+
+- ORM/query-builder mechanisms
+- parameterized queries
+- input validation
+- appropriate escaping
+- safe enum handling
+
+NEVER concatenate raw user input into SQL.
+
+Avoid N+1 query behavior when employer relationships are involved.
+
+Do not introduce Elasticsearch, Algolia, Meilisearch, or another search service for this Sprint 2 feature.
+
+That is unnecessary infrastructure.
+
+
+============================================================
+12. URL-SYNCHRONIZED SEARCH STATE
+============================================================
+
+Where supported cleanly by the existing router, synchronize meaningful search state with URL query parameters.
+
+Example conceptually:
+
+/jobs?q=software&location=montreal&category=engineering
+
+This is preferred because it provides:
+
+- reload persistence
+- browser Back/Forward support
+- shareable searches
+- preserved navigation state
+- deterministic UI state
+
+At minimum synchronize:
+
+- keyword query
+- location
+- category
+
+Also synchronize optional filters if implemented.
+
+The URL must remain readable.
+
+Do not serialize large state objects into it.
+
+
+------------------------------------------------------------
+BACK NAVIGATION
+------------------------------------------------------------
+
+If the user searches:
+
+software + Montreal
+
+opens a job,
+
+and then returns to search results,
+
+their previous search/filter state should remain intact.
+
+This is an important UX requirement.
+
+
+============================================================
+13. SEARCH INTERACTION
+============================================================
+
+Create a polished search interface.
+
+For the limited number of Sprint 2 filters, prefer:
+
+TOP SEARCH AREA
++
+HORIZONTAL / COMPACT FILTER CONTROLS
+
+rather than a large permanent left sidebar.
+
+A sidebar is unnecessary unless inspection reveals significantly more filter dimensions.
+
+
+Recommended desktop hierarchy:
+
+Page title / context
+
+[ Keyword or title ] [ Location ] [ Search ]
+
+[ Category ] [ Employment type? ] [ Work arrangement? ]
+
+Result count + active filters
+
+Job results
+
+
+On smaller screens:
+
+stack controls cleanly.
+
+Do not create an elaborate mobile filter drawer unless:
+- there are enough filters to justify one
+- the existing design system already supports drawers/sheets
+
+
+------------------------------------------------------------
+SEARCH RESPONSIVENESS
+------------------------------------------------------------
+
+If backend search is inexpensive and the current frontend architecture supports it cleanly:
+
+- debounce text input approximately 250–350 ms
+- update results
+- prevent stale responses from replacing newer ones
+
+Use AbortController or the framework's equivalent if applicable.
+
+Filter selections can update immediately.
+
+Keep an explicit Search action if it improves clarity/accessibility.
+
+Do not add a large state-management library just to implement this.
+
+
+============================================================
+14. SEARCH RESULT HEADER
+============================================================
+
+Provide useful orientation.
+
+Show:
+
+- matching job count
+- active criteria when useful
+
+Example:
+
+24 jobs
+
+or:
+
+8 jobs for "software"
+
+Avoid marketing language.
+
+Provide:
+
+Clear all
+
+when filters are active.
+
+Active filter chips may be used where consistent with the design system.
+
+Each chip should be removable individually.
+
+
+============================================================
+15. JOB RESULT CARDS
+============================================================
+
+Design reusable JobCard components.
+
+Job cards should optimize SCANNABILITY.
+
+The user should be able to quickly distinguish:
+
+- position
+- employer
+- location
+- relevant metadata
+
+Recommended information hierarchy:
+
+JOB TITLE
+Company
+
+Location
+Work arrangement if supported
+Employment type if supported
+
+Category / useful metadata
+
+Short description preview only if useful
+
+Posted date only if real timestamp information exists
+
+
+Avoid:
+
+- huge cards
+- giant company logos
+- unnecessary gradients
+- excessive badges
+- paragraphs of job description
+- fake salary information
+- decorative statistics
+
+The entire card may be clickable if implemented accessibly.
+
+There should also be an obvious semantic link/action such as:
+
+View details
+
+Keyboard users must be able to operate it normally.
+
+
+============================================================
+16. SEARCH RESULTS LAYOUT
+============================================================
+
+Optimize for scanning rather than visual spectacle.
+
+Prefer a professional vertical listing on desktop.
+
+A job listing contains enough text that wide vertical cards generally provide better scanning than a dense Pinterest-style grid.
+
+Use an appropriate maximum content width.
+
+Maintain strong spacing without wasting screen space.
+
+CareerConnect's design should feel more information-rich here than its landing page while preserving the established premium visual system.
+
+
+============================================================
+17. SORTING
+============================================================
+
+Do not add sorting solely to create another control.
+
+If the data model has reliable posting timestamps:
+
+A simple:
+
+Newest
+
+default/order may be useful.
+
+Additional sorting should only be added if meaningful.
+
+Do NOT create meaningless:
+
+"Best match"
+
+sorting without an actual relevance algorithm.
+
+
+============================================================
+18. PAGINATION
+============================================================
+
+For approximately 20–24 demonstration postings, pagination is NOT inherently necessary.
+
+Do not implement pagination simply because large job sites use it.
+
+If the existing API/list architecture already has pagination, use it.
+
+If pagination naturally fits the project and can be added with little complexity, approximately 10–12 items per page is reasonable.
+
+Otherwise:
+
+return/display the modest Sprint 2 dataset efficiently and keep the architecture extensible.
+
+Do not implement infinite scrolling for Sprint 2.
+
+
+============================================================
+19. LOADING EXPERIENCE
+============================================================
+
+Handle loading deliberately.
+
+For an initial job-list fetch:
+
+use restrained skeletons or the application's existing loading treatment.
+
+Skeleton geometry should resemble actual job cards.
+
+For quick subsequent search operations:
+
+avoid flashing large skeletons repeatedly.
+
+Prefer:
+- subtle loading indicator
+- preserved existing results
+- appropriate request-state feedback
+
+Never fake loading delays.
+
+
+============================================================
+20. EMPTY SEARCH STATE
+============================================================
+
+No-results behavior must be professionally handled.
+
+Example concept:
+
+"No jobs match these filters."
+
+Supporting guidance:
+
+"Try removing a filter or using broader search terms."
+
+Provide an obvious:
+
+Clear filters
+
+action.
+
+Do not treat zero results as an application error.
+
+
+============================================================
+21. ERROR STATE
+============================================================
+
+A failed network/database request is different from zero results.
+
+Display an appropriate error state such as:
+
+"We couldn't load jobs."
+
+Provide:
+
+Try again
+
+where appropriate.
+
+Preserve search/filter state after retry.
+
+Do not expose:
+
+- stack traces
+- SQL errors
+- internal exception details
+
+
+============================================================
+22. JOB DETAILS PAGE — #73
+============================================================
+
+Implement a dedicated professional job details experience.
+
+Use the real job ID / route parameter.
+
+The page should retrieve the requested job from the backend/data layer.
+
+Do not pass the entire job object only through transient frontend state because direct URL access must work.
+
+
+------------------------------------------------------------
+DETAIL HEADER
+------------------------------------------------------------
+
+Display meaningful information such as:
+
+Job title
+Company
+Location
+Employment type if available
+Work arrangement if available
+Category
+Posted date if available
+
+Use the actual model.
+
+
+------------------------------------------------------------
+DETAIL CONTENT
+------------------------------------------------------------
+
+Display the full job description clearly.
+
+If structured content already exists for:
+
+- responsibilities
+- qualifications
+- skills
+- company information
+
+use it.
+
+If the model only contains a description:
+
+DO NOT create fake structured sections in the frontend.
+
+Seeded demo descriptions may contain professionally structured content when the existing model supports it naturally.
+
+
+------------------------------------------------------------
+APPLICATION CTA
+------------------------------------------------------------
+
+Inspect whether the application-submission feature exists.
+
+IF IT EXISTS:
+
+integrate the appropriate:
+
+Apply
+
+action according to its actual API/route.
+
+IF IT DOES NOT EXIST:
+
+do not create a fake application submission.
+
+Do not show a button that pretends to submit an application.
+
+Keep the job-details component architecture ready for this future integration and describe the integration point in the final report.
+
+
+------------------------------------------------------------
+BACK TO RESULTS
+------------------------------------------------------------
+
+Provide:
+
+Back to jobs
+
+or equivalent.
+
+Restore the user's previous search/filter state.
+
+Browser Back must also behave naturally.
+
+
+============================================================
+23. INVALID JOB
+============================================================
+
+Opening an unknown/deleted job ID must not crash the application.
+
+Handle:
+
+404 / not found
+
+professionally.
+
+Example:
+
+"This job posting could not be found."
+
+Provide navigation back to:
+
+Browse jobs
+
+Use existing error-page patterns if available.
+
+
+============================================================
+24. DEMO DATA QUALITY
+============================================================
+
+If you create demonstration postings, make them good enough to test the feature meaningfully.
+
+Do not create:
+
+Job 1
+Job 2
+Test Company
+Lorem ipsum
+
+Create plausible records.
+
+A sample distribution might include roles similar to:
+
+- Software Engineering Intern
+- Embedded Software Developer
+- Flight Controls Engineer
+- Junior Data Engineer
+- Robotics Software Engineer
+- Systems Engineer
+- Frontend Developer
+- Backend Developer
+- Product Designer
+- Mechanical Design Engineer
+- Business Analyst
+- DevOps Engineer
+- QA Automation Engineer
+- Electrical Engineer
+- Full-Stack Developer
+- Data Scientist
+- Product Manager
+- Cybersecurity Analyst
+- Cloud Engineer
+- Aerospace Engineering Intern
+
+These examples are not requirements.
+
+Adapt the dataset to the actual schema.
+
+Ensure the dataset produces useful searches such as:
+
+software
+engineer
+intern
+aerospace
+data
+
+and meaningful location/category combinations.
+
+
+============================================================
+25. FILTER DATA QUALITY
+============================================================
+
+When using seed data, deliberately ensure:
+
+- multiple jobs share a category
+- multiple jobs share a location
+- some queries return multiple matches
+- some filter combinations return one match
+- some combinations legitimately return zero
+- casing does not affect search
+- jobs exist across multiple categories
+
+Testing filters against twenty nearly identical records is not a meaningful implementation.
+
+
+============================================================
+26. ACCESSIBILITY
+============================================================
+
+Accessibility is an engineering requirement.
+
+Search fields need real labels.
+
+Do not rely only on placeholders.
+
+Use:
+
+- semantic form controls
+- proper buttons
+- proper links
+- visible focus treatment
+- sufficient contrast
+- logical heading hierarchy
+- keyboard-operable filters
+- accessible selected states
+
+When result counts change dynamically, use an appropriate restrained accessible announcement mechanism where warranted.
+
+Do not spam screen readers on every keystroke.
+
+Job cards must not become inaccessible nested clickable elements.
+
+
+============================================================
+27. MOTION AND MICROINTERACTION
+============================================================
+
+Reuse CareerConnect's existing motion system.
+
+Do not invent another animation language.
+
+Appropriate interactions include:
+
+Search input focus
+Filter selection
+Filter-chip removal
+Job-card hover
+Button press/focus
+Loading → results transition
+Empty-state transition
+Job-details entrance
+
+Keep motion subtle.
+
+Preferred principles:
+
+- transform and opacity
+- short durations
+- consistent easing
+- no bouncing
+- no large movements
+- no decorative looping animation
+
+Respect:
+
+prefers-reduced-motion
+
+Do not sacrifice search speed for animation.
+
+
+============================================================
+28. RESPONSIVE BEHAVIOR
+============================================================
+
+Test at approximately:
+
+1440px
+1280px
+1024px
+768px
+390px
+
+Desktop should provide efficient scanning.
+
+Tablet should reorganize filters sensibly.
+
+Mobile should:
+
+- stack search controls
+- keep primary search action obvious
+- make filter controls touch-friendly
+- avoid horizontal page overflow
+- preserve readable metadata
+- keep cards compact
+- keep job details readable
+
+Do not simply shrink the desktop layout.
+
+
+============================================================
+29. PERFORMANCE
+============================================================
+
+The implementation does not need enterprise-scale search infrastructure.
+
+It DOES need sound architecture.
+
+Avoid:
+
+- unnecessary duplicate requests
+- fetching job details for every result
+- N+1 queries
+- huge frontend bundles
+- unnecessary new dependencies
+- repeated database queries for static metadata
+- large image assets
+
+If text search queries use the database:
+
+use the ORM/database correctly.
+
+Adding reasonable indexes may be appropriate if:
+- supported by the existing migration strategy
+- clearly useful
+- low risk
+
+Do not prematurely build advanced full-text indexing.
+
+
+============================================================
+30. SEARCH REQUEST RACE CONDITIONS
+============================================================
+
+If the UI performs asynchronous live/debounced searches:
+
+ensure an older response cannot overwrite the results of a newer search.
+
+Example:
+
+User types:
+soft
+software
+
+If the "soft" request finishes AFTER "software", it must not replace the newer results.
+
+Use request cancellation, request IDs, framework-native query management, or an equivalent simple mechanism.
+
+Do not introduce a heavyweight dependency solely for this.
+
+
+============================================================
+31. SECURITY AND INPUT SAFETY
+============================================================
+
+Treat search strings as untrusted input.
+
+Backend queries must be safely parameterized.
+
+Validate:
+
+- enum filters
+- IDs
+- lengths where appropriate
+- query parameter types
+
+Do not expose internal database identifiers unnecessarily if the project already uses public IDs.
+
+Do not implement arbitrary dynamic SQL.
+
+
+============================================================
+32. TESTING — #41
+============================================================
+
+Testing is a major part of this task.
+
+Do not consider US-05 complete because manual clicking works.
+
+Use the project's existing testing stack.
+
+Do not introduce a second competing test framework without strong justification.
+
+
+------------------------------------------------------------
+BACKEND / SERVICE TESTS
+------------------------------------------------------------
+
+Test important search behavior.
+
+At minimum cover:
+
+1. no filters returns available jobs
+2. keyword search finds matching titles
+3. keyword search is case-insensitive
+4. location filtering works
+5. category filtering works
+6. combined filters use correct AND semantics
+7. zero matches returns an empty successful result
+8. valid job ID returns details
+9. invalid job ID returns the proper not-found result
+
+If additional filters are implemented, test them too.
+
+
+------------------------------------------------------------
+TEST FIXTURES
+------------------------------------------------------------
+
+Automated tests must NOT depend on the entire 20–24 item demonstration seed dataset.
+
+Use deterministic test fixtures/factories appropriate to the existing testing architecture.
+
+Tests should create only the data required for each scenario.
+
+
+------------------------------------------------------------
+FRONTEND TESTS
+------------------------------------------------------------
+
+Where the existing frontend testing framework supports it, verify:
+
+- job results render
+- changing query/filter state updates results
+- active filters render correctly
+- clear filters works
+- zero-results state renders
+- job card navigation works
+- job details render
+- API failure state renders
+
+
+------------------------------------------------------------
+USER-FLOW / E2E TEST
+------------------------------------------------------------
+
+If the repository already uses an end-to-end framework, add one focused flow such as:
+
+Open Jobs
+→ search "software"
+→ select a location/category
+→ verify matching jobs
+→ open a job
+→ return to results
+→ verify search state remains
+
+Do not add an entire E2E framework only for this issue.
+
+
+============================================================
+33. SPRINT 2 ACCEPTANCE TESTS
+============================================================
+
+Sprint 2 requires acceptance tests for user stories.
+
+US-05 should have at least two clearly defined acceptance scenarios.
+
+At minimum define scenarios equivalent to:
+
+
+ACCEPTANCE TEST 1 — SEARCH AND COMBINED FILTERS
+
+GIVEN:
+multiple job postings exist
+
+WHEN:
+the user searches by keyword and selects location/category filters
+
+THEN:
+only job postings satisfying the combined criteria are shown
+
+AND:
+the displayed result count is correct.
+
+
+ACCEPTANCE TEST 2 — JOB DETAILS
+
+GIVEN:
+search results contain a job posting
+
+WHEN:
+the user opens that posting
+
+THEN:
+the correct detailed job information is displayed
+
+AND:
+the user can return to the prior search with their search/filter state preserved.
+
+
+Also strongly consider:
+
+ACCEPTANCE TEST 3 — NO RESULTS
+
+GIVEN:
+no job satisfies the selected search/filter combination
+
+THEN:
+the interface shows a useful zero-results state rather than an error.
+
+
+If the repository contains an established place for acceptance-test documentation, update it according to project conventions.
+
+If actual GitHub Issue creation is outside the tools available to you:
+
+DO NOT pretend you created GitHub issues.
+
+Instead include ready-to-copy acceptance-test titles and descriptions in your final report so they can be added manually.
+
+
+============================================================
+34. SUB-ISSUE COMPLETION MAP
+============================================================
+
+Ensure the completed implementation genuinely addresses every assigned sub-issue.
+
+
+#37 — Design job search interface
+
+Complete when:
+- Jobs page exists
+- search hierarchy is clear
+- filter design is professional
+- responsive states are implemented
+- existing CareerConnect visual language is preserved
+
+
+#38 — Implement job search
+
+Complete when:
+- actual job data is queried
+- keyword search works correctly
+- backend/frontend integration works
+- search state behaves correctly
+
+
+#39 — Add filtering options
+
+Complete when:
+- required location/category filtering works
+- justified optional filters work if implemented
+- combined filters behave correctly
+- filters can be removed/reset
+
+
+#40 — Display matching job postings
+
+Complete when:
+- matching jobs render accurately
+- count is accurate
+- cards are reusable
+- loading/empty/error states work
+
+
+#41 — Test search and filtering
+
+Complete when:
+- meaningful automated tests exist
+- important combinations and edge cases are verified
+- tests pass
+
+
+#73 — Implement job details page
+
+Complete when:
+- dedicated route exists
+- direct URL access works
+- real job data loads
+- invalid IDs are handled
+- previous search state can be restored
+
+
+============================================================
+35. DO NOT OVER-ENGINEER
+============================================================
+
+Reject unnecessary complexity.
+
+Do NOT add:
+
+Redux / Zustand / another global store
+
+unless the project already uses one or there is a genuine architectural need.
+
+Do NOT add:
+
+Elasticsearch
+Algolia
+Meilisearch
+Redis
+GraphQL
+
+just for this feature.
+
+Do NOT introduce an animation framework solely for one page.
+
+Do NOT rewrite the backend architecture.
+
+Do NOT redesign authentication.
+
+Do NOT introduce a separate design system.
+
+Do NOT restructure the entire repository.
+
+The best implementation is the smallest coherent architecture that correctly solves the complete user story and remains easy to extend.
+
+
+============================================================
+36. CODE QUALITY
+============================================================
+
+Follow existing repository conventions.
+
+Prefer:
+
+- clear names
+- focused functions
+- focused components
+- reusable query/service logic
+- centralized filter definitions
+- predictable data flow
+- minimal duplication
+- explicit error handling
+- consistent API types/interfaces
+
+Avoid:
+
+- giant page components
+- business logic buried inside rendering code
+- duplicated filter logic in frontend and backend where avoidable
+- magic strings everywhere
+- commented-out experiments
+- console.log debugging left behind
+- dead code
+- unnecessary dependencies
+
+
+============================================================
+37. FUTURE EXTENSIBILITY
+============================================================
+
+Do not implement future systems, but avoid painting the team into a corner.
+
+This job discovery feature will eventually interact with:
+
+- recruiter-created postings
+- job applications
+- saved jobs
+- application tracking
+- possible future recommendation systems
+
+The current architecture should make these additions straightforward.
+
+For example:
+
+JobCard should consume a job model, not demo-specific data.
+
+JobDetails should retrieve by job ID.
+
+Search should operate against the real job repository/service.
+
+Do not create abstractions for hypothetical features before they are needed.
+
+
+============================================================
+38. CONTINUOUS INTEGRATION
+============================================================
+
+Sprint 2 has a team-level CI requirement.
+
+Your responsibility here is primarily:
+
+make sure the new code and tests are compatible with the repository's existing CI.
+
+Inspect the CI configuration.
+
+If CI already exists:
+
+ensure your tests participate correctly.
+
+Do NOT overhaul the pipeline.
+
+If CI does not exist and creating it is clearly assigned elsewhere:
+
+do not expand US-05 into a CI-infrastructure project.
+
+Document which commands should be included in CI.
+
+
+============================================================
+39. IMPLEMENTATION ORDER
+============================================================
+
+Use a disciplined incremental strategy.
+
+Recommended order:
+
+
+PHASE 1 — DISCOVERY
+
+- git status
+- confirm test branch
+- inspect architecture
+- inspect Job model/API
+- inspect frontend
+- inspect design system
+- inspect tests
+- identify integration points
+
+
+PHASE 2 — TECHNICAL PLAN
+
+Before making major edits, form a concise internal implementation plan covering:
+
+- data source
+- API changes
+- query behavior
+- routing
+- components
+- filters
+- test strategy
+- seed-data strategy
+
+Do not produce a giant speculative redesign.
+
+
+PHASE 3 — DATA / BACKEND
+
+Implement or refine:
+
+- job persistence
+- demo seed data if required
+- list/search endpoint
+- filters
+- details endpoint
+- validation/error handling
+
+Test backend behavior before relying on it from UI.
+
+
+PHASE 4 — FRONTEND
+
+Implement:
+
+- navigation
+- Jobs page
+- search
+- filters
+- result count
+- active filters
+- job cards
+- states
+
+
+PHASE 5 — JOB DETAILS
+
+Implement:
+
+- route
+- retrieval
+- details UI
+- not-found handling
+- return navigation
+
+
+PHASE 6 — TESTING
+
+Add/run:
+
+- unit tests
+- integration tests
+- frontend tests
+- existing test suite
+
+
+PHASE 7 — BROWSER REVIEW
+
+Actually run CareerConnect.
+
+Do not assess visual quality purely from source code.
+
+
+PHASE 8 — REFINEMENT
+
+Fix:
+
+- UX deficiencies
+- responsive problems
+- accessibility problems
+- duplicate queries
+- race conditions
+- layout shifts
+- inconsistent design
+- brittle tests
+
+
+============================================================
+40. BROWSER VALIDATION MATRIX
+============================================================
+
+Manually verify these scenarios where practical:
+
+
+DEFAULT
+
+Open /jobs.
+
+Expected:
+available jobs display correctly.
+
+
+KEYWORD
+
+Search:
+software
+
+Expected:
+matching jobs only.
+
+
+CASE INSENSITIVITY
+
+Search:
+SOFTWARE
+
+Expected:
+equivalent logical result to software.
+
+
+LOCATION
+
+Select/type a known location.
+
+Expected:
+correct location results.
+
+
+CATEGORY
+
+Select category.
+
+Expected:
+correct category results.
+
+
+COMBINED
+
+software
++
+location
++
+category
+
+Expected:
+intersection of criteria.
+
+
+CLEAR ONE FILTER
+
+Expected:
+remaining filters stay active.
+
+
+CLEAR ALL
+
+Expected:
+default results return.
+
+
+NO RESULTS
+
+Expected:
+useful empty state.
+
+
+DETAIL
+
+Open one job.
+
+Expected:
+correct posting.
+
+
+BACK
+
+Return from detail.
+
+Expected:
+search/filter state preserved.
+
+
+DIRECT DETAIL URL
+
+Reload /jobs/:id.
+
+Expected:
+job still loads.
+
+
+INVALID DETAIL
+
+Open invalid ID.
+
+Expected:
+professional not-found state.
+
+
+NETWORK/API FAILURE
+
+Simulate where practical.
+
+Expected:
+proper error state.
+
+
+MOBILE
+
+Repeat important search/detail behavior around 390px.
+
+
+============================================================
+41. VISUAL QUALITY REVIEW
+============================================================
+
+The job-search experience should feel more like mature professional software than a student CRUD interface.
+
+Ask critically:
+
+- Can I scan jobs quickly?
+- Is the search bar visually dominant enough?
+- Are filters easy to understand?
+- Is too much screen space wasted?
+- Are job cards too large?
+- Is metadata consistent?
+- Are there too many badges?
+- Does the page feel part of CareerConnect?
+- Does it remain premium without becoming decorative?
+- Does mobile still feel intentionally designed?
+- Would a recruiter or professional trust this interface?
+
+Fix meaningful deficiencies.
+
+Do not solve every problem by adding another card or shadow.
+
+
+============================================================
+42. FUNCTIONAL QUALITY REVIEW
+============================================================
+
+Before declaring completion, verify:
+
+- query logic is correct
+- filters combine correctly
+- URLs represent state
+- refresh preserves state
+- browser Back works
+- no stale search result race exists
+- detail routes work directly
+- missing jobs do not crash
+- demo data is not misleading
+- data comes from the proper source
+- existing features remain functional
+
+
+============================================================
+43. BUILD / TEST / STATIC ANALYSIS
+============================================================
+
+Run every applicable existing command, such as:
+
+- frontend build
+- backend build
+- type checker
+- linter
+- formatter check
+- unit tests
+- integration tests
+- frontend tests
+
+Use the commands defined by the repository rather than inventing replacements.
+
+Fix failures caused by your work.
+
+Do not silence legitimate warnings/errors just to obtain a green result.
+
+If a pre-existing failure exists:
+
+identify it clearly and distinguish it from failures introduced by US-05.
+
+
+============================================================
+44. ACCEPTANCE CRITERIA
+============================================================
+
+Do not consider US-05 complete until all applicable items below are satisfied.
+
+[ ] Current branch is `test`
+[ ] Existing uncommitted work was preserved
+[ ] Existing architecture was inspected before implementation
+[ ] Jobs are accessible through existing navigation
+[ ] Job data comes from the application's real data layer
+[ ] Demo data, if needed, is seeded rather than hardcoded in page components
+[ ] Demo postings are not misrepresented as genuine live vacancies
+[ ] Job browsing page is implemented
+[ ] Keyword search works
+[ ] Search is case-insensitive
+[ ] Location filtering works
+[ ] Category filtering works
+[ ] Optional filters, if added, genuinely work
+[ ] Filters combine correctly
+[ ] Search state and meaningful filters are URL-synchronized where architecture permits
+[ ] Result count is correct
+[ ] Active filters can be removed
+[ ] All filters can be cleared
+[ ] Job cards are reusable and accurate
+[ ] Loading state exists
+[ ] Empty state exists
+[ ] API/error state exists
+[ ] Job details route exists
+[ ] Direct job-details navigation works
+[ ] Invalid jobs produce a not-found state
+[ ] Returning from details preserves previous search context
+[ ] No fake application system was created
+[ ] Desktop layout is polished
+[ ] Tablet layout is usable
+[ ] Mobile layout is usable
+[ ] Keyboard navigation works
+[ ] Focus states are visible
+[ ] Search inputs have proper labels
+[ ] Backend input handling is safe
+[ ] No raw user input is concatenated into SQL
+[ ] Search request races are handled if live search is used
+[ ] Meaningful automated tests exist
+[ ] At least two US-05 acceptance scenarios are clearly defined
+[ ] Existing tests still pass
+[ ] Build succeeds
+[ ] Existing Sprint 1 functionality still works
+[ ] No unnecessary dependency was introduced
+[ ] No unrelated future feature was implemented
+
+
+============================================================
+45. FINAL SELF-REVIEW
+============================================================
+
+Before stopping, perform a deliberate review from five perspectives.
+
+
+PRODUCT
+
+Does US-05 solve the actual user's problem?
+
+
+FRONTEND
+
+Is finding a job fast, clear, responsive, and accessible?
+
+
+BACKEND
+
+Are the API/query/data decisions clean and maintainable?
+
+
+QA
+
+Could incorrect search/filter behavior survive the current tests?
+
+
+ARCHITECTURE
+
+Can recruiter-created jobs and later application functionality plug into this implementation without replacing it?
+
+
+If you identify a meaningful deficiency:
+
+fix it.
+
+Do not repeatedly rewrite code for cosmetic perfection.
+
+Iterate based on evidence.
+
+
+============================================================
+46. FINAL RESPONSE
+============================================================
+
+When implementation and validation are complete, provide a concise engineering report with these sections:
+
+
+1. IMPLEMENTATION SUMMARY
+
+What was built.
+
+
+2. GITHUB ISSUE MAPPING
+
+For each:
+
+#37
+#38
+#39
+#40
+#41
+#73
+
+briefly explain what implementation satisfies it.
+
+
+3. ARCHITECTURAL DECISIONS
+
+Explain:
+
+- data source
+- search implementation
+- filter implementation
+- URL-state strategy
+- routing strategy
+- seed-data decision
+
+
+4. FILES CHANGED
+
+List important files and their purpose.
+
+
+5. DATABASE CHANGES
+
+Describe:
+
+- migrations
+- seed data
+- schema changes
+
+or explicitly state that none were necessary.
+
+
+6. SEARCH BEHAVIOR
+
+Document exactly:
+
+- fields searched
+- filters supported
+- combination semantics
+- sorting/pagination behavior if applicable
+
+
+7. TESTING
+
+List every command executed and its result.
+
+Summarize tests added.
+
+
+8. ACCEPTANCE TESTS
+
+Provide at least two ready-to-copy Sprint 2 acceptance-test descriptions for US-05 if they were not already created through available GitHub tooling.
+
+
+9. RESPONSIVE / ACCESSIBILITY VALIDATION
+
+Summarize what was checked.
+
+
+10. KNOWN LIMITATIONS
+
+State legitimate limitations without disguising them.
+
+
+11. FUTURE INTEGRATION
+
+Identify the specific extension points for:
+
+- application submission
+- recruiter-created postings
+- saved jobs
+
+without implementing those features now.
+
+
+============================================================
+47. FINAL RULE
+============================================================
+
+Do not optimize for the amount of code written.
+
+Optimize for:
+
+CORRECTNESS
++
+COHESION
++
+PROFESSIONAL USER EXPERIENCE
++
+SPRINT 2 SCOPE DISCIPLINE
++
+MAINTAINABILITY
++
+VERIFIABLE TESTING.
+
+The goal is not:
+
+"we added a search page."
+
+The goal is:
+
+"CareerConnect now has a credible, functional job-discovery subsystem that fully satisfies US-05 and is ready to evolve naturally during later sprints."
+
+Proceed independently.
+
+Inspect the repository first, make reasonable evidence-based engineering decisions, implement incrementally, test the actual behavior, review the application in the browser, refine meaningful deficiencies, and only then declare the work complete.
