@@ -2,6 +2,7 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const sqlite3 = require('sqlite3');
 const { open } = require('sqlite');
+const { JOB_CATEGORIES } = require('../domain/jobs');
 
 const DEFAULT_DATABASE_PATH = path.join(
   __dirname,
@@ -43,7 +44,46 @@ async function initializeDatabase(databasePath = process.env.DB_PATH || DEFAULT_
     );
 
     CREATE INDEX IF NOT EXISTS idx_resumes_user_id ON resumes(user_id);
+
+    CREATE TABLE IF NOT EXISTS job_categories (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL UNIQUE
+    );
+
+    CREATE TABLE IF NOT EXISTS jobs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL CHECK (length(trim(title)) > 0),
+      company TEXT NOT NULL CHECK (length(trim(company)) > 0),
+      location TEXT NOT NULL CHECK (length(trim(location)) > 0),
+      category TEXT NOT NULL REFERENCES job_categories(id),
+      description TEXT NOT NULL CHECK (length(trim(description)) > 0),
+      status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'closed')),
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      demo_key TEXT UNIQUE
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_jobs_available ON jobs(status, created_at DESC, id DESC);
   `);
+
+  // Additive migration: older databases and plain-text postings remain valid.
+  const jobColumns = new Set((await database.all('PRAGMA table_info(jobs)')).map(({ name }) => name));
+  const detailColumns = {
+    employment_type: "TEXT CHECK (employment_type IN ('Full-time', 'Internship', 'Contract'))",
+    workplace_type: "TEXT CHECK (workplace_type IN ('On-site', 'Hybrid', 'Remote'))",
+    experience_level: "TEXT CHECK (experience_level IN ('Intern', 'Entry-level', 'Mid-level', 'Senior'))",
+    details_json: 'TEXT',
+  };
+  for (const [name, definition] of Object.entries(detailColumns)) {
+    if (!jobColumns.has(name)) await database.exec(`ALTER TABLE jobs ADD COLUMN ${name} ${definition}`);
+  }
+
+  for (const category of JOB_CATEGORIES) {
+    await database.run(
+      'INSERT INTO job_categories (id, name) VALUES (?, ?) ON CONFLICT(id) DO UPDATE SET name = excluded.name',
+      category.id,
+      category.name
+    );
+  }
 
   return database;
 }

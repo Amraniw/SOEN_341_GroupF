@@ -61,7 +61,48 @@
   gap: 10px;
   margin-left: auto;
 }
-.public-header + main {
+.account-placeholder {
+  min-width: 160px;
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: end;
+  color: var(--muted);
+  font-size: 12px;
+}
+.account-status-error {
+  display: grid;
+  gap: 4px;
+  padding-block: 8px;
+  justify-items: end;
+}
+.account-status-error p {
+  margin: 0;
+  font-size: 12px;
+}
+.account-status-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.signout-button {
+  padding-inline: 12px;
+  white-space: nowrap;
+}
+.signout-error {
+  margin: 16px auto;
+  max-width: 1040px;
+}
+.public-nav [aria-current] {
+  color: var(--brand);
+}
+.public-nav [aria-current]::after {
+  transform: scaleX(1);
+}
+.landing-main [id] {
+  scroll-margin-top: 110px;
+}
+.landing-main {
   position: relative;
   overflow: hidden;
   background:
@@ -77,7 +118,7 @@
     ),
     linear-gradient(180deg, #f8faf8 0, var(--canvas) 43rem, #fff 58rem);
 }
-.public-header + main::before {
+.landing-main::before {
   content: '';
   position: absolute;
   top: 2rem;

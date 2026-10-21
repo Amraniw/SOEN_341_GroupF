@@ -125,10 +125,23 @@
   display: none;
 }
 .workspace-main {
+  min-width: 0;
   width: 100%;
   max-width: 1220px;
   margin-inline: auto;
   padding: 42px 46px 28px;
+}
+.workspace-session-status {
+  padding-block: 64px;
+}
+.session-recovery-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.workspace-public-link {
+  margin: 24px 14px 0;
 }
 .breadcrumb {
   font-size: 11px;

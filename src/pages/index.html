@@ -14,27 +14,8 @@
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
-    <header class="public-header">
-      <div class="container">
-        <a class="brand" href="/index.html"
-          ><img
-            src="/assets/brand.svg"
-            width="36"
-            height="36"
-            alt=""
-          />CareerConnect<span class="brand-dot">.</span></a
-        >
-        <nav class="public-nav" aria-label="About CareerConnect">
-          <a href="#how-it-works">How it works</a
-          ><a href="#looking-ahead">Looking ahead</a>
-        </nav>
-        <div class="header-actions">
-          <a class="button button-quiet" href="/auth/login.html">Sign in</a
-          ><a class="button" href="/auth/signup.html">Create account</a>
-        </div>
-      </div>
-    </header>
-    <main id="main">
+    <header class="public-header" data-public-header><noscript><a class="text-link" href="/index.html">CareerConnect home</a></noscript></header>
+    <main id="main" class="landing-main">
       <section class="container hero">
         <div class="hero-copy">
           <p class="eyebrow">YOUR CAREER, WITH DIRECTION</p>
@@ -194,12 +175,12 @@
           </article>
           <article class="feature">
             <span class="feature-number">03 / YOUR NEXT CHAPTER</span>
-            <h3>Room for what comes next.</h3>
+            <h3>Find your next role.</h3>
             <p>
-              Job discovery, employer profiles, and application tracking are
-              planned as the platform grows.
+              Browse available opportunities and narrow your search by keyword,
+              location, and category.
             </p>
-            <span class="badge badge-upcoming">Coming in future releases</span>
+            <a class="text-link" href="/jobs/">Find jobs <span data-icon="arrow"></span></a>
           </article>
         </div>
       </section>
@@ -230,7 +211,7 @@
           />CareerConnect<span class="brand-dot">.</span></a
         >
         <p>© 2026 CareerConnect. A considered next step.</p>
-        <a class="text-link" href="/auth/login.html"
+        <a class="text-link" href="/dashboard/index.html"
           >Your workspace <span data-icon="arrow"></span
         ></a>
       </div>

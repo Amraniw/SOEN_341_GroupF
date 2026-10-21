@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Browse opportunities and find your next role with CareerConnect." />
+    <title>Find jobs | CareerConnect</title>
+    <link rel="icon" href="/assets/brand.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/assets/styles.css" />
+    <link rel="stylesheet" href="/assets/jobs.css" />
+    <script type="module" src="/assets/jobs.js"></script>
+  </head>
+  <body data-page="jobs">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="public-header" data-public-header><noscript><a class="text-link" href="/index.html">CareerConnect home</a></noscript></header>
+    <main id="main" class="jobs-main" tabindex="-1">
+      <div class="jobs-content container">
+        <div class="jobs-heading">
+          <p class="eyebrow">YOUR NEXT CHAPTER</p>
+          <h1>Find your next role.</h1>
+          <p>Explore opportunities. Focus on what matters to you.</p>
+        </div>
+        <form id="job-search" class="job-search" action="/jobs/" method="get" role="search" aria-label="Search job postings">
+          <div class="search-fields">
+            <div class="search-field">
+              <label for="job-query">Keywords</label>
+              <input id="job-query" name="q" type="search" maxlength="120" placeholder="Job title, company, or keyword" />
+            </div>
+            <div class="search-field">
+              <label for="job-location">Location</label>
+              <input id="job-location" name="location" type="search" maxlength="100" placeholder="City, province, or state" />
+            </div>
+          </div>
+          <div class="search-filters">
+            <label for="job-category">Category</label>
+            <select id="job-category" name="category"><option value="">All categories</option></select>
+            <span class="search-hint">Combine filters to narrow your search.</span>
+          </div>
+          <button class="button" type="submit"><span data-icon="briefcase"></span>Search jobs</button>
+        </form>
+        <noscript><p class="notice notice-info">Enable JavaScript to load job listings and search results.</p></noscript>
+        <section class="job-results" aria-labelledby="results-heading">
+          <div class="results-heading">
+            <h2 id="results-heading">Available opportunities</h2>
+            <span class="results-order">Newest first</span>
+          </div>
+          <p id="results-status" class="results-status" role="status" aria-live="polite" aria-atomic="true">Loading jobs...</p>
+          <div id="active-filters" class="active-filters" aria-label="Active search filters" hidden></div>
+          <p id="demo-notice" class="demo-notice" hidden>Demonstration job postings for educational purposes. These are not verified live openings.</p>
+          <div id="jobs-feedback" hidden></div>
+          <ul id="job-list" class="job-list" aria-label="Job results" aria-busy="true"></ul>
+        </section>
+        <footer class="workspace-footer"><span>© 2026 CareerConnect</span><span>A considered next step.</span></footer>
+      </div>
+    </main>
+  </body>
+</html>

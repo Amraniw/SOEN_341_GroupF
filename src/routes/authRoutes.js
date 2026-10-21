@@ -40,6 +40,25 @@ function toPublicUser(user) {
 function createAuthRouter(database) {
   const router = express.Router();
 
+  // The signed HttpOnly cookie and database, rather than browser display storage,
+  // determine identity in every presentation context.
+  router.get('/session', async (request, response) => {
+    response.set('Cache-Control', 'no-store');
+    const userId = request.session?.userId;
+    if (!Number.isInteger(userId)) return response.json({ user: null });
+    const user = await database.get(
+      'SELECT id, name, email, created_at FROM users WHERE id = ?', userId
+    );
+    if (!user) request.session = null;
+    return response.json({ user: user ? toPublicUser(user) : null });
+  });
+
+  router.post('/logout', (request, response) => {
+    request.session = null;
+    response.set('Cache-Control', 'no-store');
+    response.json({ message: 'Signed out successfully.' });
+  });
+
   router.post('/register', async (request, response, next) => {
     try {
       const body = request.body || {};
