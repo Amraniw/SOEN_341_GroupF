@@ -3,6 +3,7 @@ const path = require('node:path');
 const sqlite3 = require('sqlite3');
 const { open } = require('sqlite');
 const { JOB_CATEGORIES } = require('../domain/jobs');
+const { APPLICATION_STATUS_IDS } = require('../domain/applications');
 
 const DEFAULT_DATABASE_PATH = path.join(
   __dirname,
@@ -63,6 +64,50 @@ async function initializeDatabase(databasePath = process.env.DB_PATH || DEFAULT_
     );
 
     CREATE INDEX IF NOT EXISTS idx_jobs_available ON jobs(status, created_at DESC, id DESC);
+
+    CREATE TABLE IF NOT EXISTS applications (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      job_id INTEGER NOT NULL,
+      status TEXT NOT NULL DEFAULT 'applied'
+        CHECK (status IN (${APPLICATION_STATUS_IDS.map((status) => `'${status}'`).join(', ')})),
+      applied_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE RESTRICT,
+      UNIQUE (user_id, job_id)
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_applications_user_updated
+      ON applications(user_id, updated_at DESC, id DESC);
+
+    CREATE TABLE IF NOT EXISTS application_status_history (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      application_id INTEGER NOT NULL,
+      status TEXT NOT NULL
+        CHECK (status IN (${APPLICATION_STATUS_IDS.map((status) => `'${status}'`).join(', ')})),
+      changed_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (application_id) REFERENCES applications(id) ON DELETE CASCADE
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_application_history_application
+      ON application_status_history(application_id, changed_at ASC, id ASC);
+
+    CREATE TRIGGER IF NOT EXISTS applications_record_initial_status
+    AFTER INSERT ON applications
+    BEGIN
+      INSERT INTO application_status_history (application_id, status)
+      VALUES (NEW.id, NEW.status);
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS applications_record_status_change
+    AFTER UPDATE OF status ON applications
+    WHEN NEW.status <> OLD.status
+    BEGIN
+      UPDATE applications SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
+      INSERT INTO application_status_history (application_id, status)
+      VALUES (NEW.id, NEW.status);
+    END;
   `);
 
   // Additive migration: older databases and plain-text postings remain valid.

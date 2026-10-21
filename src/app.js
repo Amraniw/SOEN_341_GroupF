@@ -6,6 +6,7 @@ const multer = require('multer');
 const { createAuthRouter } = require('./routes/authRoutes');
 const { createResumeRouter } = require('./routes/resumeRoutes');
 const { createJobRouter } = require('./routes/jobRoutes');
+const { createApplicationRouter } = require('./routes/applicationRoutes');
 const { UnsupportedResumeTypeError } = require('./middleware/resumeUpload');
 
 const SESSION_MAX_AGE_MS = 24 * 60 * 60 * 1000;
@@ -32,6 +33,7 @@ function createApp(database, options = {}) {
   app.use(express.json({ limit: '10kb' }));
   app.use('/api', createAuthRouter(database));
   app.use('/api/jobs', createJobRouter(database));
+  app.use('/api/applications', createApplicationRouter(database));
   app.use(
     '/api/resumes',
     createResumeRouter(database, { uploadDirectory: options.uploadDirectory })

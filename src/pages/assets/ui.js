@@ -7,6 +7,8 @@ const paths = {
   check: '<path d="m5 12 4 4L19 6"/>',
   briefcase:
     '<rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V3h8v4M3 12l9 3 9-3M12 12v5"/>',
+  applications:
+    '<path d="M9 5h6M9 3h6v4H9zM7 5H5v16h14V5h-2M8 12l2 2 5-5M8 18h8"/>',
   building:
     '<path d="M4 21V3h11v18M15 9h5v12M8 7h3M8 11h3M8 15h3M8 21v-3h3v3"/>',
   lock: '<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/>',
@@ -51,6 +53,22 @@ export function formatDate(value) {
         month: 'short',
         day: 'numeric',
         year: 'numeric',
+      });
+}
+
+export function formatDateTime(value) {
+  if (typeof value !== 'string' || !value) return 'Date unavailable';
+  const date = new Date(
+    value.includes('T') ? value : value.replace(' ', 'T') + 'Z'
+  );
+  return Number.isNaN(date.getTime())
+    ? 'Date unavailable'
+    : date.toLocaleString(undefined, {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
       });
 }
 

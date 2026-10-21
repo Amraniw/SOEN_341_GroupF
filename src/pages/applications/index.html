@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Track your CareerConnect job applications and their latest status." />
+    <title>Applications | CareerConnect</title>
+    <link rel="icon" href="/assets/brand.svg" type="image/svg+xml" />
+    <script src="/assets/theme.js"></script>
+    <link rel="stylesheet" href="/assets/styles.css" />
+    <link rel="stylesheet" href="/assets/applications.css" />
+    <script type="module" src="/assets/applications.js"></script>
+  </head>
+  <body data-page="applications">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <noscript><p class="noscript-message">JavaScript is required to track applications. Enable it, then <a href="/auth/login.html">sign in</a>.</p></noscript>
+    <div data-workspace hidden>
+      <header class="workspace-header" id="workspace-header"></header>
+      <div class="workspace-layout">
+        <aside class="workspace-sidebar" id="workspace-sidebar" aria-label="Workspace navigation"></aside>
+        <main class="workspace-main applications-main" id="main" tabindex="-1">
+          <div class="breadcrumb"><a href="/dashboard/index.html">Workspace</a><span aria-hidden="true">/</span><span>Applications</span></div>
+          <div class="page-heading applications-heading">
+            <div><p class="eyebrow">YOUR OPPORTUNITIES</p><h1>Applications</h1><p>Every application and its latest status, together in one clear view.</p></div>
+            <a class="button" href="/workspace/jobs/">Find jobs <span data-icon="arrow"></span></a>
+          </div>
+          <section class="application-overview" aria-labelledby="application-overview-heading">
+            <div><p class="eyebrow">AT A GLANCE</p><h2 id="application-overview-heading"><span id="application-total">—</span> applications</h2></div>
+            <div id="application-summary" class="application-summary" aria-label="Application status summary"></div>
+          </section>
+          <section class="applications-section" aria-labelledby="application-list-heading">
+            <div class="applications-toolbar">
+              <div><h2 id="application-list-heading">Your application journey</h2><p id="applications-status" role="status" aria-live="polite">Loading applications…</p></div>
+              <label class="application-filter">Show status<select id="application-filter"><option value="">All statuses</option></select></label>
+            </div>
+            <div id="applications-feedback" hidden></div>
+            <ol id="application-list" class="application-list" aria-busy="true"></ol>
+          </section>
+          <footer class="workspace-footer"><span>© 2026 CareerConnect</span><span>A considered next step.</span></footer>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

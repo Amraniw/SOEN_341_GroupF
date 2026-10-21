@@ -40,6 +40,7 @@ Recruiters will also be able to create and manage job postings.
 - Job application submission
 - Application status tracking:
   - Applied
+  - Under Review
   - Interview
   - Offered
   - Rejected
@@ -141,3 +142,17 @@ Run the regression and job-search integration tests with `npm test`.
 See [the US-05 implementation guide](Documentation/US-05_Job_Discovery.md) for
 API/schema details and [acceptance scenarios](Documentation/Acceptance_Tests/US-05.md)
 for the Sprint 2 GitHub issue handoff.
+
+## Sprint 2: Applications (US-06, US-07, US-10)
+
+Signed-in job seekers can apply from a job-detail page and receive an immediate
+success confirmation. Each application is stored in SQLite, protected against
+duplicate submissions, and appears in the **Applications** workspace after a
+refresh or later sign-in. The dashboard tracks the required Applied, Under
+Review, Interview, Offered, and Rejected statuses and preserves an audit history
+whenever the current status changes.
+
+The application endpoints require the signed HttpOnly session and return only
+the current user's records. See the [implementation guide](Documentation/US-06_US-07_Applications.md)
+and the acceptance scenarios for [submission](Documentation/Acceptance_Tests/US-06.md)
+and [tracking](Documentation/Acceptance_Tests/US-07.md).

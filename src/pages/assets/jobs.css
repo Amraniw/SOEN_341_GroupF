@@ -491,6 +491,63 @@
   line-height: 1.6;
   margin: 10px 0 0;
 }
+.application-confirmation {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 10px 12px;
+  align-items: center;
+}
+.application-confirmation-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--brand-soft);
+  color: var(--success);
+  font-weight: 750;
+}
+.application-confirmation strong {
+  display: block;
+  font-size: 14px;
+}
+.application-confirmation p {
+  margin: 2px 0 0;
+}
+.application-confirmation .text-link {
+  grid-column: 1 / -1;
+  font-size: 12px;
+}
+.application-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.status-under-review, .status-interview {
+  color: var(--warning);
+  background: color-mix(in srgb, var(--warning) 12%, var(--surface));
+}
+.status-offered {
+  color: var(--success);
+  background: color-mix(in srgb, var(--success) 12%, var(--surface));
+}
+.status-rejected {
+  color: var(--error);
+  background: color-mix(in srgb, var(--error) 11%, var(--surface));
+}
+.application-error {
+  margin-top: 12px;
+}
+.application-check-warning {
+  color: var(--warning);
+}
 .public-nav [aria-current='page'] {
   color: var(--brand);
 }

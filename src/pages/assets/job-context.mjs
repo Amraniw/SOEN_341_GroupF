@@ -36,7 +36,7 @@ export function workspaceReturnPath(next, origin) {
     const destination = new URL(next || '/dashboard/index.html', origin);
     const allowed = destination.origin === origin && (
       /^\/workspace\/jobs(?:\/|$)/i.test(destination.pathname) ||
-      ['/dashboard/index.html', '/profile/index.html', '/resume/index.html'].includes(destination.pathname)
+      ['/dashboard/index.html', '/profile/index.html', '/resume/index.html', '/applications/index.html'].includes(destination.pathname)
     );
     if (allowed) return destination.pathname + destination.search;
   } catch { /* Invalid return URLs use the ordinary workspace entry. */ }

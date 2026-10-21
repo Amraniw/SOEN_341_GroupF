@@ -44,6 +44,7 @@ if (session) {
   const links = [
     ['dashboard', 'Overview', 'home'],
     ['jobs', 'Find jobs', 'briefcase'],
+    ['applications', 'Applications', 'applications'],
     ['profile', 'My account', 'user'],
     ['resume', 'Resume', 'file'],
   ];
@@ -55,7 +56,7 @@ if (session) {
     <button class="button button-quiet mobile-toggle" type="button" aria-expanded="false" aria-controls="workspace-sidebar" aria-label="Open navigation">${icon('menu')}</button>`;
   document.querySelector('#workspace-sidebar').innerHTML = `
     <div><p class="nav-label">WORKSPACE</p><nav aria-label="Workspace">${links.map(([key, label, symbol]) => `<a class="nav-link" href="${key === 'jobs' ? '/workspace/jobs/' : `/${key}/index.html`}" ${page === key ? 'aria-current="page"' : ''}>${icon(symbol)}${label}${page === key ? '<span class="active-dot"></span>' : ''}</a>`).join('')}</nav>
-    <p class="nav-label nav-label-later">LOOKING AHEAD</p><div class="upcoming-nav"><span>${icon('file')}Applications</span><span>${icon('building')}Companies</span><small>Coming in a future release</small></div><a class="text-link workspace-public-link" href="/index.html">Visit public site ${icon('arrow')}</a></div>
+    <p class="nav-label nav-label-later">LOOKING AHEAD</p><div class="upcoming-nav"><span>${icon('building')}Companies</span><small>Coming in a future release</small></div><a class="text-link workspace-public-link" href="/index.html">Visit public site ${icon('arrow')}</a></div>
     <div class="sidebar-note">A little preparation.<br>A clearer next step.<span>Your career starts with you.</span></div>`;
   document.querySelector('.signout-button').addEventListener('click', (event) => signOut(event.currentTarget));
   const toggle = document.querySelector('.mobile-toggle');
