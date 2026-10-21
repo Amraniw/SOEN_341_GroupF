@@ -37,6 +37,7 @@ describe('Shared job navigation context', () => {
     const origin = 'https://careerconnect.example';
     assert.equal(navigation.workspaceReturnPath('/workspace/jobs/73?q=software', origin), '/workspace/jobs/73?q=software');
     assert.equal(navigation.workspaceReturnPath('/resume/index.html', origin), '/resume/index.html');
+    assert.equal(navigation.workspaceReturnPath('/applications/index.html', origin), '/applications/index.html');
     for (const unsafe of ['https://other.example/workspace/jobs/', '//other.example/workspace/jobs/', 'javascript:alert(1)', 'http://[', '/workspace/jobs/../../outside', '/jobs/', '/workspace/jobs-unrelated']) {
       assert.equal(navigation.workspaceReturnPath(unsafe, origin), '/dashboard/index.html');
     }

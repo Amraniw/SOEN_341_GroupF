@@ -2,7 +2,7 @@
 
 > These notes describe the original Sprint 1 frontend increment. The integrated
 > repository now includes the Express backend, current-resume/deletion endpoints,
-> and Sprint 2 job discovery. Use the root README for current setup and
+> Sprint 2 job discovery, and persistent application submission/tracking. Use the root README for current setup and
 > `Documentation/US-05_Job_Discovery.md` for `/jobs/`, `/jobs/:jobId`, API contracts,
 > demo seeding, and validation. Historical limitations below are not a statement
 > of the current integrated repository's capabilities.
@@ -41,6 +41,9 @@ to be integrated by the team. Do not treat a static preview as a complete deploy
 - /dashboard/index.html: account details, setup steps, resume receipt summary.
 - /profile/index.html: read-only name, email, creation date, account-access limits.
 - /resume/index.html: PDF selection, drag-and-drop, validation, upload, receipts.
+- /jobs/ and /workspace/jobs/: searchable listings and complete job details.
+- /applications/index.html: authenticated application history, status summary,
+  filtering, and progress tracking.
 
 ## Frontend structure
 
@@ -66,6 +69,8 @@ require JavaScript; a noscript message explains how to proceed.
 | Register  | POST /api/register | JSON name, email, password | 201, user                    |
 | Sign in   | POST /api/login    | JSON email, password       | 200, user and session cookie |
 | Upload    | POST /api/resumes  | multipart field resume     | 201, resume                  |
+| Apply     | POST /api/applications | JSON jobId              | 201, application             |
+| Track     | GET /api/applications  | none                    | 200, applications/statuses   |
 
 Registration does not set a session; the frontend signs in after successful
 registration. If that second request fails, it confirms account creation and
