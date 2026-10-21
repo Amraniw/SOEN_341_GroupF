@@ -1,4 +1,11 @@
-# CareerConnect frontend — Sprint 1
+# CareerConnect frontend — Sprint 1 notes
+
+> These notes describe the original Sprint 1 frontend increment. The integrated
+> repository now includes the Express backend, current-resume/deletion endpoints,
+> and Sprint 2 job discovery. Use the root README for current setup and
+> `Documentation/US-05_Job_Discovery.md` for `/jobs/`, `/jobs/:jobId`, API contracts,
+> demo seeding, and validation. Historical limitations below are not a statement
+> of the current integrated repository's capabilities.
 
 ## Run and integrate
 

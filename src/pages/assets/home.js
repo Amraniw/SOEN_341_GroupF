@@ -1,4 +1,7 @@
 import { icon } from './ui.js';
+import { initPublicHeader } from './public-header.js';
+
+initPublicHeader();
 
 const preview = document.querySelector('.product-preview');
 

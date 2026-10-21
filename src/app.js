@@ -5,6 +5,7 @@ const cookieSession = require('cookie-session');
 const multer = require('multer');
 const { createAuthRouter } = require('./routes/authRoutes');
 const { createResumeRouter } = require('./routes/resumeRoutes');
+const { createJobRouter } = require('./routes/jobRoutes');
 const { UnsupportedResumeTypeError } = require('./middleware/resumeUpload');
 
 const SESSION_MAX_AGE_MS = 24 * 60 * 60 * 1000;
@@ -24,16 +25,27 @@ function createApp(database, options = {}) {
       maxAge: SESSION_MAX_AGE_MS,
       httpOnly: true,
       sameSite: 'lax',
+      path: '/',
       secure: process.env.NODE_ENV === 'production',
     })
   );
   app.use(express.json({ limit: '10kb' }));
   app.use('/api', createAuthRouter(database));
+  app.use('/api/jobs', createJobRouter(database));
   app.use(
     '/api/resumes',
     createResumeRouter(database, { uploadDirectory: options.uploadDirectory })
   );
   app.use(express.static(path.join(__dirname, 'pages')));
+  app.get(['/workspace/jobs', '/workspace/jobs/', '/workspace/jobs/index.html'], (request, response) => {
+    response.sendFile(path.join(__dirname, 'pages', 'jobs', 'index.html'));
+  });
+  app.get('/workspace/jobs/:jobId', (request, response) => {
+    response.sendFile(path.join(__dirname, 'pages', 'jobs', 'detail.html'));
+  });
+  app.get('/jobs/:jobId', (request, response) => {
+    response.sendFile(path.join(__dirname, 'pages', 'jobs', 'detail.html'));
+  });
 
   app.use((request, response) => {
     response.status(404).json({ error: 'Route not found.' });

@@ -92,6 +92,10 @@ Or start it in development mode with automatic server restarts:
 
 - npm run dev
 
+Use development mode while changing backend routes so Nodemon reloads them.
+If using `npm start`, restart the server after backend changes; a browser refresh
+only reloads frontend files and cannot update the running backend's routes.
+
 Open the application at:
 
 - http://localhost:3000
@@ -99,3 +103,41 @@ Open the application at:
 ## Project Documentation
 
 Additional project documentation, sprint planning, meeting minutes, AI usage logs, user stories, and development-process information will be maintained in this repository and its GitHub Wiki.
+
+## Sprint 2: Job discovery (US-05)
+
+Open **Find jobs** in the landing-page header or workspace navigation to browse,
+search by keyword/location/category, and view complete job descriptions. Search
+criteria are preserved in the URL and when returning from a job.
+
+Public discovery uses `/jobs/`; workspace discovery uses `/workspace/jobs/`
+and retains the workspace sidebar. Both share the same search and details
+implementation. Public navigation recognizes the server session, including
+across landing-page anchors, and Sign out ends that session explicitly.
+See the [stabilization report](Documentation/US-05_Stabilization.md).
+The [account recovery report](Documentation/US-05_Account_Recovery.md) documents
+registration/workspace checks, real retries, and the default-server correction.
+
+The 50 educational demonstration postings are included in the source code and
+installed automatically when you run `npm start` or `npm run dev`. No separate
+seed command is needed on a new computer. They use real company names but are
+not verified live openings. Each computer keeps its own database; the bundled
+catalog supplies the same initial jobs everywhere, while accounts and future
+applications remain local to that computer.
+
+Startup adds missing demo postings and preserves existing IDs, edits, closed
+postings, unrelated jobs, accounts and resumes. Deleted demo postings are added
+again on the next startup; close a posting to keep it unavailable. Existing
+running servers need one restart to use the automatic setup. You can also run
+`npm run seed:jobs` explicitly. To upgrade the earlier 22-role
+catalog, run `npm run seed:jobs -- --refresh`; this refreshes only the 50 managed
+demo keys, preserving their IDs and unrelated records. The command refuses
+`NODE_ENV=production`, and automatic demo setup is also skipped in production.
+
+See the [visual/content refinement report](Documentation/US-05_Refinement.md)
+for structured details, seed refresh behavior, search semantics and current checks.
+
+Run the regression and job-search integration tests with `npm test`.
+See [the US-05 implementation guide](Documentation/US-05_Job_Discovery.md) for
+API/schema details and [acceptance scenarios](Documentation/Acceptance_Tests/US-05.md)
+for the Sprint 2 GitHub issue handoff.
