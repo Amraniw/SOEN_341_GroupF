@@ -1,0 +1,460 @@
+/* CareerConnect: dark theme. Import LAST, after responsive.css.
+   Activated by <html data-theme="dark"> (set by theme.js). */
+
+/* ---------- Theme toggle button (both themes) ---------- */
+.theme-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  flex: 0 0 auto;
+}
+.theme-toggle:hover {
+  background: var(--brand-soft);
+}
+.theme-toggle .icon-sun {
+  display: none;
+}
+:root[data-theme='dark'] .theme-toggle .icon-sun {
+  display: block;
+}
+:root[data-theme='dark'] .theme-toggle .icon-moon {
+  display: none;
+}
+.workspace-header .theme-toggle {
+  margin-left: auto;
+}
+.workspace-header .theme-toggle + .account-link {
+  margin-left: 0;
+}
+
+/* ---------- 1. Tokens (everything built on var() flips automatically) ---------- */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --brand: #4fb8a3;
+  --brand-hover: #72cdb9;
+  --brand-soft: #173029;
+  --on-brand: #06211b;
+  --ink: #e5efec;
+  --muted: #9bb1aa;
+  --canvas: #0d1513;
+  --surface: #131f1c;
+  --surface-raised: #1a2925;
+  --border: #263733;
+  --success: #74d3a4;
+  --error: #f2959b;
+  --warning: #e6bf72;
+  --focus: #62b8ea;
+  --accent: #5cb9c0;
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 35%);
+  --shadow-md: 0 12px 34px rgb(0 0 0 / 38%);
+  --shadow-lg: 0 28px 80px rgb(0 0 0 / 50%);
+  --shadow: var(--shadow-md);
+  --glass: rgb(13 21 19 / 86%);
+  --glass-strong: rgb(13 21 19 / 94%);
+  --hover-bg: #182622;
+  --track: #22332e;
+}
+
+/* ---------- 2. Base ---------- */
+:root[data-theme='dark'] ::selection {
+  color: #fff;
+  background: #1f5b4e;
+}
+:root[data-theme='dark'] .skip-link {
+  color: var(--canvas);
+}
+
+/* Buttons: light teal fill needs dark text */
+:root[data-theme='dark'] .button {
+  color: var(--on-brand);
+  box-shadow: 0 1px 1px rgb(0 0 0 / 30%);
+}
+:root[data-theme='dark'] .button:hover:not(:disabled) {
+  box-shadow: 0 7px 18px rgb(79 184 163 / 18%);
+}
+:root[data-theme='dark'] .button-spinner {
+  border-color: rgb(6 33 27 / 30%);
+  border-top-color: currentColor;
+}
+:root[data-theme='dark'] .button-secondary {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-sm);
+}
+:root[data-theme='dark'] .button-quiet {
+  background: transparent;
+  color: var(--ink);
+  box-shadow: none;
+}
+:root[data-theme='dark'] .button-secondary:hover:not(:disabled),
+:root[data-theme='dark'] .button-quiet:hover:not(:disabled) {
+  background: var(--brand-soft);
+}
+
+/* Badges */
+:root[data-theme='dark'] .badge-neutral {
+  background: #1d2b27;
+  color: #a9bbb5;
+}
+:root[data-theme='dark'] .badge-success {
+  background: #15302a;
+  color: var(--success);
+}
+:root[data-theme='dark'] .badge-upcoming {
+  background: #2f2816;
+  color: var(--warning);
+}
+
+:root[data-theme='dark'] .icon-tile {
+  background: var(--surface-raised);
+}
+:root[data-theme='dark'] .avatar {
+  background: #1f3a33;
+}
+
+/* Notices */
+:root[data-theme='dark'] .notice-error {
+  background: #2b1618;
+  border-color: #5a2b2f;
+  color: #f2a3a8;
+}
+:root[data-theme='dark'] .notice-success {
+  background: #11291e;
+  border-color: #24533d;
+  color: #8fdcb2;
+}
+:root[data-theme='dark'] .notice-info {
+  background: #11222b;
+  border-color: #284a5c;
+  color: #9ccbe4;
+}
+
+/* Generic form controls. :where() keeps specificity low so page-specific rules still win. */
+:root[data-theme='dark']
+  :where(
+    input:not([type='radio']):not([type='checkbox']):not([type='file']):not(
+        [type='range']
+      ),
+    select,
+    textarea
+  ) {
+  background-color: var(--surface-raised);
+  color: var(--ink);
+  border-color: #33473f;
+}
+:root[data-theme='dark'] input::placeholder,
+:root[data-theme='dark'] textarea::placeholder {
+  color: #7d948c;
+}
+
+/* ---------- 3. Public pages ---------- */
+:root[data-theme='dark'] .public-header {
+  background: var(--glass);
+  border-bottom-color: rgb(38 55 51 / 70%);
+}
+:root[data-theme='dark'] .public-header.is-scrolled {
+  background: var(--glass-strong);
+  box-shadow: 0 8px 30px rgb(0 0 0 / 35%);
+}
+:root[data-theme='dark'] .public-nav a {
+  color: #a8bdb6;
+}
+:root[data-theme='dark'] .public-nav a:hover {
+  color: var(--brand);
+}
+:root[data-theme='dark'] .public-header + main {
+  background:
+    radial-gradient(
+      circle at 76% 13%,
+      rgb(79 184 163 / 10%),
+      transparent 27rem
+    ),
+    linear-gradient(180deg, #0f1917 0, var(--canvas) 43rem, #0b1210 58rem);
+}
+:root[data-theme='dark'] .public-header + main::before {
+  background-image:
+    linear-gradient(rgb(79 184 163 / 9%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(79 184 163 / 9%) 1px, transparent 1px);
+}
+:root[data-theme='dark'] .hero-footnote {
+  color: #8ea49d;
+}
+
+/* Hero product preview */
+:root[data-theme='dark'] .product-preview {
+  border-color: rgb(48 78 70 / 70%);
+  background:
+    linear-gradient(145deg, rgb(255 255 255 / 5%), transparent 42%),
+    linear-gradient(135deg, #14231f, #101b18 70%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 6%),
+    var(--shadow-lg);
+}
+:root[data-theme='dark'] .product-preview::after {
+  background: radial-gradient(
+    260px circle at var(--pointer-x, 50%) var(--pointer-y, 50%),
+    rgb(79 184 163 / 14%),
+    transparent 70%
+  );
+}
+:root[data-theme='dark'] .preview-topline,
+:root[data-theme='dark'] .preview-caption {
+  color: #8fb0a5;
+}
+:root[data-theme='dark'] .preview-state-controls button {
+  color: #8ea49d;
+}
+:root[data-theme='dark'] .preview-state-controls button:hover,
+:root[data-theme='dark'] .preview-state-controls button[aria-pressed='true'] {
+  color: var(--brand);
+  background: rgb(255 255 255 / 8%);
+}
+:root[data-theme='dark'] .preview-window {
+  border-color: rgb(48 70 64 / 85%);
+  background: rgb(19 31 28 / 96%);
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 30%),
+    0 22px 55px rgb(0 0 0 / 35%);
+}
+:root[data-theme='dark']
+  .product-preview[data-preview-state='resume']
+  [data-preview-resume] {
+  background: linear-gradient(90deg, transparent, rgb(79 184 163 / 10%));
+}
+:root[data-theme='dark'] .window-dots i {
+  background: #3a4f49;
+}
+:root[data-theme='dark'] .preview-float {
+  border-color: rgb(255 255 255 / 8%);
+  background: rgb(24 38 34 / 88%);
+  box-shadow: 0 16px 42px rgb(0 0 0 / 40%);
+}
+:root[data-theme='dark'] .float-icon {
+  color: var(--on-brand);
+}
+:root[data-theme='dark'] .status-pulse {
+  border-color: var(--surface);
+}
+
+/* Principles strip, feature cards, footer */
+:root[data-theme='dark'] .principles {
+  border-color: rgb(38 55 51 / 76%);
+  background: rgb(19 31 28 / 78%);
+}
+:root[data-theme='dark'] .principles > div:hover,
+:root[data-theme='dark'] .principles > div:focus-within {
+  background: rgb(79 184 163 / 8%);
+}
+:root[data-theme='dark'] .feature:nth-child(3) {
+  border-color: #264038;
+  background: linear-gradient(145deg, #15241f, #121e1b);
+}
+:root[data-theme='dark'] .future-banner {
+  border-color: rgb(79 184 163 / 30%);
+}
+:root[data-theme='dark'] .public-footer {
+  background: var(--surface);
+}
+
+/* ---------- 4. Workspace (signed-in) ---------- */
+:root[data-theme='dark'] .workspace-header {
+  background: rgb(13 21 19 / 91%);
+}
+:root[data-theme='dark'] .workspace-layout {
+  background:
+    radial-gradient(circle at 88% 8%, rgb(79 184 163 / 8%), transparent 24rem),
+    var(--canvas);
+}
+:root[data-theme='dark'] .workspace-sidebar {
+  background: rgb(15 25 22 / 93%);
+}
+:root[data-theme='dark'] .nav-link {
+  color: #a2b7b0;
+}
+:root[data-theme='dark'] .nav-link:hover {
+  background: var(--hover-bg);
+}
+:root[data-theme='dark'] .nav-link[aria-current] {
+  color: var(--brand);
+  background: var(--brand-soft);
+}
+:root[data-theme='dark'] .next-card {
+  border-color: #23403a;
+  background:
+    radial-gradient(circle at 92% 5%, rgb(79 184 163 / 14%), transparent 15rem),
+    linear-gradient(145deg, #152924, #111c19);
+}
+:root[data-theme='dark'] .next-card::after {
+  border-color: rgb(79 184 163 / 15%);
+  box-shadow:
+    0 0 0 25px rgb(79 184 163 / 4%),
+    0 0 0 55px rgb(79 184 163 / 3%);
+}
+:root[data-theme='dark'] progress,
+:root[data-theme='dark'] progress::-webkit-progress-bar {
+  background: var(--track);
+}
+:root[data-theme='dark'] .step-icon {
+  background: var(--surface-raised);
+  color: var(--muted);
+}
+:root[data-theme='dark'] .step-icon.complete {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+:root[data-theme='dark'] .roadmap-item .icon {
+  color: #7f948b;
+}
+
+/* Resume upload */
+:root[data-theme='dark'] .drop-zone {
+  border-color: #3a5a50;
+  background: #101a17;
+}
+:root[data-theme='dark'] .drop-zone.drag-over {
+  border-color: var(--brand);
+  background: #133028;
+}
+:root[data-theme='dark'] .selected-file.is-uploaded {
+  border-color: #28584a;
+  background: #12261f;
+}
+:root[data-theme='dark'] .upload-progress > span:first-child {
+  background: var(--track);
+}
+:root[data-theme='dark'] .resume-delete-button {
+  border-color: #5a2b30;
+  color: #f0a3a8;
+  background: #231416;
+}
+:root[data-theme='dark'] .resume-delete-button:hover {
+  border-color: #8a434a;
+  color: #ffc2c6;
+  background: #301a1d;
+}
+:root[data-theme='dark'] .resume-delete-button.is-confirming {
+  border-color: #c0505a;
+  color: #fff;
+  background: #a8444d;
+}
+
+/* Profile */
+:root[data-theme='dark'] .profile-banner {
+  background: #16302a;
+  border-bottom-color: #203f37;
+}
+:root[data-theme='dark'] .profile-identity .avatar {
+  border-color: var(--surface);
+}
+:root[data-theme='dark'] .noscript-message {
+  background: #2e2615;
+  color: var(--warning);
+}
+
+/* ---------- 5. Role picker (signup) and mobile auth ---------- */
+:root[data-theme='dark'] .form-field .role-option:hover {
+  border-color: #3f6a5e;
+  background: var(--surface-raised);
+}
+:root[data-theme='dark'] .form-field .role-option:has(input:checked) {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  box-shadow:
+    0 0 0 1px var(--brand),
+    0 5px 16px rgb(0 0 0 / 30%);
+}
+:root[data-theme='dark'] .role-option__indicator {
+  border-color: #5d7a70;
+}
+:root[data-theme='dark'] .auth-mobile-progress {
+  background: rgb(19 31 28 / 86%);
+}
+
+/* ---------- 6. Auth pages (login / signup) ---------- */
+:root[data-theme='dark'] .auth-aside {
+  background:
+    radial-gradient(
+      circle at 88% 25%,
+      rgb(79 184 163 / 14%),
+      transparent 20rem
+    ),
+    linear-gradient(145deg, #112320, #0f1b18 70%);
+}
+:root[data-theme='dark'] .auth-aside::before {
+  background-image:
+    linear-gradient(rgb(79 184 163 / 10%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(79 184 163 / 10%) 1px, transparent 1px);
+}
+:root[data-theme='dark'] .auth-aside-footer {
+  border-top-color: var(--border);
+  color: #8ea49d;
+}
+:root[data-theme='dark'] .auth-journey {
+  border-color: rgb(255 255 255 / 8%);
+  background: rgb(19 31 28 / 78%);
+  box-shadow: 0 24px 60px rgb(0 0 0 / 40%);
+}
+:root[data-theme='dark'] .journey-label {
+  color: #8fb0a5;
+}
+:root[data-theme='dark'] .journey-number {
+  border-color: #33473f;
+  color: #9bb1aa;
+  background: var(--surface-raised);
+}
+:root[data-theme='dark'] .is-current .journey-number,
+:root[data-theme='dark'] .is-complete .journey-number {
+  color: var(--brand);
+  background: var(--brand-soft);
+  border-color: #2a5a4d;
+}
+:root[data-theme='dark'] .auth-main {
+  background:
+    radial-gradient(circle at 75% 20%, rgb(79 184 163 / 6%), transparent 22rem),
+    var(--canvas);
+}
+
+/* Form inputs */
+:root[data-theme='dark'] .form-field input {
+  border-color: #33473f;
+  color: var(--ink);
+  background: var(--surface-raised);
+  box-shadow: inset 0 1px 1px rgb(0 0 0 / 25%);
+}
+:root[data-theme='dark'] .form-field input:not(:placeholder-shown) {
+  background: var(--surface-raised);
+}
+:root[data-theme='dark']
+  .form-field
+  input:hover:not(:focus):not(:disabled) {
+  border-color: #4d7a6c;
+}
+:root[data-theme='dark'] .form-field input:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgb(79 184 163 / 22%);
+}
+:root[data-theme='dark'] .form-field input:disabled {
+  color: var(--muted);
+  background: #101916;
+}
+:root[data-theme='dark'] .form-field input[aria-invalid='true'] {
+  border-color: var(--error);
+}
+/* Chrome/Safari autofill paints its own light background */
+:root[data-theme='dark'] input:-webkit-autofill,
+:root[data-theme='dark'] input:-webkit-autofill:hover,
+:root[data-theme='dark'] input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--ink);
+  caret-color: var(--ink);
+  box-shadow: 0 0 0 1000px var(--surface-raised) inset;
+  transition: background-color 9999s ease-out;
+}
+:root[data-theme='dark'] .auth-form > .button-wide {
+  box-shadow: 0 12px 25px rgb(0 0 0 / 30%);
+}
