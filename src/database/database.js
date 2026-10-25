@@ -46,6 +46,21 @@ async function initializeDatabase(databasePath = process.env.DB_PATH || DEFAULT_
 
     CREATE INDEX IF NOT EXISTS idx_resumes_user_id ON resumes(user_id);
 
+    CREATE TABLE IF NOT EXISTS profiles (
+      user_id INTEGER PRIMARY KEY,
+      headline TEXT NOT NULL CHECK (length(trim(headline)) > 0),
+      location TEXT NOT NULL DEFAULT '',
+      phone TEXT NOT NULL DEFAULT '',
+      summary TEXT NOT NULL DEFAULT '',
+      skills TEXT NOT NULL DEFAULT '',
+      education TEXT NOT NULL DEFAULT '',
+      experience TEXT NOT NULL DEFAULT '',
+      website TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+
     CREATE TABLE IF NOT EXISTS job_categories (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL UNIQUE
