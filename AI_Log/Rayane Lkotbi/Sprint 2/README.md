@@ -123,7 +123,7 @@ Rayane Lkotbi
 
 # Codex Prompts
 
-## Task 6 — Sprint 2 Requirements Review
+## Task 5 — Sprint 2 Requirements Review
 
 **Purpose of AI Use:**  
 Requirements understanding, scope analysis, and preparation for implementation.
@@ -151,7 +151,7 @@ Rayane Lkotbi
 
 ---
 
-## Task 7 — Job Search and Listing Implementation
+## Task 6 — Job Search and Listing Implementation
 
 **Purpose of AI Use:**  
 AI-assisted frontend and backend implementation based on user-defined requirements.
@@ -179,7 +179,7 @@ Rayane Lkotbi
 
 ---
 
-## Task 8 — Navigation, Session, and Responsive Layout Stabilization
+## Task 7 — Navigation, Session, and Responsive Layout Stabilization
 
 **Purpose of AI Use:**  
 Integration debugging, interface refinement, and regression testing.
@@ -207,7 +207,7 @@ Rayane Lkotbi
 
 ---
 
-## Task 9 — Workspace Initialization and Account-Status Recovery
+## Task 8 — Workspace Initialization and Account-Status Recovery
 
 **Purpose of AI Use:**  
 Root-cause analysis, error-recovery implementation, and testing.
@@ -235,7 +235,7 @@ Rayane Lkotbi
 
 ---
 
-## Task 10 — Job Cards, Structured Details, and the 50-Job Demonstration Catalog
+## Task 9 — Job Cards, Structured Details, and the 50-Job Demonstration Catalog
 
 **Purpose of AI Use:**  
 Visual refinement, data modelling, demonstration-content generation, and usability improvement.
