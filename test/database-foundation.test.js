@@ -120,7 +120,20 @@ test('legacy data and relationships survive repeated additive initialization wit
         if (table === 'applications') expected[0].job_snapshot_json = null;
         assert.deepEqual(await database.all(`SELECT * FROM ${table} ORDER BY id`), expected);
       }
-      assert.deepEqual(await database.all("SELECT name, rootpage FROM sqlite_master WHERE type = 'table' ORDER BY name"), roots);
+      const initializedRoots = await database.all(
+        "SELECT name, rootpage FROM sqlite_master WHERE type = 'table' ORDER BY name"
+      );
+      for (const legacyTable of roots) {
+        assert.deepEqual(
+          initializedRoots.find(({ name }) => name === legacyTable.name),
+          legacyTable,
+          `legacy table ${legacyTable.name} should not be rebuilt`
+        );
+      }
+      assert.ok(
+        initializedRoots.some(({ name }) => name === 'profiles'),
+        'additive initialization should install the profiles table from main'
+      );
       assert.deepEqual(await database.all('PRAGMA foreign_key_check'), []);
       await assert.rejects(database.run('DELETE FROM jobs WHERE id = 9'), /FOREIGN KEY/);
       await assert.rejects(database.run('INSERT INTO applications (user_id, job_id) VALUES (7, 9)'), /UNIQUE/);
