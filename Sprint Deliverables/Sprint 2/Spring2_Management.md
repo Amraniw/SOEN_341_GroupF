@@ -75,15 +75,15 @@ All team members will participate in reviewing and testing the completed functio
 
 | Issue # | Issue Title | Issue Type | Responsible Member | Target Date | Priority | Status |
 |---|---|---|---|---|---|---|
-| #3 | Profile Management | User Story | | TBD | High | Completed |
-| #5 | Job Search and Filtering | User Story | | TBD | High | Completed |
-| #6 | Job Application Submission | User Story | | TBD | High | Completed |
-| #7 | Application Status Tracking | User Story | | TBD | High | Completed |
-| #9 | Job Posting Management | User Story | | TBD | Medium | Completed |
-| #10 | Application Dashboard | User Story | | TBD | Medium | Completed |
-| TBD | Acceptance Tests | Task | | TBD | High | Completed |
-| TBD | Continuous Integration Pipeline | Task | | TBD | High | Completed |
-| TBD | Sprint Planning and Documentation | Task | | TBD | High | Completed |
+| #3 | Profile Management | User Story | Suheil | October 19 | High | Completed |
+| #5 | Job Search and Filtering | User Story | Rayane, Carla | October 20 | High | Completed |
+| #6 | Job Application Submission | User Story | Wassim, Adam | October 23 | High | Completed |
+| #7 | Application Status Tracking | User Story | Wassim, Adam | October 24 | High | Completed |
+| #9 | Job Posting Management | User Story | Rayane, Massi | October 20 | Medium | Incomplete |
+| #10 | Application Dashboard | User Story | Wassim, Adam | October 24 | Medium | Completed |
+| TBD | Acceptance Tests | Task | All | TBD | High | Completed |
+| TBD | Continuous Integration Pipeline | Task | Adam | October 19 | High | Completed |
+| TBD | Sprint Planning and Documentation | Task | Rayane, Carla | October 25 | High | Completed |
 
 
 This section summarizes the main GitHub issues planned for Sprint 2. Each user story is broken down into smaller tasks in the GitHub repository, where responsibilities, deadlines, and progress will be tracked.
