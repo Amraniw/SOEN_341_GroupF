@@ -93,11 +93,11 @@ This section summarizes the main GitHub issues planned for Sprint 2. Each user s
 
 ### Rayane Lkotbi
 
-- **Work completed:**
-- **Issues worked on:**
-- **Pull requests / commits:**
-- **Reviews or testing performed:**
-- **Time spent:**
+- **Work completed:** Organized Sprint 2 planning, backlog, user stories, tasks, documentation, and AI logs. Led AI-assisted development of Job Search and Filtering (US-05), including frontend, backend, database integration, and UI improvements.
+- **Issues worked on:** Job Search and Filtering (US-05), job listings, search filters, job descriptions, Sprint 2 planning, and documentation.
+- **Pull requests / commits:** Pull Request #81, involving job search implementation, interface improvements, debugging, and integration. Additional contributions to sprint planning, checklists, and AI logs.
+- **Reviews or testing performed:** Reviewed AI-generated code, verified job search and filtering functionality, tested navigation and authentication sessions, and reviewed automated API tests, database persistence, and CI checks.
+- **Time spent:** October 19 to  25
 
 ### Wassim Amrani
 
