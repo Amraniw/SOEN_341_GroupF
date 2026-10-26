@@ -150,10 +150,30 @@ This section summarizes the main GitHub issues planned for Sprint 2. Each user s
 ### Adam El Fadil
 
 - **Work completed:**
+1. Theme of the website [HTML/CSS]
+2. Implemented a darkmode and an easy way to switch betweens dark and light mode [CSS/JavaScript] (BONUS)
+3. Assissted with Task 3 US-06/US-10 [JavaScript] (Pair Programming) 
+4. Workflow & Continuous Integration [YAML] 
+
 - **Issues worked on:**
+1. Frontend 
+2. Workflow & CI
+3. Documentation
+4. Backend (Pair Programming)
+
 - **Pull requests / commits:**
+Around 10 commits, mostly done for work on the frontend and the workflow.
+
 - **Reviews or testing performed:**
+1. October 21st: Tested the darkmode compability. (Verdict: It works in every pages as long as you implement the small darkmode script in the head section of your HTML)
+2. October 25th: Tested the implementation of Task 3 such as:
+A - Submitting a job application (Verdict: Everything works fine)
+B - Job application dashboard (Verdict: Looks good but you cannot edit or withdraw a job application)
+
 - **Time spent:**
+1. Darkmode & Theme: 3h + 30 min testing
+2. Assisting with Task 3 (Pair Programming): 2h
+3. Workflow, CI & Documentation: 1h
 
 ### Massi Sadek
 
