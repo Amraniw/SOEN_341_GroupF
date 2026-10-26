@@ -1,5 +1,5 @@
 const express = require('express');
-const { createAuthenticateUser } = require('../middleware/authenticateUser');
+const { createAuthenticateUsers } = require('../middleware/authenticateUser');
 
 // The account name and email stay in users; a profile adds professional details.
 const PROFILE_FIELDS = [
