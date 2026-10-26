@@ -141,11 +141,11 @@ This section summarizes the main GitHub issues planned for Sprint 2. Each user s
 
 ### Carla Reis
 
-- **Work completed:**
-- **Issues worked on:**
-- **Pull requests / commits:**
-- **Reviews or testing performed:**
-- **Time spent:**
+- **Work completed:** Helped with the documentation for the sprint 2 like sprint planning, user stories and the team process as well as with the final report to be submitted. Also contributed with imprlementaiton 2, the Job search and Filtering along with a teammate providing feedback and reviewing the implementation.
+- **Issues worked on:** Job Search and Filtering (US-05), Documentation
+- **Pull requests / commits:** Planning and documentation for Sprint 2, work related to the Job Search and Filtering implementaiton.
+- **Reviews or testing performed:** Job Search and Filtering functionality and Debug of AI generated code. Feedback provided while the implementation process of implementation 2. Reviewed final documentation to be submitted.
+- **Time spent:** October 19 to 26 
 
 ### Adam El Fadil
 
