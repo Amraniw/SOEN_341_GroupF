@@ -200,11 +200,12 @@ October 19th to 25th
 
 - **Time spent:** October 22 to 26
 
+
 ### Suheil Almouhassel
 
-- **Work completed:**
-- **Issues worked on:**
-- **Pull requests / commits:**
-- **Reviews or testing performed:**
-- **Time spent:**
+- **Work completed:** Developed and implemented Profile Management (US-03), including profile creation, editing, and user information management. Improved the profile interface and integrated it with the existing CareerConnect application.
+- **Issues worked on:** Profile Management (US-03), profile interface design (#32), profile information fields (#33), profile creation (#34), profile editing (#35), and profile testing (#36).
+- **Pull requests / commits:** Contributed frontend development and profile management changes, including interface improvements and integration with existing functionality.
+- **Reviews or testing performed:** Tested profile creation, editing, and data persistence. Reviewed user interface functionality and verified compatibility with existing authentication and resume management features.
+- **Time spent:** October 19 to 25
 
