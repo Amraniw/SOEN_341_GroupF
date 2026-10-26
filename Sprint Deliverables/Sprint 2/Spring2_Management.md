@@ -73,17 +73,18 @@ All team members will participate in reviewing and testing the completed functio
 
 ## 2. Sprint 2 Work Plan
 
-| Issue # | Issue Title | Priority | Status |
-|---|---|---|---|
-| #3 | Profile Management | High | Not Started |
-| #5 | Job Search and Filtering | High | Not Started |
-| #6 | Job Application Submission | High | Not Started |
-| #7 | Application Status Tracking | High | Not Started |
-| #9 | Job Posting Management | Medium | Not Started |
-| #10 | Application Dashboard | Medium | Not Started |
-| TBD | Acceptance Tests | High | Not Started |
-| TBD | Continuous Integration Pipeline | High | Not Started |
-| TBD | Sprint Planning and Documentation | High | In Progress |
+| Issue # | Issue Title | Issue Type | Responsible Member | Target Date | Priority | Status |
+|---|---|---|---|---|---|---|
+| #3 | Profile Management | User Story | | TBD | High | Completed |
+| #5 | Job Search and Filtering | User Story | | TBD | High | Completed |
+| #6 | Job Application Submission | User Story | | TBD | High | Completed |
+| #7 | Application Status Tracking | User Story | | TBD | High | Completed |
+| #9 | Job Posting Management | User Story | | TBD | Medium | Completed |
+| #10 | Application Dashboard | User Story | | TBD | Medium | Completed |
+| TBD | Acceptance Tests | Task | | TBD | High | Completed |
+| TBD | Continuous Integration Pipeline | Task | | TBD | High | Completed |
+| TBD | Sprint Planning and Documentation | Task | | TBD | High | Completed |
+
 
 This section summarizes the main GitHub issues planned for Sprint 2. Each user story is broken down into smaller tasks in the GitHub repository, where responsibilities, deadlines, and progress will be tracked.
 
