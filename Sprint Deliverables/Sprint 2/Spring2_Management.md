@@ -158,10 +158,29 @@ This section summarizes the main GitHub issues planned for Sprint 2. Each user s
 ### Massi Sadek
 
 - **Work completed:**
-- **Issues worked on:**
-- **Pull requests / commits:**
+  - Implemented Feature 4 (US-09): Recruiter Job Posting Management with Codex assistance.
+  - Extended the SQLite database to support recruiter accounts, job ownership, and role-based access control.
+  - Implemented secure recruiter API endpoints for creating, viewing, editing, closing, reopening, and deleting job postings.
+  - Developed the recruiter dashboard with posting forms, job listings, overview statistics, and management controls.
+  - Integrated recruiter functionality with the existing authentication, session management, job listings, and navigation systems.
+  - Added server-side authorization, ownership validation, input validation, and security protections to prevent unauthorized modifications.
+  - Added automated tests covering recruiter functionality, database migrations, security, and frontend integration.
+  - Prepared the Sprint 2 AI Usage Log documenting four Codex interactions, implementation decisions, and validation results.
+
+- **Issues worked on:** #9 — US-09: Job Posting Management
+
+- **Pull requests / commits:** 
+  - PR #84 — Implement recruiter job posting management
+  - Implementation commit a436fa9
+
 - **Reviews or testing performed:**
-- **Time spent:**
+ - Reviewed Codex-generated implementation and verified integration with existing project functionality.
+ - Validated recruiter authentication, posting ownership, role restrictions, and secure CRUD operations.
+ - Verified the recruiter dashboard manually in the browser, including creating, editing, closing, reopening, and deleting postings.
+ - Completed full automated validation with 138 tests passed and 0 failures, plus 54 successful JavaScript syntax checks.
+ - Verified compatibility with existing job-seeker features and documented outstanding dependency security advisories.
+ 
+- **Time spent:** October 22 to 26
 
 ### Suheil Almouhassel
 
