@@ -8,6 +8,7 @@ const { createResumeRouter } = require('./routes/resumeRoutes');
 const { createJobRouter } = require('./routes/jobRoutes');
 const { createApplicationRouter } = require('./routes/applicationRoutes');
 const { createRecruiterRouter } = require('./routes/recruiterRoutes');
+const { createProfileRouter } = require('./routes/profileRoutes');
 const { UnsupportedResumeTypeError } = require('./middleware/resumeUpload');
 
 const SESSION_MAX_AGE_MS = 24 * 60 * 60 * 1000;
@@ -40,6 +41,7 @@ function createApp(database, options = {}) {
     '/api/resumes',
     createResumeRouter(database, { uploadDirectory: options.uploadDirectory })
   );
+  app.use('/api/profile', createProfileRouter(database));
   app.use(express.static(path.join(__dirname, 'pages')));
   app.get(['/recruiter/dashboard', '/recruiter/dashboard/'], (request, response) => {
     response.sendFile(path.join(__dirname, 'pages', 'recruiter', 'dashboard.html'));
