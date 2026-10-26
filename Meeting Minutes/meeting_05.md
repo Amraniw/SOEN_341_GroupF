@@ -9,7 +9,7 @@ Meeting 05 - Sprint 2 Final Touches and Organization
 - Suheil Almouhassel
 - Adam El Fadil
 - Carla Reis lopez 
-- Massi 
+- Sadek Massinissa
 
 ## Topics Discussed
 
