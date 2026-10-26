@@ -81,10 +81,10 @@ All team members will participate in reviewing and testing the completed functio
 | #7 | Application Status Tracking | User Story | Wassim, Adam | October 24 | High | Completed |
 | #9 | Job Posting Management | User Story | Rayane, Massi | October 20 | Medium | Incomplete |
 | #10 | Application Dashboard | User Story | Wassim, Adam | October 24 | Medium | Completed |
-| TBD | Acceptance Tests | Task | All | TBD | High | Completed |
-| TBD | Continuous Integration Pipeline | Task | Adam | October 19 | High | Completed |
-| TBD | Sprint Planning and Documentation | Task | Rayane, Carla | October 25 | High | Completed |
-| TBD | Dark Mode | Bonus | Adam | October 25 | Low | Completed |
+| - | Acceptance Tests | Task | All | October 24 | High | Completed |
+| - | Continuous Integration Pipeline | Task | Adam | October 19 | High | Completed |
+| - | Sprint Planning and Documentation | Task | Rayane, Carla | October 25 | High | Completed |
+| - | Dark Mode | Bonus | Adam | October 25 | Low | Completed |
 
 
 This section summarizes the main GitHub issues planned for Sprint 2. Each user story is broken down into smaller tasks in the GitHub repository, where responsibilities, deadlines, and progress will be tracked.
