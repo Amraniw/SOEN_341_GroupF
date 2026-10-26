@@ -1,5 +1,6 @@
 import { escapeHtml, icon } from './ui.js';
 import { resolveSession, signOut } from './session.js';
+import { workspaceHome } from './workspace-role.mjs';
 
 const NAVIGATION = [
   ['jobs', 'Find jobs', '/jobs/'],
@@ -47,7 +48,7 @@ export function initPublicHeader() {
     try {
       const session = await resolveSession({ force });
       actions.innerHTML = session
-        ? `<a class="button button-secondary workspace-entry" href="/dashboard/index.html"><span><span class="workspace-entry-prefix">Your </span>workspace</span></a><button class="button button-quiet signout-button" type="button" aria-label="Sign out">${icon('logout')}<span class="signout-label">Sign out</span></button>`
+        ? `<a class="button button-secondary workspace-entry" href="${workspaceHome(session.user.role)}"><span>${session.user.role === 'recruiter' ? 'Recruiter dashboard' : '<span class="workspace-entry-prefix">Your </span>workspace'}</span></a><button class="button button-quiet signout-button" type="button" aria-label="Sign out">${icon('logout')}<span class="signout-label">Sign out</span></button>`
         : '<a class="button button-quiet" href="/auth/login.html">Sign in</a><a class="button header-create-account" href="/auth/signup.html">Create account</a>';
       actions.querySelector('.signout-button')?.addEventListener('click', (event) => signOut(event.currentTarget));
     } catch (error) {

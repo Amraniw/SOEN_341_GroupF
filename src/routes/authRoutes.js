@@ -33,6 +33,7 @@ function toPublicUser(user) {
     id: user.id,
     name: user.name,
     email: user.email,
+    role: user.role,
     createdAt: user.created_at,
   };
 }
@@ -47,7 +48,7 @@ function createAuthRouter(database) {
     const userId = request.session?.userId;
     if (!Number.isInteger(userId)) return response.json({ user: null });
     const user = await database.get(
-      'SELECT id, name, email, created_at FROM users WHERE id = ?', userId
+      'SELECT id, name, email, created_at, role FROM users WHERE id = ?', userId
     );
     if (!user) request.session = null;
     return response.json({ user: user ? toPublicUser(user) : null });
@@ -65,6 +66,11 @@ function createAuthRouter(database) {
       const name = typeof body.name === 'string' ? body.name.trim() : '';
       const email = normalizeEmail(body.email);
       const { password } = body;
+      const role = body.role === undefined ? 'job_seeker' : body.role;
+
+      if (role !== 'job_seeker' && role !== 'recruiter') {
+        return response.status(400).json({ error: 'Choose a valid account role.' });
+      }
 
       if (!name) {
         return response.status(400).json({ error: 'Name is required.' });
@@ -101,10 +107,11 @@ function createAuthRouter(database) {
       let result;
       try {
         result = await database.run(
-          'INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)',
+          'INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)',
           name,
           email,
-          passwordHash
+          passwordHash,
+          role
         );
       } catch (error) {
         if (error.code === 'SQLITE_CONSTRAINT') {
@@ -114,7 +121,7 @@ function createAuthRouter(database) {
       }
 
       const newUser = await database.get(
-        'SELECT id, name, email, created_at FROM users WHERE id = ?',
+        'SELECT id, name, email, created_at, role FROM users WHERE id = ?',
         result.lastID
       );
 
@@ -146,7 +153,7 @@ function createAuthRouter(database) {
       }
 
       const user = await database.get(
-        'SELECT id, name, email, password_hash, created_at FROM users WHERE email = ?',
+        'SELECT id, name, email, password_hash, created_at, role FROM users WHERE email = ?',
         email
       );
 

@@ -1,3 +1,5 @@
+import { workspaceHome } from './workspace-role.mjs';
+
 export const FILTER_KEYS = ['q', 'location', 'category'];
 
 export function isWorkspaceJobs(pathname = globalThis.location?.pathname || '') {
@@ -31,14 +33,17 @@ export function jobUrl(id, filters, pathname) {
   return `${jobsBasePath(pathname)}${encodeURIComponent(id)}${query ? `?${query}` : ''}`;
 }
 
-export function workspaceReturnPath(next, origin) {
+export function workspaceReturnPath(next, origin, role) {
   try {
-    const destination = new URL(next || '/dashboard/index.html', origin);
+    const destination = new URL(next || workspaceHome(role), origin);
+    const rolePages = role === 'recruiter'
+      ? ['/recruiter/dashboard', '/recruiter/dashboard/', '/recruiter/dashboard.html', '/profile/index.html']
+      : ['/dashboard/index.html', '/profile/index.html', '/resume/index.html', '/applications/index.html'];
     const allowed = destination.origin === origin && (
       /^\/workspace\/jobs(?:\/|$)/i.test(destination.pathname) ||
-      ['/dashboard/index.html', '/profile/index.html', '/resume/index.html', '/applications/index.html'].includes(destination.pathname)
+      rolePages.includes(destination.pathname)
     );
     if (allowed) return destination.pathname + destination.search;
   } catch { /* Invalid return URLs use the ordinary workspace entry. */ }
-  return '/dashboard/index.html';
+  return workspaceHome(role);
 }

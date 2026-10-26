@@ -1,5 +1,6 @@
 import { resolveSession, signInUrl, signOut } from './session.js';
 import { escapeHtml, initials, icon } from './ui.js';
+import { workspaceHome, workspaceLinks, resolveWorkspaceAccess } from './workspace-role.mjs';
 
 async function loadWorkspaceSession() {
   const notice = document.createElement('main');
@@ -19,9 +20,9 @@ async function loadWorkspaceSession() {
     message.setAttribute('role', 'status');
     message.textContent = 'Checking your account…';
     try {
-      const current = await resolveSession({ force: true });
-      if (!current) {
-        location.replace(signInUrl());
+      const { session: current, redirect } = await resolveWorkspaceAccess({ resolveSession, pathname: location.pathname, signInUrl });
+      if (redirect) {
+        location.replace(redirect);
         return null;
       }
       notice.remove();
@@ -41,21 +42,15 @@ async function loadWorkspaceSession() {
 export const session = await loadWorkspaceSession();
 if (session) {
   const page = document.body.dataset.page;
-  const links = [
-    ['dashboard', 'Overview', 'home'],
-    ['jobs', 'Find jobs', 'briefcase'],
-    ['applications', 'Applications', 'applications'],
-    ['profile', 'My account', 'user'],
-    ['resume', 'Resume', 'file'],
-  ];
+  const links = workspaceLinks(session.user.role);
   document.querySelector('#workspace-header').innerHTML = `
-    <a class="brand" href="/dashboard/index.html"><img src="/assets/brand.svg" width="36" height="36" alt="">CareerConnect<span class="brand-dot">.</span></a>
-    <span class="workspace-label">YOUR CAREER WORKSPACE</span>
+    <a class="brand" href="${workspaceHome(session.user.role)}"><img src="/assets/brand.svg" width="36" height="36" alt="">CareerConnect<span class="brand-dot">.</span></a>
+    <span class="workspace-label">${session.user.role === 'recruiter' ? 'RECRUITER WORKSPACE' : 'YOUR CAREER WORKSPACE'}</span>
     <a class="account-link" href="/profile/index.html" aria-label="View my account"><span class="avatar avatar-small">${escapeHtml(initials(session.user.name))}</span><span class="account-name">${escapeHtml(session.user.name)}</span></a>
     <button class="button button-quiet signout-button" type="button" aria-label="Sign out">${icon('logout')}<span class="signout-label">Sign out</span></button>
     <button class="button button-quiet mobile-toggle" type="button" aria-expanded="false" aria-controls="workspace-sidebar" aria-label="Open navigation">${icon('menu')}</button>`;
   document.querySelector('#workspace-sidebar').innerHTML = `
-    <div><p class="nav-label">WORKSPACE</p><nav aria-label="Workspace">${links.map(([key, label, symbol]) => `<a class="nav-link" href="${key === 'jobs' ? '/workspace/jobs/' : `/${key}/index.html`}" ${page === key ? 'aria-current="page"' : ''}>${icon(symbol)}${label}${page === key ? '<span class="active-dot"></span>' : ''}</a>`).join('')}</nav>
+    <div><p class="nav-label">WORKSPACE</p><nav aria-label="Workspace">${links.map(([key, label, symbol, href]) => `<a class="nav-link" href="${href}" ${page === key ? 'aria-current="page"' : ''}>${icon(symbol)}${label}${page === key ? '<span class="active-dot"></span>' : ''}</a>`).join('')}</nav>
     <p class="nav-label nav-label-later">LOOKING AHEAD</p><div class="upcoming-nav"><span>${icon('building')}Companies</span><small>Coming in a future release</small></div><a class="text-link workspace-public-link" href="/index.html">Visit public site ${icon('arrow')}</a></div>
     <div class="sidebar-note">A little preparation.<br>A clearer next step.<span>Your career starts with you.</span></div>`;
   document.querySelector('.signout-button').addEventListener('click', (event) => signOut(event.currentTarget));

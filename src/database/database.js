@@ -110,16 +110,30 @@ async function initializeDatabase(databasePath = process.env.DB_PATH || DEFAULT_
     END;
   `);
 
-  // Additive migration: older databases and plain-text postings remain valid.
+  // Additive migrations also run on fresh databases, keeping one definition for
+  // each new column. Nullable foreign keys are compatible with existing rows.
+  const userColumns = new Set((await database.all('PRAGMA table_info(users)')).map(({ name }) => name));
+  if (!userColumns.has('role')) {
+    await database.exec("ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'job_seeker' CHECK (role IN ('job_seeker', 'recruiter'))");
+  }
+
   const jobColumns = new Set((await database.all('PRAGMA table_info(jobs)')).map(({ name }) => name));
-  const detailColumns = {
+  const jobColumnDefinitions = {
     employment_type: "TEXT CHECK (employment_type IN ('Full-time', 'Internship', 'Contract'))",
     workplace_type: "TEXT CHECK (workplace_type IN ('On-site', 'Hybrid', 'Remote'))",
     experience_level: "TEXT CHECK (experience_level IN ('Intern', 'Entry-level', 'Mid-level', 'Senior'))",
     details_json: 'TEXT',
+    recruiter_id: 'INTEGER REFERENCES users(id)',
   };
-  for (const [name, definition] of Object.entries(detailColumns)) {
+  for (const [name, definition] of Object.entries(jobColumnDefinitions)) {
     if (!jobColumns.has(name)) await database.exec(`ALTER TABLE jobs ADD COLUMN ${name} ${definition}`);
+  }
+
+  await database.exec('CREATE INDEX IF NOT EXISTS idx_jobs_recruiter_created ON jobs(recruiter_id, created_at DESC, id DESC)');
+
+  const applicationColumns = new Set((await database.all('PRAGMA table_info(applications)')).map(({ name }) => name));
+  if (!applicationColumns.has('job_snapshot_json')) {
+    await database.exec('ALTER TABLE applications ADD COLUMN job_snapshot_json TEXT');
   }
 
   for (const category of JOB_CATEGORIES) {

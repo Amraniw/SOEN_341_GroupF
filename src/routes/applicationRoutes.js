@@ -118,6 +118,10 @@ function createApplicationRouter(database) {
   });
 
   router.post('/', async (request, response, next) => {
+    if (request.authenticatedUser.role !== 'job_seeker') {
+      return response.status(403).json({ error: 'Only job seekers can submit applications.' });
+    }
+
     const body = request.body || {};
     if (Object.keys(body).some((key) => key !== 'jobId')) {
       return response.status(400).json({ error: 'The application request contains unsupported information.' });

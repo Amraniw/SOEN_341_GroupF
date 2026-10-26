@@ -128,6 +128,7 @@ form.addEventListener('submit', async (event) => {
         name: form.elements.name.value.trim(),
         email,
         password,
+        role: form.elements.role.value,
       });
       registered = true;
     }
@@ -138,7 +139,7 @@ form.addEventListener('submit', async (event) => {
     setButtonState('success');
     await new Promise((resolve) => setTimeout(resolve, 320));
     const next = new URLSearchParams(location.search).get('next');
-    location.assign(workspaceReturnPath(next, location.origin));
+    location.assign(workspaceReturnPath(next, location.origin, data.user.role));
   } catch (error) {
     if (registered) {
       form.hidden = true;

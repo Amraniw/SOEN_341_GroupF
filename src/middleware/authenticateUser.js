@@ -8,7 +8,7 @@ function createAuthenticateUser(database) {
       }
 
       const user = await database.get(
-        'SELECT id, name, email FROM users WHERE id = ?',
+        'SELECT id, name, email, role FROM users WHERE id = ?',
         userId
       );
 
