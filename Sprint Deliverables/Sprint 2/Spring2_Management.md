@@ -169,7 +169,7 @@ This section summarizes the main GitHub issues planned for Sprint 2. Each user s
 
 - **Issues worked on:** #9 — US-09: Job Posting Management
 
-- **Pull requests / commits:** 
+- **Pull requests / commits:**
   - PR #84 — Implement recruiter job posting management
   - Implementation commit a436fa9
 
@@ -179,7 +179,7 @@ This section summarizes the main GitHub issues planned for Sprint 2. Each user s
  - Verified the recruiter dashboard manually in the browser, including creating, editing, closing, reopening, and deleting postings.
  - Completed full automated validation with 138 tests passed and 0 failures, plus 54 successful JavaScript syntax checks.
  - Verified compatibility with existing job-seeker features and documented outstanding dependency security advisories.
- 
+
 - **Time spent:** October 22 to 26
 
 ### Suheil Almouhassel
