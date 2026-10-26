@@ -2,7 +2,9 @@ import { escapeHtml, formatDate } from './ui.js';
 import { companyMark, DEMO_DISCLAIMER, fetchJobs, jobTags, jobsUrl, searchState } from './job-shared.js';
 import { initJobShell } from './job-shell.js';
 import { request } from './api.js';
-import { signInUrl } from './session.js';
+import { signInUrl, resolveSession } from './session.js';
+import { loadJobApplication } from './job-application.mjs';
+import { RECRUITER_HOME } from './workspace-role.mjs';
 
 if (await initJobShell()) {
   const surface = document.querySelector('#job-detail');
@@ -11,6 +13,11 @@ if (await initJobShell()) {
   const id = location.pathname.split('/').filter(Boolean).at(-1);
   let controller;
   let generation = 0;
+  let currentJob;
+
+  function recruiterNotice() {
+    return `<p>Applications are for job seekers. Manage your postings in your recruiter dashboard.</p><a class="button button-secondary" href="${RECRUITER_HOME}">Recruiter dashboard</a>`;
+  }
 
   function applicationStatus(application, confirmation = false) {
     const heading = confirmation ? 'Application submitted' : 'Already applied';
@@ -31,13 +38,16 @@ if (await initJobShell()) {
     if (!apply) return;
     apply.setAttribute('aria-busy', 'true');
     try {
-      const { application } = await request(`/applications/job/${job.id}`, undefined, 'GET');
-      apply.innerHTML = application ? applicationStatus(application) : readyToApply(job);
+      const state = await loadJobApplication(job.id, { resolveSession, request });
+      if (state.kind === 'recruiter') apply.innerHTML = recruiterNotice();
+      else if (state.kind === 'anonymous') {
+        apply.innerHTML = `<a class="button button-wide" href="${escapeHtml(signInUrl('apply'))}">Sign in to apply</a><p>Your job search will be waiting when you return.</p>`;
+      } else apply.innerHTML = state.application ? applicationStatus(state.application) : readyToApply(job);
     } catch (error) {
       if (error.status === 401) {
         apply.innerHTML = `<a class="button button-wide" href="${escapeHtml(signInUrl('apply'))}">Sign in to apply</a><p>Your job search will be waiting when you return.</p>`;
       } else {
-        apply.innerHTML = `${readyToApply(job)}<p class="application-check-warning" role="status">We couldn’t verify whether you already applied. Please check your applications before submitting again.</p>`;
+        apply.innerHTML = `<p class="application-check-warning" role="alert">We couldn’t verify your account or application status. ${escapeHtml(error.message)}</p><button class="button button-secondary" type="button" data-retry-application>Check again</button>`;
       }
     } finally {
       apply.removeAttribute('aria-busy');
@@ -57,6 +67,10 @@ if (await initJobShell()) {
     } catch (error) {
       if (error.status === 401) {
         location.assign(signInUrl('apply'));
+        return;
+      }
+      if (error.status === 403) {
+        apply.innerHTML = recruiterNotice();
         return;
       }
       if (error.status === 409) {
@@ -95,6 +109,7 @@ if (await initJobShell()) {
     try {
       const { job } = await fetchJobs(`/${encodeURIComponent(id)}`, controller.signal);
       if (requestId !== generation) return;
+      currentJob = job;
       document.title = `${job.title} | CareerConnect`;
       const details = job.details;
       const section = (heading, items) => items?.length ? `<section class="detail-section"><h2>${heading}</h2><ul>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>` : '';
@@ -144,6 +159,7 @@ if (await initJobShell()) {
   surface.addEventListener('click', (event) => {
     const apply = event.target.closest('[data-apply-job]');
     if (apply) submitApplication(apply);
+    else if (event.target.closest('[data-retry-application]')) initializeApplication(currentJob);
     else if (event.target.closest('[data-retry]')) loadDetail();
   });
   addEventListener('pagehide', () => controller?.abort());

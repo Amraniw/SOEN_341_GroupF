@@ -135,7 +135,7 @@
                   ><input
                     type="radio"
                     name="role"
-                    value="seeker"
+                    value="job_seeker"
                     checked
                   /><span class="role-option__indicator" aria-hidden="true"></span
                   ><span class="role-option__copy"
@@ -155,19 +155,6 @@
                 >
               </div>
             </fieldset>
-
-            <div class="form-field" id="recruiterField" hidden>
-              <label for="companyName">Company Key</label
-              ><input
-                id="companyName"
-                name="companyName"
-                type="password"
-                autocomplete="organization"
-                data-label="Company name"
-                aria-describedby="companyName-error"
-                maxlength="100"
-              /><span class="field-error" id="companyName-error"></span>
-            </div>
 
             <div class="form-field">
               <label for="password">Password</label>
@@ -239,34 +226,5 @@
       </main>
     </div>
 
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const recruiterField = document.getElementById("recruiterField");
-        const companyNameInput = document.getElementById("companyName");
-
-        function syncRecruiterField(role) {
-          const isRecruiter = role === "recruiter";
-          recruiterField.hidden = !isRecruiter;
-          companyNameInput.required = isRecruiter;
-          if (!isRecruiter) {
-            companyNameInput.value = "";
-          }
-        }
-
-        document
-          .querySelectorAll('input[name="role"]')
-          .forEach((radio) => {
-            radio.addEventListener("change", (e) => {
-              syncRecruiterField(e.target.value);
-            });
-          });
-
-        // Set initial state in case a role was pre-selected (e.g. back/forward nav)
-        const checkedRole = document.querySelector(
-          'input[name="role"]:checked'
-        );
-        if (checkedRole) syncRecruiterField(checkedRole.value);
-      });
-    </script>
   </body>
 </html>

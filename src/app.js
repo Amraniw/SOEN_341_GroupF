@@ -7,6 +7,7 @@ const { createAuthRouter } = require('./routes/authRoutes');
 const { createResumeRouter } = require('./routes/resumeRoutes');
 const { createJobRouter } = require('./routes/jobRoutes');
 const { createApplicationRouter } = require('./routes/applicationRoutes');
+const { createRecruiterRouter } = require('./routes/recruiterRoutes');
 const { createProfileRouter } = require('./routes/profileRoutes');
 const { UnsupportedResumeTypeError } = require('./middleware/resumeUpload');
 
@@ -35,12 +36,16 @@ function createApp(database, options = {}) {
   app.use('/api', createAuthRouter(database));
   app.use('/api/jobs', createJobRouter(database));
   app.use('/api/applications', createApplicationRouter(database));
+  app.use('/api/recruiter', createRecruiterRouter(database));
   app.use(
     '/api/resumes',
     createResumeRouter(database, { uploadDirectory: options.uploadDirectory })
   );
   app.use('/api/profile', createProfileRouter(database));
   app.use(express.static(path.join(__dirname, 'pages')));
+  app.get(['/recruiter/dashboard', '/recruiter/dashboard/'], (request, response) => {
+    response.sendFile(path.join(__dirname, 'pages', 'recruiter', 'dashboard.html'));
+  });
   app.get(['/workspace/jobs', '/workspace/jobs/', '/workspace/jobs/index.html'], (request, response) => {
     response.sendFile(path.join(__dirname, 'pages', 'jobs', 'index.html'));
   });
@@ -56,6 +61,10 @@ function createApp(database, options = {}) {
   });
 
   app.use((error, request, response, next) => {
+    if (error.type === 'entity.too.large' && /^\/api\/recruiter(?:\/|$)/.test(request.path)) {
+      return response.status(400).json({ error: 'Recruiter requests must be 10 KB or smaller.' });
+    }
+
     if (error.type === 'entity.parse.failed') {
       return response.status(400).json({ error: 'Request body must contain valid JSON.' });
     }
