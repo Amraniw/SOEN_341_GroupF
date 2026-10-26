@@ -171,9 +171,7 @@ A - Submitting a job application (Verdict: Everything works fine)
 B - Job application dashboard (Verdict: Looks good but you cannot edit or withdraw a job application)
 
 - **Time spent:**
-1. Darkmode & Theme: 3h + 30 min testing
-2. Assisting with Task 3 (Pair Programming): 2h
-3. Workflow, CI & Documentation: 1h
+October 19th to 25th
 
 ### Massi Sadek
 
