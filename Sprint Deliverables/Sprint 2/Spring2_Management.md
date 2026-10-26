@@ -102,10 +102,42 @@ This section summarizes the main GitHub issues planned for Sprint 2. Each user s
 ### Wassim Amrani
 
 - **Work completed:**
+  - Implemented Task 3: Job Application Submission and Tracking with Codex assistance.
+  - Added authenticated application submission, persistent SQLite storage, duplicate-application prevention, and successful-submission confirmation.
+  - Implemented application tracking with support for Applied, Under Review, Interview, Offered, and Rejected, including status-history and timestamp support.
+  - Built the My Applications dashboard with status filters, counters, application timelines, job links, and empty states.
+  - Connected the application workflow to the existing job listings and job-detail pages.
+  - Helped integrate the team's job-listing and Dark Mode features, including resolving the homepage header conflict.
+  - Identified and requested a correction to dark-mode styling on individual job-posting pages.
+  - Added automated tests and supporting documentation with Codex assistance.
+  - Prepared my Sprint 2 AI usage log.
+  - Wrote or uploaded Sprint 2 meeting minutes.
+
 - **Issues worked on:**
+  - [#6 — US-06: Job Application Submission](https://github.com/Amraniw/SOEN_341_GroupF/issues/6)
+  - [#7 — US-07: Application Status Tracking](https://github.com/Amraniw/SOEN_341_GroupF/issues/7)
+  - [#10 — US-10: Application Dashboard](https://github.com/Amraniw/SOEN_341_GroupF/issues/10)
+
 - **Pull requests / commits:**
+  - Implementation: [PR #80 — Job application tracking](https://github.com/Amraniw/SOEN_341_GroupF/pull/80)
+  - Task 3 implementation commit: [`fefbae3`](https://github.com/Amraniw/SOEN_341_GroupF/commit/fefbae3)
+  - Job-page dark-mode correction: [`681d674`](https://github.com/Amraniw/SOEN_341_GroupF/commit/681d674)
+  - Related team integration: [PR #77 — Task 2](https://github.com/Amraniw/SOEN_341_GroupF/pull/77) and [PR #78 — Darkmode](https://github.com/Amraniw/SOEN_341_GroupF/pull/78)
+  - Reviewed: [PR #84 — Implement recruiter job posting management](https://github.com/Amraniw/SOEN_341_GroupF/pull/84)
+
 - **Reviews or testing performed:**
+  - Reviewed PR #84 concerning recruiter job posting management.
+  - Reviewed the application workflow and clarified its integration dependency on recruiter roles and job ownership.
+  - Identified the dark-mode issue on individual job-posting pages and reviewed the correction before requesting the final commit and push.
+  - Reviewed Codex's reported automated validation covering application submission, persistence, duplicate prevention, user isolation, supported statuses, history, and invalid requests.
+  - Codex reported that the complete project suite passed with 81 tests and 0 failures after the dark-mode correction.
+
 - **Time spent:**
+  - Task 3 implementation and review: 3 hours
+  - Testing and corrections: 4 hours
+  - Pull-request review: 2 hours
+  - Documentation: 2 hours
+  - **Total: 11 hours**
 
 ### Carla Reis
 
