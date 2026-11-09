@@ -71,13 +71,13 @@ All team members will participate in reviewing, testing, and integrating the com
 
 | Issue # | Issue Title | Issue Type | Responsible Member | Target Date | Priority | Status |
 |---|---|---|---|---|---|---|
-| #8 | Recruiter Application Dashboard | User Story | To confirm | November 13 | High | Not Started |
-| #10 | Job-Seeker Application Dashboard | User Story | To confirm | November 12 | High | In Progress |
-| #116 | Notifications and Reminders | User Story | To confirm | November 13 | High | Not Started |
-| #123 | AI-Powered Resume Feedback | User Story | To confirm | November 14 | Medium | Not Started |
-| #113 | Acceptance Tests | Task | To confirm | November 13 | High | In Progress |
-| - | Unit Testing | Task | To confirm | November 14 | High | Not Started |
-| - | Continuous Integration Pipeline | Task | To confirm | November 14 | High | In Progress |
-| - | Sprint Planning and Documentation | Task | To confirm | November 14 | High | In Progress |
+| #8 | Recruiter Application Dashboard | User Story | Suheil, Massi | November 13 | High | Not Started |
+| #10 | Job-Seeker Application Dashboard | User Story | Wassim | November 12 | High | In Progress |
+| #116 | Notifications and Reminders | User Story | Adam, Carla | November 13 | High | Not Started |
+| #123 | AI-Powered Resume Feedback | User Story | Rayane | November 14 | Medium | Not Started |
+| #113 | Acceptance Tests | Task | Wassim, Rayane, Adam | November 13 | High | In Progress |
+| - | Unit Testing | Task | To Confirm | November 14 | High | Not Started |
+| - | Continuous Integration Pipeline | Task | Everyone | November 14 | High | In Progress |
+| - | Sprint Planning and Documentation | Task | Rayane, Carla | November 14 | High | In Progress |
 
 This section summarizes the main GitHub issues planned for Sprint 3. Each user story is broken down into smaller tasks in the GitHub repository, where responsibilities, deadlines, and progress will be tracked.
