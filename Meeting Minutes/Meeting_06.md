@@ -28,7 +28,9 @@ Meeting 06 - Sprint 3 Final Touches and Organization
 
 ## Action Items
 
-- 
+- Each member will complete their AI usage log and individual contribution log, including time spent and links to supporting work.
+- Review the implemented features together and correct any remaining integration or styling issues.
+- Verify acceptance-test coverage for Sprint 1 and Sprint 2 user stories.
 
 ## Next Meeting
 
