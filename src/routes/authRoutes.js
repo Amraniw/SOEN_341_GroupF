@@ -1,5 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
+const { EMPLOYMENT_STATUSES } = require('../domain/employment');
+const { shouldSendWelcome, welcomeNotification } = require('../domain/notifications');
 
 const BCRYPT_SALT_ROUNDS = 10;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -34,6 +36,7 @@ function toPublicUser(user) {
     name: user.name,
     email: user.email,
     role: user.role,
+    employmentStatus: user.employment_status ?? null,
     createdAt: user.created_at,
   };
 }
@@ -48,7 +51,7 @@ function createAuthRouter(database) {
     const userId = request.session?.userId;
     if (!Number.isInteger(userId)) return response.json({ user: null });
     const user = await database.get(
-      'SELECT id, name, email, created_at, role FROM users WHERE id = ?', userId
+      'SELECT id, name, email, created_at, role, employment_status FROM users WHERE id = ?', userId
     );
     if (!user) request.session = null;
     return response.json({ user: user ? toPublicUser(user) : null });
@@ -70,6 +73,15 @@ function createAuthRouter(database) {
 
       if (role !== 'job_seeker' && role !== 'recruiter') {
         return response.status(400).json({ error: 'Choose a valid account role.' });
+      }
+
+      // Employment status only applies to job seekers; it defaults to unemployed.
+      let employmentStatus = null;
+      if (role === 'job_seeker') {
+        employmentStatus = body.employmentStatus === undefined ? 'unemployed' : body.employmentStatus;
+        if (!EMPLOYMENT_STATUSES.includes(employmentStatus)) {
+          return response.status(400).json({ error: 'Choose a valid employment status.' });
+        }
       }
 
       if (!name) {
@@ -107,11 +119,12 @@ function createAuthRouter(database) {
       let result;
       try {
         result = await database.run(
-          'INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)',
+          'INSERT INTO users (name, email, password_hash, role, employment_status) VALUES (?, ?, ?, ?, ?)',
           name,
           email,
           passwordHash,
-          role
+          role,
+          employmentStatus
         );
       } catch (error) {
         if (error.code === 'SQLITE_CONSTRAINT') {
@@ -121,7 +134,7 @@ function createAuthRouter(database) {
       }
 
       const newUser = await database.get(
-        'SELECT id, name, email, created_at, role FROM users WHERE id = ?',
+        'SELECT id, name, email, created_at, role, employment_status FROM users WHERE id = ?',
         result.lastID
       );
 
@@ -153,7 +166,7 @@ function createAuthRouter(database) {
       }
 
       const user = await database.get(
-        'SELECT id, name, email, password_hash, created_at, role FROM users WHERE email = ?',
+        'SELECT id, name, email, password_hash, created_at, role, employment_status FROM users WHERE email = ?',
         email
       );
 
@@ -162,6 +175,19 @@ function createAuthRouter(database) {
       }
 
       request.session = { userId: user.id };
+
+      // The welcome is a convenience: a failure here must never block sign-in.
+      if (shouldSendWelcome(user)) {
+        const welcome = welcomeNotification(user);
+        try {
+          await database.run(
+            'INSERT INTO notifications (user_id, type, title, message, link) VALUES (?, ?, ?, ?, ?)',
+            user.id, welcome.type, welcome.title, welcome.message, welcome.link
+          );
+        } catch (error) {
+          console.error('Could not create welcome notification:', error.message);
+        }
+      }
 
       return response.status(200).json({
         message: 'Login successful.',

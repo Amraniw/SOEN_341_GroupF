@@ -35,3 +35,24 @@ export function buttonLabel(count) {
   if (!Number.isInteger(count) || count <= 0) return 'Notifications';
   return `Notifications, ${count} unread`;
 }
+
+// Popups (toasts) for notifications that arrive while a page is open.
+export const TOAST_MAX_AGE_MS = 5 * 60 * 1000;
+export const MAX_TOASTS = 3;
+
+// Picks which unread notifications should pop up. `lastId` is the newest id this
+// tab has already announced, so each notification pops up once. On the first
+// check after a page opens (`initial`), only recent items qualify, so an old
+// backlog of unread items does not pop up all at once.
+export function selectToastItems(items, { lastId = 0, now = Date.now(), initial = false } = {}) {
+  if (!Array.isArray(items)) return [];
+  return items
+    .filter((item) => item && !item.read && Number.isInteger(item.id) && item.id > lastId)
+    .filter((item) => {
+      if (!initial) return true;
+      const date = parseTimestamp(item.createdAt);
+      return Boolean(date) && now - date.getTime() <= TOAST_MAX_AGE_MS;
+    })
+    .sort((a, b) => a.id - b.id)
+    .slice(-MAX_TOASTS);
+}

@@ -40,7 +40,7 @@ describe('Feature 4 Phase 01: trusted identity and exclusive roles', () => {
       const session = await agent.get('/api/session').expect(200);
       for (const response of [registration, login, session]) {
         assert.equal(response.body.user.role, expected);
-        assert.deepEqual(Object.keys(response.body.user).sort(), ['createdAt', 'email', 'id', 'name', 'role']);
+        assert.deepEqual(Object.keys(response.body.user).sort(), ['createdAt', 'email', 'employmentStatus', 'id', 'name', 'role']);
       }
       assert.equal((await database.get('SELECT role FROM users WHERE id = ?', login.body.user.id)).role, expected);
       assert.equal(registration.headers['set-cookie'], undefined);

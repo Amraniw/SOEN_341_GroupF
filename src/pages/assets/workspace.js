@@ -1,6 +1,6 @@
 import { resolveSession, signInUrl, signOut } from './session.js';
 import { escapeHtml, initials, icon } from './ui.js';
-import { workspaceHome, workspaceLinks, resolveWorkspaceAccess } from './workspace-role.mjs';
+import { workspaceHome, workspaceLinks, resolveWorkspaceAccess, isWorkspaceHome } from './workspace-role.mjs';
 import { initNotifications } from './notifications.js';
 
 async function loadWorkspaceSession() {
@@ -55,7 +55,10 @@ if (session) {
     <p class="nav-label nav-label-later">LOOKING AHEAD</p><div class="upcoming-nav"><span>${icon('building')}Companies</span><small>Coming in a future release</small></div><a class="text-link workspace-public-link" href="/index.html">Visit public site ${icon('arrow')}</a></div>
     <div class="sidebar-note">A little preparation.<br>A clearer next step.<span>Your career starts with you.</span></div>`;
   document.querySelector('.signout-button').addEventListener('click', (event) => signOut(event.currentTarget));
-  initNotifications(document.querySelector('#workspace-header'));
+  initNotifications(document.querySelector('#workspace-header'), {
+    userId: session.user.id,
+    idleWarning: isWorkspaceHome(location.pathname, session.user.role),
+  });
   const toggle = document.querySelector('.mobile-toggle');
   const sidebar = document.querySelector('#workspace-sidebar');
   function closeNavigation() {

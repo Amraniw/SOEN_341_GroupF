@@ -113,7 +113,7 @@ test('legacy data and relationships survive repeated additive initialization wit
       database = await initializeDatabase(filename);
       for (const table of tables) {
         const expected = before[table].map((row) => ({ ...row }));
-        if (table === 'users') expected[0].role = 'job_seeker';
+        if (table === 'users') Object.assign(expected[0], { role: 'job_seeker', employment_status: null });
         if (table === 'jobs') Object.assign(expected[0], {
           employment_type: null, workplace_type: null, experience_level: null, details_json: null, recruiter_id: null,
         });

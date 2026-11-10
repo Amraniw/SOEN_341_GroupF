@@ -4,6 +4,13 @@ export function workspaceHome(role) {
   return role === 'recruiter' ? RECRUITER_HOME : '/dashboard/index.html';
 }
 
+// True on the signed-in home page for this role (where the idle warning applies).
+export function isWorkspaceHome(pathname, role) {
+  return role === 'recruiter'
+    ? /^\/recruiter\/dashboard(?:\.html)?\/?$/i.test(pathname)
+    : /^\/dashboard(?:\/(?:index\.html)?)?$/i.test(pathname);
+}
+
 export function workspaceRedirect(pathname, role) {
   if (/^\/recruiter(?:\/|$)/i.test(pathname) && role !== 'recruiter') return '/dashboard/index.html';
   if (/^\/dashboard(?:\/(?:index\.html)?)?$/i.test(pathname) && role === 'recruiter') return RECRUITER_HOME;

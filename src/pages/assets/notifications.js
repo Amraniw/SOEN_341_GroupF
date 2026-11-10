@@ -1,17 +1,21 @@
 import { request } from './api.js';
 import { escapeHtml, icon } from './ui.js';
-import { badgeText, buttonLabel, safeLink, timeAgo } from './notification-format.mjs';
+import { MAX_TOASTS, badgeText, buttonLabel, safeLink, selectToastItems, timeAgo } from './notification-format.mjs';
+import { ACTIVITY_EVENTS, createIdleWatcher } from './idle-watcher.mjs';
 
 const POLL_MS = 30000;
+const TOAST_MS = 8000;
 const TYPE_ICONS = {
   new_application: 'user',
   application_update: 'applications',
   interview_invitation: 'briefcase',
   deadline_reminder: 'bell',
+  welcome: 'user',
 };
 
-// Adds the notification bell and its dropdown to the workspace header.
-export function initNotifications(header) {
+// Adds the notification bell, its dropdown and popups to the workspace header.
+// With `idleWarning`, also pops up a reminder after 67 seconds without activity.
+export function initNotifications(header, { userId = null, idleWarning = false } = {}) {
   const root = document.createElement('div');
   root.className = 'notifications';
   root.innerHTML = `
@@ -36,6 +40,74 @@ export function initNotifications(header) {
   const list = root.querySelector('.notification-list');
   let unread = 0;
   let timer = null;
+
+  const toastRegion = document.createElement('div');
+  toastRegion.className = 'toast-region';
+  toastRegion.setAttribute('role', 'status');
+  toastRegion.setAttribute('aria-live', 'polite');
+  document.body.append(toastRegion);
+  const activeToasts = [];
+  const toastStorageKey = `careerconnect.last-toasted-notification:${userId ?? 'anonymous'}`;
+  let lastToasted = 0;
+  let firstCheck = true;
+  try {
+    const stored = Number(sessionStorage.getItem(toastStorageKey));
+    if (Number.isInteger(stored) && stored > 0) lastToasted = stored;
+  } catch { /* Popups still work without session storage. */ }
+
+  // Shows a popup. Notification popups open their notification when clicked;
+  // the idle reminder is informational only.
+  function showToast({ title, message, iconName = 'bell', onOpen = null, autoDismiss = true, className = '' }) {
+    const toast = document.createElement('div');
+    toast.className = `toast ${className}`.trim();
+    const bodyTag = onOpen ? 'button' : 'div';
+    toast.innerHTML = `
+      <${bodyTag} class="toast-body"${onOpen ? ' type="button"' : ''}>
+        <span class="notification-icon">${icon(iconName)}</span>
+        <span class="notification-copy"><strong>${escapeHtml(title)}</strong><span>${escapeHtml(message)}</span></span>
+      </${bodyTag}>
+      <button class="toast-close" type="button" aria-label="Dismiss notification"><span aria-hidden="true">×</span></button>`;
+    let hideTimer = null;
+    const handle = {
+      dismiss() {
+        clearTimeout(hideTimer);
+        const index = activeToasts.indexOf(handle);
+        if (index !== -1) activeToasts.splice(index, 1);
+        toast.remove();
+      },
+    };
+    const startTimer = () => {
+      clearTimeout(hideTimer);
+      if (autoDismiss) hideTimer = setTimeout(handle.dismiss, TOAST_MS);
+    };
+    toast.addEventListener('pointerenter', () => clearTimeout(hideTimer));
+    toast.addEventListener('pointerleave', startTimer);
+    toast.addEventListener('focusin', () => clearTimeout(hideTimer));
+    toast.addEventListener('focusout', startTimer);
+    toast.querySelector('.toast-close').addEventListener('click', handle.dismiss);
+    if (onOpen) toast.querySelector('.toast-body').addEventListener('click', () => onOpen(handle));
+    activeToasts.push(handle);
+    toastRegion.append(toast);
+    while (activeToasts.length > MAX_TOASTS) activeToasts[0].dismiss();
+    startTimer();
+    return handle;
+  }
+
+  function showNotificationToast(item) {
+    const href = safeLink(item.link);
+    showToast({
+      title: item.title,
+      message: item.message,
+      iconName: TYPE_ICONS[item.type] || 'bell',
+      onOpen: async (handle) => {
+        try {
+          await markRead(item.id);
+        } catch { /* The link still works if marking as read fails. */ }
+        handle.dismiss();
+        if (href) location.assign(href);
+      },
+    });
+  }
 
   function setUnread(count) {
     unread = Number.isInteger(count) && count > 0 ? count : 0;
@@ -84,11 +156,20 @@ export function initNotifications(header) {
     }
   }
 
+  // Updates the badge and pops up any unread notification this tab has not announced yet.
   async function refreshCount() {
     try {
-      const { unreadCount } = await request('/notifications/unread-count', undefined, 'GET');
-      const increased = unreadCount > unread;
-      setUnread(unreadCount);
+      const data = await request('/notifications?unread=true&limit=5', undefined, 'GET');
+      const initial = firstCheck;
+      firstCheck = false;
+      selectToastItems(data.items, { lastId: lastToasted, initial }).forEach(showNotificationToast);
+      const newest = Math.max(lastToasted, ...data.items.map((item) => (Number.isInteger(item.id) ? item.id : 0)));
+      if (newest > lastToasted) {
+        lastToasted = newest;
+        try { sessionStorage.setItem(toastStorageKey, String(newest)); } catch { /* Optional. */ }
+      }
+      const increased = data.unreadCount > unread;
+      setUnread(data.unreadCount);
       if (increased && !panel.hidden) loadList();
     } catch (error) {
       onError(error, '');
@@ -161,6 +242,33 @@ export function initNotifications(header) {
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') refreshCount();
   });
+
+  if (idleWarning) {
+    let idleToast = null;
+    const watcher = createIdleWatcher({
+      onIdle() {
+        if (document.visibilityState !== 'visible') return;
+        idleToast?.dismiss();
+        idleToast = showToast({
+          title: 'Are you still there?',
+          message: 'You’ve been inactive for a little while. Move your mouse or press a key to keep going.',
+          iconName: 'bell',
+          autoDismiss: false,
+          className: 'toast-idle',
+        });
+      },
+    });
+    const onActivity = () => {
+      idleToast?.dismiss();
+      idleToast = null;
+      watcher.activity();
+    };
+    ACTIVITY_EVENTS.forEach((name) => addEventListener(name, onActivity, { passive: true }));
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') onActivity();
+    });
+    watcher.start();
+  }
 
   refreshCount();
   startPolling();

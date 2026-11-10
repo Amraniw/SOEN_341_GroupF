@@ -5,6 +5,7 @@ const { open } = require('sqlite');
 const { JOB_CATEGORIES } = require('../domain/jobs');
 const { APPLICATION_STATUS_IDS, APPLICATION_STATUSES } = require('../domain/applications');
 const { NOTIFICATION_TYPES } = require('../domain/notifications');
+const { EMPLOYMENT_STATUSES } = require('../domain/employment');
 
 const DEFAULT_DATABASE_PATH = path.join(
   __dirname,
@@ -133,6 +134,14 @@ async function initializeDatabase(databasePath = process.env.DB_PATH || DEFAULT_
     await database.exec("ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'job_seeker' CHECK (role IN ('job_seeker', 'recruiter'))");
   }
 
+  // Nullable on purpose: accounts created before this column existed have an
+  // unknown status and are not sent the unemployed-job-seeker welcome.
+  if (!userColumns.has('employment_status')) {
+    await database.exec(
+      `ALTER TABLE users ADD COLUMN employment_status TEXT CHECK (employment_status IN (${EMPLOYMENT_STATUSES.map((status) => `'${status}'`).join(', ')}))`
+    );
+  }
+
   const jobColumns = new Set((await database.all('PRAGMA table_info(jobs)')).map(({ name }) => name));
   const jobColumnDefinitions = {
     employment_type: "TEXT CHECK (employment_type IN ('Full-time', 'Internship', 'Contract'))",
@@ -157,6 +166,24 @@ async function initializeDatabase(databasePath = process.env.DB_PATH || DEFAULT_
   // later. They run after the migrations above because they read jobs.recruiter_id.
   const statusLabel = (column) =>
     `CASE ${column} ${APPLICATION_STATUSES.map(({ id, name }) => `WHEN '${id}' THEN '${name}'`).join(' ')} ELSE ${column} END`;
+  // SQLite cannot alter a CHECK constraint in place, so a notifications table
+  // created before a type was added is rebuilt (rows are kept) in one transaction.
+  const existingNotifications = await database.get(
+    "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'notifications'"
+  );
+  const rebuildNotifications = Boolean(existingNotifications)
+    && NOTIFICATION_TYPES.some((type) => !existingNotifications.sql.includes(`'${type}'`));
+  if (rebuildNotifications) {
+    await database.exec(`
+      BEGIN;
+      DROP TRIGGER IF EXISTS applications_notify_recruiter;
+      DROP TRIGGER IF EXISTS applications_notify_applicant;
+      DROP INDEX IF EXISTS idx_notifications_user_created;
+      DROP INDEX IF EXISTS idx_notifications_user_unread;
+      ALTER TABLE notifications RENAME TO notifications_previous;
+    `);
+  }
+  try {
   await database.exec(`
     CREATE TABLE IF NOT EXISTS notifications (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -208,6 +235,19 @@ async function initializeDatabase(databasePath = process.env.DB_PATH || DEFAULT_
       FROM jobs j WHERE j.id = NEW.job_id;
     END;
   `);
+  if (rebuildNotifications) {
+    await database.exec(`
+      INSERT INTO notifications (id, user_id, type, title, message, link, application_id, job_id, dedupe_key, read_at, created_at)
+      SELECT id, user_id, type, title, message, link, application_id, job_id, dedupe_key, read_at, created_at
+      FROM notifications_previous;
+      DROP TABLE notifications_previous;
+      COMMIT;
+    `);
+  }
+  } catch (error) {
+    if (rebuildNotifications) await database.exec('ROLLBACK').catch(() => {});
+    throw error;
+  }
 
   for (const category of JOB_CATEGORIES) {
     await database.run(
