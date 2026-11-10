@@ -4,13 +4,14 @@ import { MAX_TOASTS, badgeText, buttonLabel, safeLink, selectToastItems, timeAgo
 import { ACTIVITY_EVENTS, createIdleWatcher } from './idle-watcher.mjs';
 
 const POLL_MS = 30000;
-const TOAST_MS = 8000;
+const TOAST_MS = 90000;
 const TYPE_ICONS = {
   new_application: 'user',
   application_update: 'applications',
   interview_invitation: 'briefcase',
   deadline_reminder: 'bell',
   welcome: 'user',
+  idle_warning: 'bell',
 };
 
 // Adds the notification bell, its dropdown and popups to the workspace header.
@@ -245,13 +246,35 @@ export function initNotifications(header, { userId = null, idleWarning = false }
 
   if (idleWarning) {
     let idleToast = null;
+    let activityCount = 0;
     const watcher = createIdleWatcher({
-      onIdle() {
+      async onIdle() {
         if (document.visibilityState !== 'visible') return;
+        const seenActivity = activityCount;
         idleToast?.dismiss();
+        // The warning is also saved as a notification so it shows up in the bell.
+        // The text lives on the server; this copy is only used if saving fails.
+        let content = {
+          title: '67',
+          message: 'SIX SEVEN HAHAHAHAHAHAHAHAHA',
+        };
+        try {
+          const data = await request('/notifications/idle-warning', {}, 'POST');
+          content = data.notification;
+          // Already announced by the idle popup, so the regular popups skip it.
+          if (data.notification.id > lastToasted) {
+            lastToasted = data.notification.id;
+            try { sessionStorage.setItem(toastStorageKey, String(lastToasted)); } catch { /* Optional. */ }
+          }
+          setUnread(data.unreadCount);
+          if (!panel.hidden) loadList();
+        } catch (error) {
+          onError(error, '');
+        }
+        if (activityCount !== seenActivity) return; // They came back while this was saving.
         idleToast = showToast({
-          title: 'Are you still there?',
-          message: 'You’ve been inactive for a little while. Move your mouse or press a key to keep going.',
+          title: content.title,
+          message: content.message,
           iconName: 'bell',
           autoDismiss: false,
           className: 'toast-idle',
@@ -259,6 +282,7 @@ export function initNotifications(header, { userId = null, idleWarning = false }
       },
     });
     const onActivity = () => {
+      activityCount += 1;
       idleToast?.dismiss();
       idleToast = null;
       watcher.activity();

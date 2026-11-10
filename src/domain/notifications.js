@@ -3,6 +3,7 @@ const NOTIFICATION_TYPES = Object.freeze([
   'application_update',
   'interview_invitation',
   'welcome',
+  'idle_warning',
   // Reserved so deadline reminders can be added without rebuilding the table
   // (SQLite cannot alter a CHECK constraint in place).
   'deadline_reminder',
@@ -31,10 +32,26 @@ function welcomeNotification(user) {
   const firstName = String(user.name || '').trim().split(/\s+/)[0] || 'there';
   return {
     type: 'welcome',
-    title: `Welcome back, ${firstName}!`,
-    message: 'Still looking for your next role? Browse open jobs and keep your resume up to date so you are ready to apply.',
+    title: `I see you a bum huh, ${firstName}...`,
+    message: 'Broski is still unemployed lmao 🫩🥀',
     link: '/workspace/jobs/',
   };
 }
 
-module.exports = { NOTIFICATION_TYPES, publicNotification, shouldSendWelcome, welcomeNotification };
+// Created when someone has been inactive on their home page for a while.
+function idleWarningNotification() {
+  return {
+    type: 'idle_warning',
+    title: '67',
+    message: 'SIX SEVEN HAHAHAHAHAHAHAHAHA',
+    link: null,
+  };
+}
+
+module.exports = {
+  NOTIFICATION_TYPES,
+  publicNotification,
+  shouldSendWelcome,
+  welcomeNotification,
+  idleWarningNotification,
+};

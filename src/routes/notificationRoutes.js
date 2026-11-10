@@ -1,7 +1,7 @@
 const express = require('express');
 const { createAuthenticateUser } = require('../middleware/authenticateUser');
 const { requireSameOrigin } = require('../middleware/requireSameOrigin');
-const { publicNotification } = require('../domain/notifications');
+const { publicNotification, idleWarningNotification } = require('../domain/notifications');
 
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 50;
@@ -82,6 +82,36 @@ function createNotificationRouter(database) {
   router.get('/unread-count', async (request, response, next) => {
     try {
       return response.json({ unreadCount: await unreadCount(request.authenticatedUser.id) });
+    } catch (caught) {
+      return next(caught);
+    }
+  });
+
+  // Records the idle warning so it also appears in the bell. While the person's
+  // latest idle warning is still unread, that one is returned instead of adding another.
+  router.post('/idle-warning', async (request, response, next) => {
+    if (rejectFields(request, response)) return undefined;
+    try {
+      const userId = request.authenticatedUser.id;
+      const latest = await database.get(
+        `SELECT ${COLUMNS} FROM notifications
+         WHERE user_id = ? AND type = 'idle_warning' ORDER BY id DESC LIMIT 1`,
+        userId
+      );
+      let row = latest;
+      let created = false;
+      if (!latest || latest.read_at !== null) {
+        const idle = idleWarningNotification();
+        const result = await database.run(
+          'INSERT INTO notifications (user_id, type, title, message, link) VALUES (?, ?, ?, ?, ?)',
+          userId, idle.type, idle.title, idle.message, idle.link
+        );
+        row = await database.get(`SELECT ${COLUMNS} FROM notifications WHERE id = ?`, result.lastID);
+        created = true;
+      }
+      return response
+        .status(created ? 201 : 200)
+        .json({ notification: publicNotification(row), created, unreadCount: await unreadCount(userId) });
     } catch (caught) {
       return next(caught);
     }
