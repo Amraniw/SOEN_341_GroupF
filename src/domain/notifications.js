@@ -32,8 +32,8 @@ function welcomeNotification(user) {
   const firstName = String(user.name || '').trim().split(/\s+/)[0] || 'there';
   return {
     type: 'welcome',
-    title: `I see you a bum huh, ${firstName}...`,
-    message: 'Broski is still unemployed lmao 🫩🥀',
+    title: `🫩🥀`,
+    message: 'Congratulations, ${firstName}! You are unemployed!',
     link: '/workspace/jobs/',
   };
 }
