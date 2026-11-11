@@ -35,7 +35,7 @@ describe('Welcome notification on sign-in', () => {
     const first = await agent.get('/api/notifications').expect(200);
     assert.equal(first.body.items.length, 1);
     assert.equal(first.body.items[0].type, 'welcome');
-    assert.equal(first.body.items[0].title, 'I see you a bum huh, Jordan...');
+    assert.equal(first.body.items[0].title, '🫩🥀');
     assert.equal(first.body.items[0].link, '/workspace/jobs/');
     assert.equal(first.body.unreadCount, 1);
     await agent.post('/api/login').send(account).expect(200);
