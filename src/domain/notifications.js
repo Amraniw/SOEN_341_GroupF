@@ -33,7 +33,7 @@ function welcomeNotification(user) {
   return {
     type: 'welcome',
     title: `🫩🥀`,
-    message: 'Congratulations, ${firstName}! You are unemployed!',
+    message: `Congratulations, ${firstName}! You are unemployed!`,
     link: '/workspace/jobs/',
   };
 }
