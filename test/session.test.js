@@ -37,7 +37,7 @@ describe('Application-wide cookie session', () => {
     assert.equal(response.body.user.name, user.name);
     assert.equal(response.body.user.email, user.email);
     assert.ok(response.body.user.createdAt);
-    assert.deepEqual(Object.keys(response.body.user).sort(), ['createdAt', 'email', 'id', 'name', 'role']);
+    assert.deepEqual(Object.keys(response.body.user).sort(), ['createdAt', 'email', 'employmentStatus', 'id', 'name', 'role']);
     assert.equal(response.body.user.role, 'job_seeker');
   });
 
@@ -102,7 +102,7 @@ describe('Application-wide cookie session', () => {
     const wrapped = {
       run: (...args) => database.run(...args),
       get: async (sql, ...args) => {
-        if (failSession && sql.includes('SELECT id, name, email, created_at, role FROM users')) {
+        if (failSession && sql.includes('SELECT id, name, email, created_at, role, employment_status FROM users')) {
           failSession = false;
           throw new Error('Temporary session database failure');
         }

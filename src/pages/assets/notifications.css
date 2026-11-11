@@ -1,0 +1,255 @@
+/* In-app notification bell and dropdown, shown in the signed-in workspace header. */
+.notifications {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+.workspace-header .notifications {
+  margin-left: auto;
+}
+.workspace-header .theme-toggle + .notifications {
+  margin-left: 0;
+}
+.workspace-header .notifications + .theme-toggle,
+.workspace-header .notifications + .account-link {
+  margin-left: 0;
+}
+.notification-button {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+}
+.notification-button:hover,
+.notification-button[aria-expanded='true'] {
+  background: var(--brand-soft);
+}
+.notification-badge {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border: 2px solid var(--surface);
+  border-radius: 10px;
+  background: var(--brand);
+  color: var(--on-brand, #fff);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+}
+.notification-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 40;
+  width: min(380px, calc(100vw - 24px));
+  max-height: min(70vh, 520px);
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+}
+.notification-panel-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.notification-panel-header h2 {
+  margin: 0;
+  font-size: 15px;
+  letter-spacing: -0.2px;
+}
+.notification-mark-all {
+  min-height: 32px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: 12px;
+}
+.notification-mark-all:disabled {
+  color: var(--muted);
+  text-decoration: none;
+}
+.notification-status {
+  margin: 0;
+  padding: 16px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.notification-status:empty {
+  display: none;
+}
+.notification-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.notification-item {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+}
+.notification-list li:last-child .notification-item {
+  border-bottom: 0;
+}
+.notification-item:hover {
+  background: var(--brand-soft);
+}
+.notification-item.is-unread {
+  box-shadow: inset 3px 0 0 var(--brand);
+}
+.notification-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--canvas);
+  color: var(--muted);
+}
+.is-unread .notification-icon {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+.notification-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.notification-copy strong {
+  font-size: 13px;
+  font-weight: 650;
+}
+.notification-copy > span {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.notification-copy small {
+  color: var(--muted);
+  font-size: 11px;
+}
+@media (max-width: 800px) {
+  .notification-panel {
+    position: fixed;
+    top: 74px;
+    right: 12px;
+    left: 12px;
+    width: auto;
+  }
+}
+
+/* Popups for new notifications and the idle reminder. */
+.toast-region {
+  position: fixed;
+  top: 76px;
+  right: 16px;
+  z-index: 60;
+  display: grid;
+  gap: 10px;
+  width: min(380px, calc(100vw - 24px));
+  pointer-events: none;
+}
+.toast {
+  position: relative;
+  pointer-events: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+  animation: toast-in 0.2s ease-out;
+}
+.toast-body {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: 12px;
+  width: 100%;
+  padding: 14px 44px 14px 16px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+}
+button.toast-body {
+  cursor: pointer;
+}
+button.toast-body:hover {
+  background: var(--brand-soft);
+  border-radius: var(--radius-md);
+}
+.toast .notification-icon {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+.toast-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  font-size: 20px;
+  line-height: 1;
+}
+.toast-close:hover {
+  background: var(--canvas);
+  color: var(--ink);
+}
+.toast-idle {
+  box-shadow: inset 3px 0 0 var(--brand), var(--shadow-md);
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+}
+@media (max-width: 800px) {
+  .toast-region {
+    right: 12px;
+    left: 12px;
+    width: auto;
+  }
+}

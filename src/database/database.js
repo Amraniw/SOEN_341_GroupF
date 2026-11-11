@@ -3,7 +3,9 @@ const path = require('node:path');
 const sqlite3 = require('sqlite3');
 const { open } = require('sqlite');
 const { JOB_CATEGORIES } = require('../domain/jobs');
-const { APPLICATION_STATUS_IDS } = require('../domain/applications');
+const { APPLICATION_STATUS_IDS, APPLICATION_STATUSES } = require('../domain/applications');
+const { NOTIFICATION_TYPES } = require('../domain/notifications');
+const { EMPLOYMENT_STATUSES } = require('../domain/employment');
 
 const DEFAULT_DATABASE_PATH = path.join(
   __dirname,
@@ -132,6 +134,14 @@ async function initializeDatabase(databasePath = process.env.DB_PATH || DEFAULT_
     await database.exec("ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'job_seeker' CHECK (role IN ('job_seeker', 'recruiter'))");
   }
 
+  // Nullable on purpose: accounts created before this column existed have an
+  // unknown status and are not sent the unemployed-job-seeker welcome.
+  if (!userColumns.has('employment_status')) {
+    await database.exec(
+      `ALTER TABLE users ADD COLUMN employment_status TEXT CHECK (employment_status IN (${EMPLOYMENT_STATUSES.map((status) => `'${status}'`).join(', ')}))`
+    );
+  }
+
   const jobColumns = new Set((await database.all('PRAGMA table_info(jobs)')).map(({ name }) => name));
   const jobColumnDefinitions = {
     employment_type: "TEXT CHECK (employment_type IN ('Full-time', 'Internship', 'Contract'))",
@@ -149,6 +159,94 @@ async function initializeDatabase(databasePath = process.env.DB_PATH || DEFAULT_
   const applicationColumns = new Set((await database.all('PRAGMA table_info(applications)')).map(({ name }) => name));
   if (!applicationColumns.has('job_snapshot_json')) {
     await database.exec('ALTER TABLE applications ADD COLUMN job_snapshot_json TEXT');
+  }
+
+  // Notifications are created by triggers so that every code path that inserts
+  // an application or changes its status produces one, including routes added
+  // later. They run after the migrations above because they read jobs.recruiter_id.
+  const statusLabel = (column) =>
+    `CASE ${column} ${APPLICATION_STATUSES.map(({ id, name }) => `WHEN '${id}' THEN '${name}'`).join(' ')} ELSE ${column} END`;
+  // SQLite cannot alter a CHECK constraint in place, so a notifications table
+  // created before a type was added is rebuilt (rows are kept) in one transaction.
+  const existingNotifications = await database.get(
+    "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'notifications'"
+  );
+  const rebuildNotifications = Boolean(existingNotifications)
+    && NOTIFICATION_TYPES.some((type) => !existingNotifications.sql.includes(`'${type}'`));
+  if (rebuildNotifications) {
+    await database.exec(`
+      BEGIN;
+      DROP TRIGGER IF EXISTS applications_notify_recruiter;
+      DROP TRIGGER IF EXISTS applications_notify_applicant;
+      DROP INDEX IF EXISTS idx_notifications_user_created;
+      DROP INDEX IF EXISTS idx_notifications_user_unread;
+      ALTER TABLE notifications RENAME TO notifications_previous;
+    `);
+  }
+  try {
+  await database.exec(`
+    CREATE TABLE IF NOT EXISTS notifications (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      type TEXT NOT NULL
+        CHECK (type IN (${NOTIFICATION_TYPES.map((type) => `'${type}'`).join(', ')})),
+      title TEXT NOT NULL CHECK (length(trim(title)) > 0),
+      message TEXT NOT NULL CHECK (length(trim(message)) > 0),
+      link TEXT,
+      application_id INTEGER REFERENCES applications(id) ON DELETE SET NULL,
+      job_id INTEGER REFERENCES jobs(id) ON DELETE SET NULL,
+      dedupe_key TEXT UNIQUE,
+      read_at TEXT,
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_notifications_user_created
+      ON notifications(user_id, created_at DESC, id DESC);
+    CREATE INDEX IF NOT EXISTS idx_notifications_user_unread
+      ON notifications(user_id, read_at);
+
+    CREATE TRIGGER IF NOT EXISTS applications_notify_recruiter
+    AFTER INSERT ON applications
+    WHEN (SELECT recruiter_id FROM jobs WHERE id = NEW.job_id) IS NOT NULL
+    BEGIN
+      INSERT INTO notifications (user_id, type, title, message, link, application_id, job_id)
+      SELECT j.recruiter_id, 'new_application', 'New application',
+             u.name || ' applied for ' || j.title || '.',
+             '/recruiter/dashboard', NEW.id, j.id
+      FROM jobs j JOIN users u ON u.id = NEW.user_id
+      WHERE j.id = NEW.job_id;
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS applications_notify_applicant
+    AFTER UPDATE OF status ON applications
+    WHEN NEW.status <> OLD.status
+    BEGIN
+      INSERT INTO notifications (user_id, type, title, message, link, application_id, job_id)
+      SELECT NEW.user_id,
+             CASE NEW.status WHEN 'interview' THEN 'interview_invitation' ELSE 'application_update' END,
+             CASE NEW.status WHEN 'interview' THEN 'Interview invitation' ELSE 'Application update' END,
+             CASE NEW.status
+               WHEN 'interview' THEN 'You have been invited to interview for ' || j.title || ' at ' || j.company || '.'
+               ELSE 'Your application for ' || j.title || ' at ' || j.company
+                    || ' was updated to ' || (${statusLabel('NEW.status')}) || '.'
+             END,
+             '/applications/index.html', NEW.id, j.id
+      FROM jobs j WHERE j.id = NEW.job_id;
+    END;
+  `);
+  if (rebuildNotifications) {
+    await database.exec(`
+      INSERT INTO notifications (id, user_id, type, title, message, link, application_id, job_id, dedupe_key, read_at, created_at)
+      SELECT id, user_id, type, title, message, link, application_id, job_id, dedupe_key, read_at, created_at
+      FROM notifications_previous;
+      DROP TABLE notifications_previous;
+      COMMIT;
+    `);
+  }
+  } catch (error) {
+    if (rebuildNotifications) await database.exec('ROLLBACK').catch(() => {});
+    throw error;
   }
 
   for (const category of JOB_CATEGORIES) {

@@ -69,6 +69,18 @@ fields.forEach((input) => {
   });
 });
 
+// Employment status only applies to job seekers, so recruiters never see it.
+const employmentField = form.querySelector('[data-employment-field]');
+if (signup && employmentField) {
+  const syncEmploymentField = () => {
+    employmentField.hidden = form.elements.role.value !== 'job_seeker';
+  };
+  form.querySelectorAll('input[name="role"]').forEach((radio) =>
+    radio.addEventListener('change', syncEmploymentField)
+  );
+  syncEmploymentField();
+}
+
 document.querySelectorAll('[data-toggle-password]').forEach((button) => {
   button.addEventListener('click', () => {
     const input = document.getElementById(button.dataset.togglePassword);
@@ -124,11 +136,15 @@ form.addEventListener('submit', async (event) => {
   let registered = false;
   try {
     if (signup) {
+      const role = form.elements.role.value;
       await request('/register', {
         name: form.elements.name.value.trim(),
         email,
         password,
-        role: form.elements.role.value,
+        role,
+        ...(role === 'job_seeker'
+          ? { employmentStatus: form.elements.employmentStatus.value }
+          : {}),
       });
       registered = true;
     }
