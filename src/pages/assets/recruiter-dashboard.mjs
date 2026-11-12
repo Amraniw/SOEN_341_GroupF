@@ -1,5 +1,11 @@
 import { FIELDS, LISTS, postingDraft, postingPayload } from './recruiter-form.mjs';
 
+// Closing dates are plain calendar days (YYYY-MM-DD), shown without time zone shifts.
+function closingDateLabel(day) {
+  const date = new Date(`${day}T12:00:00`);
+  return Number.isNaN(date.getTime()) ? day : date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
 export function createRecruiterDashboard({ document, request, formatDate, onUnauthorized = () => {} }) {
   const byId = (id) => document.getElementById(id);
   const form = byId('posting-form');
@@ -71,6 +77,10 @@ export function createRecruiterDashboard({ document, request, formatDate, onUnau
         option.value = id;
         input.append(option);
       }
+    } else if (spec === 'date') {
+      // Optional deadline; job seekers who match the posting get a reminder before it.
+      input = element('input');
+      input.type = 'date';
     } else {
       input = element(['description', 'overview', 'companyDescription'].includes(key) ? 'textarea' : 'input');
       input.maxLength = spec;
@@ -188,7 +198,7 @@ export function createRecruiterDashboard({ document, request, formatDate, onUnau
       identity.append(element('h3', job.title), element('p', `${job.company} · ${job.location}`));
       top.append(identity, element('span', job.status === 'open' ? 'Open' : 'Closed', `recruiter-status${job.status === 'closed' ? ' recruiter-status-closed' : ''}`));
       const facts = element('div', undefined, 'recruiter-facts');
-      facts.append(element('span', job.categoryName), element('span', `Created ${formatDate(job.createdAt)}`), element('span', `${job.applicationCount} ${job.applicationCount === 1 ? 'application' : 'applications'}`));
+      facts.append(element('span', job.categoryName), element('span', `Created ${formatDate(job.createdAt)}`), ...(job.closingDate ? [element('span', `Closes ${closingDateLabel(job.closingDate)}`)] : []), element('span', `${job.applicationCount} ${job.applicationCount === 1 ? 'application' : 'applications'}`));
       const actions = element('div', undefined, 'recruiter-actions');
       const editButton = action('Edit', () => edit(job.id));
       editButton.setAttribute('aria-label', `Edit ${job.title}`);

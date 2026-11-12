@@ -148,6 +148,7 @@ async function initializeDatabase(databasePath = process.env.DB_PATH || DEFAULT_
     workplace_type: "TEXT CHECK (workplace_type IN ('On-site', 'Hybrid', 'Remote'))",
     experience_level: "TEXT CHECK (experience_level IN ('Intern', 'Entry-level', 'Mid-level', 'Senior'))",
     details_json: 'TEXT',
+    closing_date: 'TEXT',
     recruiter_id: 'INTEGER REFERENCES users(id)',
   };
   for (const [name, definition] of Object.entries(jobColumnDefinitions)) {

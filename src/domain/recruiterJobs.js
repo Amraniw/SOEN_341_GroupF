@@ -1,4 +1,5 @@
 const { JOB_CATEGORIES } = require('./jobs');
+const { isValidClosingDate } = require('./jobAlerts');
 
 const TEXT_LIMITS = { title: 200, company: 200, location: 200, category: 80, description: 5000 };
 const ENUMS = {
@@ -9,7 +10,7 @@ const ENUMS = {
 const JOB_COLUMNS = Object.freeze({
   title: 'title', company: 'company', location: 'location', category: 'category', description: 'description',
   employmentType: 'employment_type', workplaceType: 'workplace_type', experienceLevel: 'experience_level',
-  details: 'details_json',
+  details: 'details_json', closingDate: 'closing_date',
 });
 const DETAIL_LISTS = ['responsibilities', 'qualifications', 'preferredSkills', 'benefits'];
 
@@ -82,6 +83,15 @@ function readJobFields(body, { partial = false } = {}) {
       return { error: `Choose a valid ${key}.` };
     }
   }
+  // Optional last day to apply (YYYY-MM-DD). Job seekers get a reminder before it.
+  if (Object.hasOwn(body, 'closingDate')) {
+    const value = body.closingDate;
+    if (value === null || value === '') fields.closingDate = null;
+    else if (isValidClosingDate(value)) fields.closingDate = value;
+    else return { error: 'closingDate must be a valid date (YYYY-MM-DD).' };
+  } else if (!partial) {
+    fields.closingDate = null;
+  }
   if (Object.hasOwn(body, 'details')) {
     const { details, error } = normalizeDetails(body.details);
     if (error) return { error };
@@ -100,7 +110,7 @@ function recruiterJob(row) {
     category: row.category, categoryName: JOB_CATEGORIES.find(({ id }) => id === row.category)?.name,
     description: row.description, status: row.status, createdAt: row.created_at,
     employmentType: row.employment_type, workplaceType: row.workplace_type,
-    experienceLevel: row.experience_level, details,
+    experienceLevel: row.experience_level, closingDate: row.closing_date ?? null, details,
     recruiterId: row.recruiter_id, applicationCount: row.applicationCount,
   };
 }
