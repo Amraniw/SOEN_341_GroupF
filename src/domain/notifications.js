@@ -7,6 +7,7 @@ const NOTIFICATION_TYPES = Object.freeze([
   // Reserved so deadline reminders can be added without rebuilding the table
   // (SQLite cannot alter a CHECK constraint in place).
   'deadline_reminder',
+  'job_match',
 ]);
 
 function publicNotification(row) {

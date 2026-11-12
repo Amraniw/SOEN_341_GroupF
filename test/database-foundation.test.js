@@ -115,7 +115,7 @@ test('legacy data and relationships survive repeated additive initialization wit
         const expected = before[table].map((row) => ({ ...row }));
         if (table === 'users') Object.assign(expected[0], { role: 'job_seeker', employment_status: null });
         if (table === 'jobs') Object.assign(expected[0], {
-          employment_type: null, workplace_type: null, experience_level: null, details_json: null, recruiter_id: null,
+          employment_type: null, workplace_type: null, experience_level: null, details_json: null, closing_date: null, recruiter_id: null,
         });
         if (table === 'applications') expected[0].job_snapshot_json = null;
         assert.deepEqual(await database.all(`SELECT * FROM ${table} ORDER BY id`), expected);

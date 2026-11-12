@@ -18,6 +18,7 @@ export const FIELDS = [
   ['employmentType', 'Employment type', ENUMS.employmentType],
   ['workplaceType', 'Workplace type', ENUMS.workplaceType],
   ['experienceLevel', 'Experience level', ENUMS.experienceLevel],
+  ['closingDate', 'Applications close on', 'date'],
   ['overview', 'Structured overview', 3000], ['companyDescription', 'About the company', 2000],
 ];
 const REQUIRED = ['title', 'company', 'location', 'category', 'description'];
@@ -46,6 +47,7 @@ export function postingPayload(draft, original = null) {
     if (typeof spec === 'number' && raw.length > spec) return { error: `${label} must be ${spec} characters or fewer.`, field: key };
     if (key === 'category' && !CATEGORIES.some(([id]) => id === value)) return { error: 'Choose a valid category.', field: key };
     if (ENUMS[key] && value && !ENUMS[key].includes(value)) return { error: `Choose a valid ${label.toLowerCase()}.`, field: key };
+    if (spec === 'date' && value && !/^\d{4}-\d{2}-\d{2}$/.test(value)) return { error: `${label} must be a valid date.`, field: key };
     if (!['overview', 'companyDescription'].includes(key)) payload[key] = value || null;
   }
   const details = { overview: (draft.overview ?? '').trim(), companyDescription: (draft.companyDescription ?? '').trim() };

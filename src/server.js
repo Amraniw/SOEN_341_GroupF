@@ -1,6 +1,7 @@
 const { createApp } = require('./app');
 const { initializeDatabase } = require('./database/database');
 const { seedDemoJobs } = require('./database/seedJobs');
+const { startClosingReminderSchedule } = require('./domain/jobAlerts');
 
 const DEFAULT_PORT = 3000;
 
@@ -27,6 +28,9 @@ async function startServer({ databasePath, port = getPort() } = {}) {
       const listener = app.listen(port, () => resolve(listener));
       listener.once('error', reject);
     });
+    // Hourly check for jobs that close soon (reminders for matching job seekers).
+    const stopReminders = startClosingReminderSchedule(database);
+    server.once('close', stopReminders);
     return { server, database };
   } catch (error) {
     await database.close();

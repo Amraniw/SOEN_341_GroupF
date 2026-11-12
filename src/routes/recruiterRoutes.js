@@ -2,6 +2,7 @@ const express = require('express');
 const { createAuthorizeRecruiter } = require('../middleware/authorizeRecruiter');
 const { requireSameOrigin } = require('../middleware/requireSameOrigin');
 const { JOB_COLUMNS, isObject, readJobFields, recruiterJob } = require('../domain/recruiterJobs');
+const { runJobAlerts } = require('../domain/jobAlerts');
 
 // Aggregate once for a listing, rather than querying applications per posting.
 const JOB_SELECT = `SELECT j.*, COALESCE(counts.application_count, 0) AS applicationCount
@@ -66,6 +67,7 @@ function createRecruiterRouter(database) {
     request.jobId = result.lastID;
     const job = await ownedJob(request);
     if (!job) return response.status(404).json(NOT_FOUND);
+    await runJobAlerts(database, job.id);
     return response.status(201).json({ message: 'Job posting created successfully.', job: recruiterJob(job) });
   });
 
@@ -87,6 +89,7 @@ function createRecruiterRouter(database) {
     if (!result.changes) return response.status(404).json(NOT_FOUND);
     const job = await ownedJob(request);
     if (!job) return response.status(404).json(NOT_FOUND);
+    await runJobAlerts(database, job.id);
     return response.json({ message: 'Job posting updated successfully.', job: recruiterJob(job) });
   });
 
@@ -100,6 +103,7 @@ function createRecruiterRouter(database) {
     if (!result.changes) return response.status(404).json(NOT_FOUND);
     const job = await ownedJob(request);
     if (!job) return response.status(404).json(NOT_FOUND);
+    if (job.status === 'open') await runJobAlerts(database, job.id);
     return response.json({ message: 'Job posting status updated successfully.', job: recruiterJob(job) });
   });
 

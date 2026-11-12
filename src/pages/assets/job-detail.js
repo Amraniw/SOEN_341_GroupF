@@ -117,6 +117,9 @@ if (await initJobShell()) {
         ['Location', job.location], ['Employment', job.employmentType],
         ['Workplace', job.workplaceType], ['Experience', job.experienceLevel],
         ['Category', job.categoryName], ['Posted', formatDate(job.createdAt)],
+        ['Applications close', job.closingDate
+          ? new Date(`${job.closingDate}T12:00:00`).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
+          : null],
       ];
       surface.innerHTML = `<article class="job-detail">
         <header class="job-detail-header">

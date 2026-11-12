@@ -86,7 +86,8 @@ function createJobRouter(database) {
       `SELECT j.id, j.title, j.company, j.location, j.category,
               c.name AS categoryName, substr(j.description, 1, 200) AS summary,
               j.created_at, j.demo_key, j.employment_type AS employmentType,
-              j.workplace_type AS workplaceType, j.experience_level AS experienceLevel
+              j.workplace_type AS workplaceType, j.experience_level AS experienceLevel,
+              j.closing_date AS closingDate
        FROM jobs j JOIN job_categories c ON c.id = j.category
        WHERE ${conditions.join(' AND ')}
        ORDER BY datetime(j.created_at) DESC, j.id DESC`,
@@ -109,7 +110,8 @@ function createJobRouter(database) {
     const row = await database.get(
       `SELECT j.id, j.title, j.company, j.location, j.category, c.name AS categoryName,
               j.description, j.created_at, j.demo_key, j.employment_type AS employmentType,
-              j.workplace_type AS workplaceType, j.experience_level AS experienceLevel, j.details_json
+              j.workplace_type AS workplaceType, j.experience_level AS experienceLevel, j.details_json,
+              j.closing_date AS closingDate
        FROM jobs j JOIN job_categories c ON c.id = j.category
        WHERE j.id = ? AND j.status = 'open'`,
       Number(jobId)
