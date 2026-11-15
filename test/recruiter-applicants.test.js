@@ -198,6 +198,21 @@ describe('Recruiter applicant review panel', () => {
     assert.deepEqual(expired.unauthorized, [401]);
   });
 
+  test('shows how each offer was answered, and which offers are still waiting', async () => {
+    const view = setup(api([
+      { ...applicant(4, 'Ada Accepted', 'offered'), offerResponse: 'accepted' },
+      { ...applicant(3, 'Dan Declined', 'offered'), offerResponse: 'declined' },
+      { ...applicant(2, 'Wes Waiting', 'offered'), offerResponse: null },
+      applicant(1, 'Ian Interview', 'interview'),
+    ]));
+    await view.button.fire('click');
+    const [accepted, declined, waiting, interview] = [...rows(view.card)];
+    assert.match(accepted.textContent, /Offer accepted/);
+    assert.match(declined.textContent, /Offer declined/);
+    assert.match(waiting.textContent, /Awaiting response/);
+    assert.doesNotMatch(interview.textContent, /Offer accepted|Offer declined|Awaiting response/);
+  });
+
   test('applicant text is rendered as text, never as markup, and load errors are reported', async () => {
     const hostile = setup(api([applicant(1, '<img src=x onerror=alert(1)>')]));
     await hostile.button.fire('click');

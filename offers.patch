@@ -1,0 +1,536 @@
+diff --git a/src/database/database.js b/src/database/database.js
+index 2ea2783..467b363 100644
+--- a/src/database/database.js
++++ b/src/database/database.js
+@@ -6,6 +6,7 @@ const { JOB_CATEGORIES } = require('../domain/jobs');
+ const { APPLICATION_STATUS_IDS, APPLICATION_STATUSES } = require('../domain/applications');
+ const { NOTIFICATION_TYPES } = require('../domain/notifications');
+ const { EMPLOYMENT_STATUSES } = require('../domain/employment');
++const { installOfferResponses } = require('./offerResponses');
+ 
+ const DEFAULT_DATABASE_PATH = path.join(
+   __dirname,
+@@ -142,6 +143,8 @@ async function initializeDatabase(databasePath = process.env.DB_PATH || DEFAULT_
+     );
+   }
+ 
++  await installOfferResponses(database);
++
+   const jobColumns = new Set((await database.all('PRAGMA table_info(jobs)')).map(({ name }) => name));
+   const jobColumnDefinitions = {
+     employment_type: "TEXT CHECK (employment_type IN ('Full-time', 'Internship', 'Contract'))",
+diff --git a/src/database/offerResponses.js b/src/database/offerResponses.js
+new file mode 100644
+index 0000000..3080da1
+--- /dev/null
++++ b/src/database/offerResponses.js
+@@ -0,0 +1,30 @@
++const { OFFER_RESPONSES } = require('../domain/applications');
++
++// Adds offer responses to applications. Safe to run on every start.
++async function installOfferResponses(database) {
++  const columns = new Set(
++    (await database.all('PRAGMA table_info(applications)')).map(({ name }) => name)
++  );
++  if (!columns.has('offer_response')) {
++    await database.exec(
++      `ALTER TABLE applications ADD COLUMN offer_response TEXT CHECK (offer_response IN (${OFFER_RESPONSES.map((response) => `'${response}'`).join(', ')}))`
++    );
++  }
++  if (!columns.has('offer_responded_at')) {
++    await database.exec('ALTER TABLE applications ADD COLUMN offer_responded_at TEXT');
++  }
++
++  // Accepting an offer makes the applicant employed in the same statement, so the
++  // two can never disagree. Declining changes nothing about employment.
++  await database.exec(`
++    CREATE TRIGGER IF NOT EXISTS applications_offer_accepted_employs_applicant
++    AFTER UPDATE OF offer_response ON applications
++    WHEN NEW.offer_response = 'accepted' AND OLD.offer_response IS NOT 'accepted'
++    BEGIN
++      UPDATE users SET employment_status = 'employed'
++      WHERE id = NEW.user_id AND role = 'job_seeker';
++    END;
++  `);
++}
++
++module.exports = { installOfferResponses };
+diff --git a/src/domain/applications.js b/src/domain/applications.js
+index dc911a5..18e6505 100644
+--- a/src/domain/applications.js
++++ b/src/domain/applications.js
+@@ -10,6 +10,10 @@ const APPLICATION_STATUS_IDS = Object.freeze(
+   APPLICATION_STATUSES.map(({ id }) => id)
+ );
+ 
++// A job seeker's answer to an offer. It is stored beside the status, not as a new
++// status, because SQLite cannot alter the status CHECK constraints in place.
++const OFFER_RESPONSES = Object.freeze(['accepted', 'declined']);
++
+ function applicationStatusName(status) {
+   return APPLICATION_STATUSES.find(({ id }) => id === status)?.name || status;
+ }
+@@ -17,5 +21,6 @@ function applicationStatusName(status) {
+ module.exports = {
+   APPLICATION_STATUSES,
+   APPLICATION_STATUS_IDS,
++  OFFER_RESPONSES,
+   applicationStatusName,
+ };
+diff --git a/src/pages/assets/applications.css b/src/pages/assets/applications.css
+index c0652ad..9eb606c 100644
+--- a/src/pages/assets/applications.css
++++ b/src/pages/assets/applications.css
+@@ -244,3 +244,37 @@
+     margin-left: 0;
+   }
+ }
++
++/* Accept or decline an offer. */
++.offer-panel {
++  display: grid;
++  gap: 6px;
++  margin: 4px 0 16px;
++  padding: 16px 18px;
++  border: 1px solid var(--border);
++  border-left: 3px solid var(--brand);
++  border-radius: var(--radius-md);
++  background: var(--brand-soft);
++}
++.offer-panel strong {
++  color: var(--ink);
++}
++.offer-panel p {
++  margin: 0;
++  color: var(--muted);
++  font-size: 14px;
++}
++.offer-panel.is-declined {
++  border-left-color: var(--border);
++  background: var(--surface);
++}
++.offer-actions {
++  display: flex;
++  flex-wrap: wrap;
++  gap: 10px;
++  margin-top: 8px;
++}
++.offer-error {
++  color: var(--ink);
++  font-weight: 600;
++}
+diff --git a/src/pages/assets/applications.js b/src/pages/assets/applications.js
+index 8e328f0..007efc8 100644
+--- a/src/pages/assets/applications.js
++++ b/src/pages/assets/applications.js
+@@ -12,6 +12,10 @@ if (session) {
+   const feedback = document.querySelector('#applications-feedback');
+   let applications = [];
+   let statuses = [];
++  // Accept/decline state: which offer is awaiting confirmation, and any error to show.
++  let offerConfirm = null;
++  let offerBusy = false;
++  const offerErrors = {};
+ 
+   function statusBadge(application) {
+     const className = application.status.replaceAll('_', '-');
+@@ -27,10 +31,46 @@ if (session) {
+     return `<div class="application-timeline" aria-label="Application progress">${path.map((stage, index) => `<span class="timeline-step ${index <= current ? 'is-complete' : ''} ${index === current ? 'is-current' : ''}"><i aria-hidden="true"></i><span>${escapeHtml(statuses.find(({ id }) => id === stage)?.name || stage)}</span></span>`).join('<span class="timeline-connector" aria-hidden="true"></span>')}</div>`;
+   }
+ 
++  // The accept/decline area on an application that has an offer. Both answers are
++  // final, so each asks for a confirmation first.
++  function offerPanel(application) {
++    if (application.offerResponse === 'accepted') {
++      return '<div class="offer-panel is-accepted" role="status"><strong>Offer accepted</strong><p>Congratulations! Your profile now shows you as employed.</p></div>';
++    }
++    if (application.offerResponse === 'declined') {
++      return `<div class="offer-panel is-declined" role="status"><strong>Offer declined</strong><p>You turned down this offer on ${escapeHtml(formatDateTime(application.offerRespondedAt))}.</p></div>`;
++    }
++    if (application.status !== 'offered') return '';
++
++    const error = offerErrors[application.id]
++      ? `<p class="offer-error" role="alert">${escapeHtml(offerErrors[application.id])}</p>`
++      : '';
++    if (offerConfirm?.id === application.id) {
++      const accepting = offerConfirm.response === 'accepted';
++      return `<div class="offer-panel" role="group" aria-label="Confirm your response">
++        <strong>${accepting ? 'Accept this offer?' : 'Decline this offer?'}</strong>
++        <p>${accepting ? 'Your profile will be marked as employed. This can’t be undone.' : 'This can’t be undone.'}</p>${error}
++        <div class="offer-actions">
++          <button class="button" type="button" data-offer-confirm ${offerBusy ? 'disabled aria-busy="true"' : ''}>${accepting ? 'Yes, accept offer' : 'Yes, decline offer'}</button>
++          <button class="button button-secondary" type="button" data-offer-cancel ${offerBusy ? 'disabled' : ''}>Cancel</button>
++        </div>
++      </div>`;
++    }
++    return `<div class="offer-panel" role="group" aria-label="Respond to your offer">
++      <strong>You have an offer</strong>
++      <p>Accept it to take the job, or decline to pass.</p>${error}
++      <div class="offer-actions">
++        <button class="button" type="button" data-offer-choice="accepted" data-application-id="${application.id}">Accept offer</button>
++        <button class="button button-secondary" type="button" data-offer-choice="declined" data-application-id="${application.id}">Decline offer</button>
++      </div>
++    </div>`;
++  }
++
+   function card(application) {
+     return `<li class="application-card">
+       <div class="application-card-top">${companyMark(application.job.company)}<div class="application-card-title"><p>${escapeHtml(application.job.company)}</p><h3>${escapeHtml(application.job.title)}</h3><span>${escapeHtml(application.job.location)}</span></div>${statusBadge(application)}</div>
+       ${timeline(application)}
++      ${offerPanel(application)}
+       <div class="application-card-footer"><span>Applied ${escapeHtml(formatDateTime(application.appliedAt))}</span><span>Updated ${escapeHtml(formatDateTime(application.updatedAt))}</span><a class="text-link" href="/workspace/jobs/${application.jobId}">View job →</a></div>
+     </li>`;
+   }
+@@ -52,6 +92,25 @@ if (session) {
+     }
+   }
+ 
++  async function submitOffer() {
++    if (!offerConfirm || offerBusy) return;
++    const { id, response } = offerConfirm;
++    offerBusy = true;
++    delete offerErrors[id];
++    render();
++    try {
++      const result = await request(`/applications/${id}/offer`, { response }, 'PATCH');
++      applications = applications.map((application) => (application.id === id ? result.application : application));
++      offerConfirm = null;
++    } catch (error) {
++      offerErrors[id] = error.message;
++    } finally {
++      offerBusy = false;
++      render();
++      list.querySelector('[data-offer-confirm], [data-offer-choice]')?.focus();
++    }
++  }
++
+   async function loadApplications() {
+     list.setAttribute('aria-busy', 'true');
+     feedback.hidden = true;
+@@ -84,6 +143,21 @@ if (session) {
+       render();
+     } else if (event.target.closest('[data-retry-applications]')) {
+       loadApplications();
++    } else if (event.target.closest('[data-offer-choice]')) {
++      const choice = event.target.closest('[data-offer-choice]');
++      const id = Number(choice.dataset.applicationId);
++      offerConfirm = { id, response: choice.dataset.offerChoice };
++      delete offerErrors[id];
++      render();
++      list.querySelector('[data-offer-confirm]')?.focus();
++    } else if (event.target.closest('[data-offer-cancel]')) {
++      const id = offerConfirm?.id;
++      offerConfirm = null;
++      if (id !== undefined) delete offerErrors[id];
++      render();
++      list.querySelector('[data-offer-choice]')?.focus();
++    } else if (event.target.closest('[data-offer-confirm]')) {
++      submitOffer();
+     }
+   });
+ 
+diff --git a/src/routes/applicationRoutes.js b/src/routes/applicationRoutes.js
+index fcd913a..589a766 100644
+--- a/src/routes/applicationRoutes.js
++++ b/src/routes/applicationRoutes.js
+@@ -1,7 +1,9 @@
+ const express = require('express');
+ const { createAuthenticateUser } = require('../middleware/authenticateUser');
++const { requireSameOrigin } = require('../middleware/requireSameOrigin');
+ const {
+   APPLICATION_STATUSES,
++  OFFER_RESPONSES,
+   applicationStatusName,
+ } = require('../domain/applications');
+ 
+@@ -17,6 +19,8 @@ function publicApplication(row) {
+     statusLabel: applicationStatusName(row.status),
+     appliedAt: row.applied_at,
+     updatedAt: row.updated_at,
++    offerResponse: row.offer_response ?? null,
++    offerRespondedAt: row.offer_responded_at ?? null,
+     job: {
+       id: row.job_id,
+       title: row.title,
+@@ -32,6 +36,7 @@ function publicApplication(row) {
+ 
+ const APPLICATION_SELECT = `
+   SELECT a.id, a.user_id, a.job_id, a.status, a.applied_at, a.updated_at,
++         a.offer_response, a.offer_responded_at,
+          j.title, j.company, j.location, j.category,
+          c.name AS category_name, j.employment_type, j.workplace_type
+   FROM applications a
+@@ -117,6 +122,87 @@ function createApplicationRouter(database) {
+     }
+   });
+ 
++  // A job seeker accepts or declines an offer they received. Accepting also marks
++  // them as employed (see the trigger in database/offerResponses.js). One answer
++  // only: the conditional UPDATE lets exactly one of any simultaneous requests win.
++  router.patch('/:applicationId/offer', requireSameOrigin, async (request, response, next) => {
++    if (request.authenticatedUser.role !== 'job_seeker') {
++      return response.status(403).json({ error: 'Only job seekers can respond to offers.' });
++    }
++    const applicationId = positiveInteger(Number(request.params.applicationId));
++    if (!applicationId || String(applicationId) !== request.params.applicationId) {
++      return response.status(404).json({ error: 'This application could not be found.' });
++    }
++    const body = request.body || {};
++    if (Object.keys(body).some((key) => key !== 'response')) {
++      return response.status(400).json({ error: 'The offer response contains unsupported information.' });
++    }
++    if (!OFFER_RESPONSES.includes(body.response)) {
++      return response.status(400).json({ error: 'Choose whether to accept or decline the offer.' });
++    }
++
++    try {
++      const userId = request.authenticatedUser.id;
++      const result = await database.run(
++        `UPDATE applications
++         SET offer_response = ?, offer_responded_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
++         WHERE id = ? AND user_id = ? AND status = 'offered' AND offer_response IS NULL`,
++        body.response,
++        applicationId,
++        userId
++      );
++
++      if (result.changes === 0) {
++        const existing = await database.get(
++          `${APPLICATION_SELECT} WHERE a.id = ? AND a.user_id = ?`,
++          applicationId,
++          userId
++        );
++        if (!existing) {
++          return response.status(404).json({ error: 'This application could not be found.' });
++        }
++        if (existing.offer_response) {
++          return response.status(409).json({
++            error: `You already ${existing.offer_response} this offer.`,
++            application: publicApplication(existing),
++          });
++        }
++        return response.status(409).json({ error: 'This application does not have an offer to respond to.' });
++      }
++
++      // Letting the recruiter know is a convenience: it must never undo the answer.
++      try {
++        await database.run(
++          `INSERT INTO notifications (user_id, type, title, message, link, application_id, job_id)
++           SELECT j.recruiter_id, 'application_update', ?,
++                  u.name || ' ' || ? || ' your offer for ' || j.title || '.',
++                  '/recruiter/dashboard', a.id, j.id
++           FROM applications a
++           JOIN jobs j ON j.id = a.job_id
++           JOIN users u ON u.id = a.user_id
++           WHERE a.id = ? AND j.recruiter_id IS NOT NULL`,
++          body.response === 'accepted' ? 'Offer accepted' : 'Offer declined',
++          body.response,
++          applicationId
++        );
++      } catch (error) {
++        console.error('Could not notify the recruiter about the offer response:', error.message);
++      }
++
++      const row = await database.get(
++        `${APPLICATION_SELECT} WHERE a.id = ? AND a.user_id = ?`,
++        applicationId,
++        userId
++      );
++      return response.json({
++        message: body.response === 'accepted' ? 'Offer accepted.' : 'Offer declined.',
++        application: publicApplication(row),
++      });
++    } catch (error) {
++      return next(error);
++    }
++  });
++
+   router.post('/', async (request, response, next) => {
+     if (request.authenticatedUser.role !== 'job_seeker') {
+       return response.status(403).json({ error: 'Only job seekers can submit applications.' });
+diff --git a/test/database-foundation.test.js b/test/database-foundation.test.js
+index e4b4fce..e8bbcf1 100644
+--- a/test/database-foundation.test.js
++++ b/test/database-foundation.test.js
+@@ -117,7 +117,7 @@ test('legacy data and relationships survive repeated additive initialization wit
+         if (table === 'jobs') Object.assign(expected[0], {
+           employment_type: null, workplace_type: null, experience_level: null, details_json: null, closing_date: null, recruiter_id: null,
+         });
+-        if (table === 'applications') expected[0].job_snapshot_json = null;
++        if (table === 'applications') Object.assign(expected[0], { job_snapshot_json: null, offer_response: null, offer_responded_at: null });
+         assert.deepEqual(await database.all(`SELECT * FROM ${table} ORDER BY id`), expected);
+       }
+       const initializedRoots = await database.all(
+diff --git a/test/offer-response.test.js b/test/offer-response.test.js
+new file mode 100644
+index 0000000..bda3421
+--- /dev/null
++++ b/test/offer-response.test.js
+@@ -0,0 +1,167 @@
++const assert = require('node:assert/strict');
++const { after, before, beforeEach, describe, test } = require('node:test');
++const request = require('supertest');
++const { createApp } = require('../src/app');
++const { initializeDatabase } = require('../src/database/database');
++
++describe('Accepting or declining a job offer', () => {
++  let database;
++  let app;
++  let jobId;
++  let recruiterId;
++  let sequence = 0;
++
++  before(async () => {
++    database = await initializeDatabase(':memory:');
++    app = createApp(database, { sessionSecret: 'careerconnect-offer-test-secret' });
++  });
++  after(async () => database.close());
++
++  beforeEach(async () => {
++    await database.run('DELETE FROM notifications');
++    await database.run('DELETE FROM applications');
++    await database.run('DELETE FROM jobs');
++    await database.run('DELETE FROM users');
++    const recruiter = request.agent(app);
++    const credentials = { email: 'recruiter@example.test', password: 'DemoPass123' };
++    await recruiter.post('/api/register').send({ name: 'Riley Recruiter', ...credentials, role: 'recruiter' }).expect(201);
++    recruiterId = (await database.get('SELECT id FROM users WHERE email = ?', credentials.email)).id;
++    jobId = (await database.run(
++      `INSERT INTO jobs (title, company, location, category, description, status, recruiter_id)
++       VALUES ('Frontend Developer', 'Northstar Studio', 'Montreal, QC', 'software-engineering', 'Build interfaces.', 'open', ?)`,
++      recruiterId
++    )).lastID;
++  });
++
++  async function jobSeeker({ employmentStatus = 'unemployed', status = 'offered', name = 'Jordan Davis' } = {}) {
++    sequence += 1;
++    const credentials = { email: `seeker-${sequence}@example.test`, password: 'DemoPass123' };
++    const agent = request.agent(app);
++    await agent.post('/api/register').send({ name, ...credentials, employmentStatus }).expect(201);
++    await agent.post('/api/login').send(credentials).expect(200);
++    const applicationId = (await agent.post('/api/applications').send({ jobId }).expect(201)).body.application.id;
++    if (status !== 'applied') await database.run('UPDATE applications SET status = ? WHERE id = ?', status, applicationId);
++    return { agent, credentials, applicationId };
++  }
++
++  const employment = async (email) =>
++    (await database.get('SELECT employment_status FROM users WHERE email = ?', email)).employment_status;
++
++  test('requires a signed-in job seeker', async () => {
++    const { applicationId } = await jobSeeker();
++    await request(app).patch(`/api/applications/${applicationId}/offer`).send({ response: 'accepted' }).expect(401);
++    const recruiter = request.agent(app);
++    await recruiter.post('/api/login').send({ email: 'recruiter@example.test', password: 'DemoPass123' }).expect(200);
++    await recruiter.patch(`/api/applications/${applicationId}/offer`).send({ response: 'accepted' }).expect(403);
++    assert.equal((await database.get('SELECT offer_response FROM applications')).offer_response, null);
++  });
++
++  test('accepting records the answer and marks the job seeker as employed', async () => {
++    const { agent, credentials, applicationId } = await jobSeeker();
++    assert.equal(await employment(credentials.email), 'unemployed');
++
++    const response = await agent.patch(`/api/applications/${applicationId}/offer`).send({ response: 'accepted' }).expect(200);
++    assert.equal(response.body.application.offerResponse, 'accepted');
++    assert.ok(response.body.application.offerRespondedAt);
++    assert.equal(response.body.application.status, 'offered');
++    assert.equal(await employment(credentials.email), 'employed');
++    assert.equal((await agent.get('/api/session').expect(200)).body.user.employmentStatus, 'employed');
++    assert.equal((await agent.get('/api/applications').expect(200)).body.items[0].offerResponse, 'accepted');
++  });
++
++  test('an employed job seeker no longer gets the welcome notification on sign-in', async () => {
++    const { agent, credentials, applicationId } = await jobSeeker();
++    const welcomes = async () => (await database.get("SELECT COUNT(*) AS n FROM notifications WHERE type = 'welcome'")).n;
++    assert.equal(await welcomes(), 1, 'the first sign-in, while unemployed, sends it');
++    await agent.patch(`/api/applications/${applicationId}/offer`).send({ response: 'accepted' }).expect(200);
++    await agent.post('/api/login').send(credentials).expect(200);
++    assert.equal(await welcomes(), 1, 'signing in again after accepting adds none');
++  });
++
++  test('declining records the answer and leaves employment unchanged', async () => {
++    const { agent, credentials, applicationId } = await jobSeeker();
++    const response = await agent.patch(`/api/applications/${applicationId}/offer`).send({ response: 'declined' }).expect(200);
++    assert.equal(response.body.application.offerResponse, 'declined');
++    assert.equal(await employment(credentials.email), 'unemployed');
++    await agent.post('/api/login').send(credentials).expect(200);
++    assert.equal((await database.get("SELECT COUNT(*) AS n FROM notifications WHERE type = 'welcome'")).n, 2);
++  });
++
++  test('the recruiter is notified of the answer', async () => {
++    const accepted = await jobSeeker({ name: 'Ada Lovelace' });
++    await accepted.agent.patch(`/api/applications/${accepted.applicationId}/offer`).send({ response: 'accepted' }).expect(200);
++    const declined = await jobSeeker({ name: 'Grace Hopper' });
++    await declined.agent.patch(`/api/applications/${declined.applicationId}/offer`).send({ response: 'declined' }).expect(200);
++
++    const rows = await database.all(
++      "SELECT title, message, link FROM notifications WHERE user_id = ? AND title LIKE 'Offer %' ORDER BY id",
++      recruiterId
++    );
++    assert.deepEqual(rows, [
++      { title: 'Offer accepted', message: 'Ada Lovelace accepted your offer for Frontend Developer.', link: '/recruiter/dashboard' },
++      { title: 'Offer declined', message: 'Grace Hopper declined your offer for Frontend Developer.', link: '/recruiter/dashboard' },
++    ]);
++  });
++
++  test('an offer can only be answered once', async () => {
++    const { agent, credentials, applicationId } = await jobSeeker();
++    await agent.patch(`/api/applications/${applicationId}/offer`).send({ response: 'declined' }).expect(200);
++    const again = await agent.patch(`/api/applications/${applicationId}/offer`).send({ response: 'accepted' }).expect(409);
++    assert.equal(again.body.error, 'You already declined this offer.');
++    assert.equal((await database.get('SELECT offer_response FROM applications')).offer_response, 'declined');
++    assert.equal(await employment(credentials.email), 'unemployed');
++  });
++
++  test('simultaneous answers have a single winner', async () => {
++    const { agent, applicationId } = await jobSeeker();
++    const results = await Promise.all(
++      ['accepted', 'declined', 'accepted'].map((value) =>
++        agent.patch(`/api/applications/${applicationId}/offer`).send({ response: value })
++      )
++    );
++    assert.deepEqual(results.map(({ status }) => status).sort(), [200, 409, 409]);
++    assert.equal((await database.get("SELECT COUNT(*) AS n FROM notifications WHERE title LIKE 'Offer %'")).n, 1);
++  });
++
++  test('only an applied-to offer can be answered', async () => {
++    for (const status of ['applied', 'under_review', 'interview', 'rejected']) {
++      const { agent, credentials, applicationId } = await jobSeeker({ status });
++      const response = await agent.patch(`/api/applications/${applicationId}/offer`).send({ response: 'accepted' }).expect(409);
++      assert.equal(response.body.error, 'This application does not have an offer to respond to.');
++      assert.equal(await employment(credentials.email), 'unemployed');
++    }
++  });
++
++  test('job seekers cannot answer someone else’s offer', async () => {
++    const owner = await jobSeeker({ name: 'Owner' });
++    const other = await jobSeeker({ name: 'Someone Else', status: 'applied' });
++    await other.agent.patch(`/api/applications/${owner.applicationId}/offer`).send({ response: 'accepted' }).expect(404);
++    assert.equal((await database.get('SELECT offer_response FROM applications WHERE id = ?', owner.applicationId)).offer_response, null);
++    assert.equal(await employment(owner.credentials.email), 'unemployed');
++    assert.equal(await employment(other.credentials.email), 'unemployed');
++  });
++
++  test('invalid requests are rejected without changing anything', async () => {
++    const { agent, credentials, applicationId } = await jobSeeker();
++    for (const body of [{}, { response: 'maybe' }, { response: '' }, { response: null }, { response: ['accepted'] }]) {
++      assert.equal((await agent.patch(`/api/applications/${applicationId}/offer`).send(body).expect(400)).body.error, 'Choose whether to accept or decline the offer.');
++    }
++    assert.equal((await agent.patch(`/api/applications/${applicationId}/offer`).send({ response: 'accepted', status: 'offered' }).expect(400)).body.error, 'The offer response contains unsupported information.');
++    for (const id of ['0', '-1', 'abc', '1.5', '999999']) {
++      await agent.patch(`/api/applications/${id}/offer`).send({ response: 'accepted' }).expect(404);
++    }
++    assert.equal((await database.get('SELECT offer_response FROM applications')).offer_response, null);
++    assert.equal(await employment(credentials.email), 'unemployed');
++  });
++
++  test('untrusted origins cannot answer an offer', async () => {
++    const { agent, applicationId } = await jobSeeker();
++    await agent.patch(`/api/applications/${applicationId}/offer`).set('Origin', 'https://evil.example').send({ response: 'accepted' }).expect(403);
++    assert.equal((await database.get('SELECT offer_response FROM applications')).offer_response, null);
++  });
++
++  test('the database only allows accepted or declined', async () => {
++    const { applicationId } = await jobSeeker();
++    await assert.rejects(database.run('UPDATE applications SET offer_response = ? WHERE id = ?', 'perhaps', applicationId), /CHECK/);
++  });
++});

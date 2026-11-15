@@ -117,7 +117,7 @@ test('legacy data and relationships survive repeated additive initialization wit
         if (table === 'jobs') Object.assign(expected[0], {
           employment_type: null, workplace_type: null, experience_level: null, details_json: null, closing_date: null, recruiter_id: null,
         });
-        if (table === 'applications') expected[0].job_snapshot_json = null;
+        if (table === 'applications') Object.assign(expected[0], { job_snapshot_json: null, offer_response: null, offer_responded_at: null });
         assert.deepEqual(await database.all(`SELECT * FROM ${table} ORDER BY id`), expected);
       }
       const initializedRoots = await database.all(

@@ -6,6 +6,7 @@ const { JOB_CATEGORIES } = require('../domain/jobs');
 const { APPLICATION_STATUS_IDS, APPLICATION_STATUSES } = require('../domain/applications');
 const { NOTIFICATION_TYPES } = require('../domain/notifications');
 const { EMPLOYMENT_STATUSES } = require('../domain/employment');
+const { installOfferResponses } = require('./offerResponses');
 
 const DEFAULT_DATABASE_PATH = path.join(
   __dirname,
@@ -141,6 +142,8 @@ async function initializeDatabase(databasePath = process.env.DB_PATH || DEFAULT_
       `ALTER TABLE users ADD COLUMN employment_status TEXT CHECK (employment_status IN (${EMPLOYMENT_STATUSES.map((status) => `'${status}'`).join(', ')}))`
     );
   }
+
+  await installOfferResponses(database);
 
   const jobColumns = new Set((await database.all('PRAGMA table_info(jobs)')).map(({ name }) => name));
   const jobColumnDefinitions = {

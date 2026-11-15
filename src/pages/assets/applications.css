@@ -244,3 +244,37 @@
     margin-left: 0;
   }
 }
+
+/* Accept or decline an offer. */
+.offer-panel {
+  display: grid;
+  gap: 6px;
+  margin: 4px 0 16px;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--brand);
+  border-radius: var(--radius-md);
+  background: var(--brand-soft);
+}
+.offer-panel strong {
+  color: var(--ink);
+}
+.offer-panel p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+.offer-panel.is-declined {
+  border-left-color: var(--border);
+  background: var(--surface);
+}
+.offer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+.offer-error {
+  color: var(--ink);
+  font-weight: 600;
+}

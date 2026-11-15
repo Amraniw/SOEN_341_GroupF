@@ -6,6 +6,8 @@ const DECISIONS = {
   rejected: { heading: 'Decline this application?', confirm: 'Decline application', copy: (name, title) => `${name}’s application for ${title} will be declined and they will be notified right away.` },
 };
 
+const OFFER_NOTES = { accepted: 'Offer accepted', declined: 'Offer declined' };
+
 export function createApplicantsPanel({ document, request, formatDate, onUnauthorized = () => {} }) {
   const byId = (id) => document.getElementById(id);
   const dialog = byId('decision-dialog');
@@ -39,6 +41,13 @@ export function createApplicantsPanel({ document, request, formatDate, onUnautho
       element('span', application.applicant.email),
       element('small', `Applied ${formatDate(application.appliedAt)}`),
     );
+    // Once an offer is out, show the applicant's answer, or that it is still waiting.
+    const offerNote = application.offerResponse
+      ? OFFER_NOTES[application.offerResponse]
+      : application.status === 'offered' ? 'Awaiting response' : '';
+    if (offerNote) {
+      main.append(element('em', offerNote, `applicant-offer applicant-offer-${application.offerResponse || 'pending'}`));
+    }
     const badge = element('span', application.statusLabel, `applicant-status applicant-status-${application.status}`);
 
     const actions = element('div', undefined, 'applicant-actions');

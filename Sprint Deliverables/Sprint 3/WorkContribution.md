@@ -29,7 +29,7 @@
 
 - **Work completed:**
 1. Notification and Status System [JavaScript/HTML/CSS]
-2. Assissted with US-16 [JavaScript] (Pair Programming) 
+2. Assissted with US-16/US-08 [JavaScript] (Pair Programming) 
 3. Workflow & Continuous Integration [YAML] 
 
 - **Issues worked on:**

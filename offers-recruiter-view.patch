@@ -1,0 +1,180 @@
+diff --git a/src/domain/recruiterApplications.js b/src/domain/recruiterApplications.js
+index 02f4f06..24158d4 100644
+--- a/src/domain/recruiterApplications.js
++++ b/src/domain/recruiterApplications.js
+@@ -4,6 +4,7 @@ const { applicationStatusName } = require('./applications');
+ // built from this select must also filter on jobs.recruiter_id.
+ const RECRUITER_APPLICATION_SELECT = `
+   SELECT a.id, a.job_id, a.status, a.applied_at, a.updated_at,
++         a.offer_response, a.offer_responded_at,
+          u.id AS applicant_id, u.name AS applicant_name, u.email AS applicant_email
+   FROM applications a
+   JOIN users u ON u.id = a.user_id
+@@ -17,6 +18,9 @@ function recruiterApplication(row) {
+     statusLabel: applicationStatusName(row.status),
+     appliedAt: row.applied_at,
+     updatedAt: row.updated_at,
++    // How the applicant answered an offer: 'accepted', 'declined', or null while waiting.
++    offerResponse: row.offer_response ?? null,
++    offerRespondedAt: row.offer_responded_at ?? null,
+     applicant: {
+       id: row.applicant_id,
+       name: row.applicant_name,
+diff --git a/src/pages/assets/recruiter-applicants.mjs b/src/pages/assets/recruiter-applicants.mjs
+index 6e4e431..874f799 100644
+--- a/src/pages/assets/recruiter-applicants.mjs
++++ b/src/pages/assets/recruiter-applicants.mjs
+@@ -6,6 +6,8 @@ const DECISIONS = {
+   rejected: { heading: 'Decline this application?', confirm: 'Decline application', copy: (name, title) => `${name}’s application for ${title} will be declined and they will be notified right away.` },
+ };
+ 
++const OFFER_NOTES = { accepted: 'Offer accepted', declined: 'Offer declined' };
++
+ export function createApplicantsPanel({ document, request, formatDate, onUnauthorized = () => {} }) {
+   const byId = (id) => document.getElementById(id);
+   const dialog = byId('decision-dialog');
+@@ -39,6 +41,13 @@ export function createApplicantsPanel({ document, request, formatDate, onUnautho
+       element('span', application.applicant.email),
+       element('small', `Applied ${formatDate(application.appliedAt)}`),
+     );
++    // Once an offer is out, show the applicant's answer, or that it is still waiting.
++    const offerNote = application.offerResponse
++      ? OFFER_NOTES[application.offerResponse]
++      : application.status === 'offered' ? 'Awaiting response' : '';
++    if (offerNote) {
++      main.append(element('em', offerNote, `applicant-offer applicant-offer-${application.offerResponse || 'pending'}`));
++    }
+     const badge = element('span', application.statusLabel, `applicant-status applicant-status-${application.status}`);
+ 
+     const actions = element('div', undefined, 'applicant-actions');
+diff --git a/src/pages/assets/recruiter.css b/src/pages/assets/recruiter.css
+index 9985acd..8dca9ab 100644
+--- a/src/pages/assets/recruiter.css
++++ b/src/pages/assets/recruiter.css
+@@ -55,6 +55,9 @@
+ .applicant-status-applied { background: var(--surface); color: var(--muted); border: 1px solid var(--border); }
+ .applicant-status-offered { background: color-mix(in srgb, var(--success) 16%, transparent); color: var(--success); }
+ .applicant-status-rejected { background: color-mix(in srgb, var(--error) 14%, transparent); color: var(--error); }
++.applicant-main .applicant-offer { display: block; margin-top: 2px; font-size: 12px; font-style: normal; font-weight: 650; color: var(--muted); }
++.applicant-main .applicant-offer-accepted { color: var(--success); }
++.applicant-main .applicant-offer-declined { color: var(--error); }
+ .applicant-actions { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+ .applicant-actions select { min-width: 150px; padding: 9px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); color: var(--ink); font: inherit; font-size: 13px; }
+ .applicant-actions .button { min-height: 40px; }
+diff --git a/test/recruiter-applicants.test.js b/test/recruiter-applicants.test.js
+index 18959dd..59ead8f 100644
+--- a/test/recruiter-applicants.test.js
++++ b/test/recruiter-applicants.test.js
+@@ -198,6 +198,21 @@ describe('Recruiter applicant review panel', () => {
+     assert.deepEqual(expired.unauthorized, [401]);
+   });
+ 
++  test('shows how each offer was answered, and which offers are still waiting', async () => {
++    const view = setup(api([
++      { ...applicant(4, 'Ada Accepted', 'offered'), offerResponse: 'accepted' },
++      { ...applicant(3, 'Dan Declined', 'offered'), offerResponse: 'declined' },
++      { ...applicant(2, 'Wes Waiting', 'offered'), offerResponse: null },
++      applicant(1, 'Ian Interview', 'interview'),
++    ]));
++    await view.button.fire('click');
++    const [accepted, declined, waiting, interview] = [...rows(view.card)];
++    assert.match(accepted.textContent, /Offer accepted/);
++    assert.match(declined.textContent, /Offer declined/);
++    assert.match(waiting.textContent, /Awaiting response/);
++    assert.doesNotMatch(interview.textContent, /Offer accepted|Offer declined|Awaiting response/);
++  });
++
+   test('applicant text is rendered as text, never as markup, and load errors are reported', async () => {
+     const hostile = setup(api([applicant(1, '<img src=x onerror=alert(1)>')]));
+     await hostile.button.fire('click');
+diff --git a/test/recruiter-offer-response.test.js b/test/recruiter-offer-response.test.js
+new file mode 100644
+index 0000000..c4698c9
+--- /dev/null
++++ b/test/recruiter-offer-response.test.js
+@@ -0,0 +1,85 @@
++const assert = require('node:assert/strict');
++const { after, before, beforeEach, describe, test } = require('node:test');
++const request = require('supertest');
++const { createApp } = require('../src/app');
++const { initializeDatabase } = require('../src/database/database');
++
++describe('Recruiters see how applicants answered their offers', () => {
++  let database;
++  let app;
++  let recruiter;
++  let jobId;
++
++  before(async () => {
++    database = await initializeDatabase(':memory:');
++    app = createApp(database, { sessionSecret: 'careerconnect-recruiter-offer-test-secret' });
++  });
++  after(async () => database.close());
++
++  beforeEach(async () => {
++    await database.run('DELETE FROM notifications');
++    await database.run('DELETE FROM applications');
++    await database.run('DELETE FROM jobs');
++    await database.run('DELETE FROM users');
++    recruiter = request.agent(app);
++    const credentials = { email: 'recruiter@example.test', password: 'DemoPass123' };
++    await recruiter.post('/api/register').send({ name: 'Riley Recruiter', ...credentials, role: 'recruiter' }).expect(201);
++    await recruiter.post('/api/login').send(credentials).expect(200);
++    const { id } = await database.get('SELECT id FROM users WHERE email = ?', credentials.email);
++    jobId = (await database.run(
++      `INSERT INTO jobs (title, company, location, category, description, status, recruiter_id)
++       VALUES ('Frontend Developer', 'Northstar Studio', 'Montreal, QC', 'software-engineering', 'Build interfaces.', 'open', ?)`,
++      id
++    )).lastID;
++  });
++
++  async function applicant(name) {
++    const credentials = { email: `${name.split(' ')[0].toLowerCase()}@example.test`, password: 'DemoPass123' };
++    const agent = request.agent(app);
++    await agent.post('/api/register').send({ name, ...credentials, employmentStatus: 'unemployed' }).expect(201);
++    await agent.post('/api/login').send(credentials).expect(200);
++    const applicationId = (await agent.post('/api/applications').send({ jobId }).expect(201)).body.application.id;
++    return { agent, applicationId };
++  }
++
++  const listed = async () => (await recruiter.get(`/api/recruiter/jobs/${jobId}/applications`).expect(200)).body.items;
++
++  test('the full flow: offer sent, then accepted or declined, is visible to the recruiter', async () => {
++    const ada = await applicant('Ada Lovelace');
++    const dan = await applicant('Dan Brown');
++    const wes = await applicant('Wes Waiting');
++    for (const { applicationId } of [ada, dan, wes]) {
++      await recruiter.patch(`/api/recruiter/applications/${applicationId}/status`).send({ status: 'offered' }).expect(200);
++    }
++
++    // The applicant is told about the offer and can follow the link to answer it.
++    const note = (await ada.agent.get('/api/notifications?unread=true').expect(200)).body.items.find(({ type }) => type === 'job_offer');
++    assert.equal(note.link, '/applications/index.html');
++
++    assert.ok((await listed()).every((item) => item.offerResponse === null && item.offerRespondedAt === null));
++
++    await ada.agent.patch(`/api/applications/${ada.applicationId}/offer`).send({ response: 'accepted' }).expect(200);
++    await dan.agent.patch(`/api/applications/${dan.applicationId}/offer`).send({ response: 'declined' }).expect(200);
++
++    const byName = Object.fromEntries((await listed()).map((item) => [item.applicant.name, item]));
++    assert.equal(byName['Ada Lovelace'].offerResponse, 'accepted');
++    assert.ok(byName['Ada Lovelace'].offerRespondedAt);
++    assert.equal(byName['Dan Brown'].offerResponse, 'declined');
++    assert.equal(byName['Wes Waiting'].offerResponse, null);
++    assert.equal(byName['Wes Waiting'].status, 'offered');
++  });
++
++  test('the status endpoint also reports the answer, and other recruiters still cannot see the posting', async () => {
++    const ada = await applicant('Ada Lovelace');
++    await recruiter.patch(`/api/recruiter/applications/${ada.applicationId}/status`).send({ status: 'offered' }).expect(200);
++    await ada.agent.patch(`/api/applications/${ada.applicationId}/offer`).send({ response: 'accepted' }).expect(200);
++    const moved = await recruiter.patch(`/api/recruiter/applications/${ada.applicationId}/status`).send({ status: 'interview' }).expect(200);
++    assert.equal(moved.body.application.offerResponse, 'accepted');
++
++    const other = request.agent(app);
++    const credentials = { email: 'other-recruiter@example.test', password: 'DemoPass123' };
++    await other.post('/api/register').send({ name: 'Other Recruiter', ...credentials, role: 'recruiter' }).expect(201);
++    await other.post('/api/login').send(credentials).expect(200);
++    await other.get(`/api/recruiter/jobs/${jobId}/applications`).expect(404);
++  });
++});
