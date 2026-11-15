@@ -219,18 +219,31 @@ async function initializeDatabase(databasePath = process.env.DB_PATH || DEFAULT_
       WHERE j.id = NEW.job_id;
     END;
 
-    CREATE TRIGGER IF NOT EXISTS applications_notify_applicant
+    -- Recreated on every start so wording changes reach existing databases.
+    DROP TRIGGER IF EXISTS applications_notify_applicant;
+    CREATE TRIGGER applications_notify_applicant
     AFTER UPDATE OF status ON applications
     WHEN NEW.status <> OLD.status
     BEGIN
       INSERT INTO notifications (user_id, type, title, message, link, application_id, job_id)
       SELECT NEW.user_id,
-             CASE NEW.status WHEN 'interview' THEN 'interview_invitation' ELSE 'application_update' END,
-             CASE NEW.status WHEN 'interview' THEN 'Interview invitation' ELSE 'Application update' END,
              CASE NEW.status
+               WHEN 'interview' THEN 'interview_invitation'
+               WHEN 'offered' THEN 'job_offer'
+               ELSE 'application_update'
+             END,
+             CASE NEW.status
+               WHEN 'interview' THEN 'Interview invitation'
+               WHEN 'offered' THEN 'Job offer'
+               ELSE 'Application update'
+             END,
+             CASE NEW.status
+               WHEN 'under_review' THEN 'Your application for ' || j.title || ' at ' || j.company || ' is now under review.'
                WHEN 'interview' THEN 'You have been invited to interview for ' || j.title || ' at ' || j.company || '.'
+               WHEN 'offered' THEN 'Congratulations! ' || j.company || ' has offered you the ' || j.title || ' position.'
+               WHEN 'rejected' THEN j.company || ' has decided not to move forward with your application for ' || j.title || '. Thank you for applying.'
                ELSE 'Your application for ' || j.title || ' at ' || j.company
-                    || ' was updated to ' || (${statusLabel('NEW.status')}) || '.'
+                    || ' was moved to ' || (${statusLabel('NEW.status')}) || '.'
              END,
              '/applications/index.html', NEW.id, j.id
       FROM jobs j WHERE j.id = NEW.job_id;

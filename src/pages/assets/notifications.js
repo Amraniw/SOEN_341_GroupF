@@ -9,6 +9,7 @@ const TYPE_ICONS = {
   new_application: 'user',
   application_update: 'applications',
   interview_invitation: 'briefcase',
+  job_offer: 'check',
   deadline_reminder: 'bell',
   welcome: 'user',
   idle_warning: 'bell',

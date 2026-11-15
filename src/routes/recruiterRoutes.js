@@ -3,6 +3,8 @@ const { createAuthorizeRecruiter } = require('../middleware/authorizeRecruiter')
 const { requireSameOrigin } = require('../middleware/requireSameOrigin');
 const { JOB_COLUMNS, isObject, readJobFields, recruiterJob } = require('../domain/recruiterJobs');
 const { runJobAlerts } = require('../domain/jobAlerts');
+const { APPLICATION_STATUSES, APPLICATION_STATUS_IDS } = require('../domain/applications');
+const { RECRUITER_APPLICATION_SELECT, recruiterApplication } = require('../domain/recruiterApplications');
 
 // Aggregate once for a listing, rather than querying applications per posting.
 const JOB_SELECT = `SELECT j.*, COALESCE(counts.application_count, 0) AS applicationCount
@@ -10,6 +12,7 @@ const JOB_SELECT = `SELECT j.*, COALESCE(counts.application_count, 0) AS applica
     SELECT job_id, COUNT(*) AS application_count FROM applications GROUP BY job_id
   ) counts ON counts.job_id = j.id`;
 const NOT_FOUND = { error: 'This job posting could not be found.' };
+const APPLICATION_NOT_FOUND = { error: 'This application could not be found.' };
 const DELETE_CONFLICT = { error: 'This posting has applications and cannot be deleted. Close it instead.' };
 
 function createRecruiterRouter(database) {
@@ -105,6 +108,66 @@ function createRecruiterRouter(database) {
     if (!job) return response.status(404).json(NOT_FOUND);
     if (job.status === 'open') await runJobAlerts(database, job.id);
     return response.json({ message: 'Job posting status updated successfully.', job: recruiterJob(job) });
+  });
+
+  router.get('/jobs/:id/applications', async (request, response, next) => {
+    try {
+      const job = await ownedJob(request);
+      if (!job) return response.status(404).json(NOT_FOUND);
+      const rows = await database.all(
+        `${RECRUITER_APPLICATION_SELECT}
+         WHERE a.job_id = ? AND j.recruiter_id = ?
+         ORDER BY datetime(a.applied_at) DESC, a.id DESC`,
+        request.jobId, request.authenticatedUser.id
+      );
+      return response.json({
+        job: { id: job.id, title: job.title, company: job.company },
+        items: rows.map(recruiterApplication),
+        total: rows.length,
+        statuses: APPLICATION_STATUSES,
+      });
+    } catch (error) {
+      return next(error);
+    }
+  });
+
+  // Moving an application to a new status is what notifies the applicant: a
+  // database trigger writes the matching notification for every status change.
+  router.patch('/applications/:applicationId/status', async (request, response, next) => {
+    const { applicationId } = request.params;
+    if (!/^[1-9]\d*$/.test(applicationId) || !Number.isSafeInteger(Number(applicationId))) {
+      return response.status(400).json({ error: 'Choose a valid application.' });
+    }
+    const body = request.body;
+    if (!isObject(body) || Object.keys(body).length !== 1 || !Object.hasOwn(body, 'status')
+      || !APPLICATION_STATUS_IDS.includes(body.status)) {
+      return response.status(400).json({ error: `Provide only a status of ${APPLICATION_STATUS_IDS.join(', ')}.` });
+    }
+
+    try {
+      const recruiterId = request.authenticatedUser.id;
+      const result = await database.run(
+        `UPDATE applications SET status = ?
+         WHERE id = ? AND status <> ?
+           AND job_id IN (SELECT id FROM jobs WHERE recruiter_id = ?)`,
+        body.status, Number(applicationId), body.status, recruiterId
+      );
+      const row = await database.get(
+        `${RECRUITER_APPLICATION_SELECT} WHERE a.id = ? AND j.recruiter_id = ?`,
+        Number(applicationId), recruiterId
+      );
+      if (!row) return response.status(404).json(APPLICATION_NOT_FOUND);
+      const changed = result.changes > 0;
+      return response.json({
+        message: changed
+          ? 'Application status updated. The applicant has been notified.'
+          : 'This application already has that status.',
+        changed,
+        application: recruiterApplication(row),
+      });
+    } catch (error) {
+      return next(error);
+    }
   });
 
   router.delete('/jobs/:id', async (request, response, next) => {

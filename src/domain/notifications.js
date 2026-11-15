@@ -2,6 +2,7 @@ const NOTIFICATION_TYPES = Object.freeze([
   'new_application',
   'application_update',
   'interview_invitation',
+  'job_offer',
   'welcome',
   'idle_warning',
   // Reserved so deadline reminders can be added without rebuilding the table

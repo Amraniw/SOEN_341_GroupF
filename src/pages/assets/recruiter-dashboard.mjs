@@ -1,4 +1,5 @@
 import { FIELDS, LISTS, postingDraft, postingPayload } from './recruiter-form.mjs';
+import { createApplicantsPanel } from './recruiter-applicants.mjs';
 
 // Closing dates are plain calendar days (YYYY-MM-DD), shown without time zone shifts.
 function closingDateLabel(day) {
@@ -13,6 +14,7 @@ export function createRecruiterDashboard({ document, request, formatDate, onUnau
   const editor = byId('posting-editor');
   const list = byId('posting-list');
   const dialog = byId('delete-dialog');
+  const applicants = createApplicantsPanel({ document, request, formatDate, onUnauthorized });
   const controls = {};
   const listEditors = {};
   let original = null;
@@ -208,6 +210,12 @@ export function createRecruiterDashboard({ document, request, formatDate, onUnau
       remove.setAttribute('data-has-applications', String(job.applicationCount > 0));
       remove.setAttribute('aria-label', `Delete ${job.title}`);
       for (const button of [editButton, lifecycle, remove]) button.setAttribute('data-management', '');
+      if (job.applicationCount > 0) {
+        const review = action(`Review applicants (${job.applicationCount})`, () => {}, 'button');
+        review.setAttribute('aria-label', `Review applicants for ${job.title}`);
+        applicants.attach(job, card, review);
+        actions.append(review);
+      }
       actions.append(editButton, lifecycle, remove);
       if (job.status === 'open') {
         const view = element('a', 'View public posting', 'text-link');

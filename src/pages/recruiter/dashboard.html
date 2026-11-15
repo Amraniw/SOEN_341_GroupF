@@ -57,5 +57,11 @@
       <p id="delete-copy"></p><p>This cannot be undone. Postings with applications must be closed instead.</p>
       <div class="recruiter-actions"><button class="button button-secondary" type="button" id="cancel-delete" autofocus>Keep posting</button><button class="button recruiter-danger" type="button" id="confirm-delete">Delete permanently</button></div>
     </dialog>
+    <dialog id="decision-dialog" aria-labelledby="decision-heading" aria-describedby="decision-copy">
+      <h2 id="decision-heading">Confirm decision</h2>
+      <div id="decision-notice" class="notice" role="alert" tabindex="-1" hidden></div>
+      <p id="decision-copy"></p>
+      <div class="recruiter-actions"><button class="button button-secondary" type="button" id="cancel-decision" autofocus>Go back</button><button class="button" type="button" id="confirm-decision">Confirm</button></div>
+    </dialog>
   </body>
 </html>
