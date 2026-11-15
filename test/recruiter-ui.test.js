@@ -382,3 +382,162 @@ describe('Phase 03 page and real API integration', () => {
     } finally { await database.close(); }
   });
 });
+
+describe('Sprint 3 posting-management improvements', () => {
+  const GONE = 'This posting no longer exists. Your list has been refreshed.';
+  // A fake recruiter API whose postings change like the real one, including the
+  // 404 (worded by api.js as an outage) for a posting that no longer exists.
+  function liveApi(initial) {
+    let items = initial.map((item) => ({ ...item }));
+    const missing = () => Object.assign(new Error('This service is not available right now. Please try again later.'), { status: 404 });
+    const api = async (path, body, method) => {
+      const [, id, status] = path.match(/^\/recruiter\/jobs\/(\d+)(\/status)?$/) || [];
+      if (!id) return method === 'POST' ? { job: job({ id: 99 }) } : responses(items)(path);
+      const posting = items.find((item) => item.id === Number(id));
+      if (!posting) throw missing();
+      if (status) posting.status = body.status;
+      else if (method === 'DELETE') items = items.filter((item) => item !== posting);
+      else if (method === 'PATCH') Object.assign(posting, body);
+      return { job: posting };
+    };
+    return { api, remove: (id) => { items = items.filter((item) => item.id !== id); }, find: (id) => items.find((item) => item.id === id) };
+  }
+  const cards = (get) => get('posting-list').querySelectorAll('article');
+  const card = (get, title) => cards(get).find((article) => article.querySelector('h3').textContent === title);
+
+  test('a posting removed elsewhere is explained and refreshed instead of reported as an outage', async () => {
+    // Status change: the list is refreshed and an unrelated draft is kept.
+    let server = liveApi([job()]);
+    let view = fixture(server.api);
+    await view.dashboard.load();
+    view.dashboard.newPosting();
+    view.get('posting-title').value = 'Unsaved draft';
+    server.remove(1);
+    await view.dashboard.changeStatus(job());
+    assert.equal(view.get('mutation-notice').textContent, GONE);
+    assert.equal(view.get('mutation-notice').getAttribute('role'), 'alert');
+    assert.equal(view.document.activeElement, view.get('mutation-notice'));
+    assert.equal(cards(view.get).length, 0);
+    assert.equal(view.get('posting-editor').hidden, false);
+    assert.equal(view.get('posting-title').value, 'Unsaved draft');
+
+    // Saving an edit of a removed posting closes its editor.
+    server = liveApi([job({ id: 2 })]);
+    view = fixture(server.api);
+    await view.dashboard.load();
+    await view.dashboard.edit(2);
+    view.get('posting-title').value = 'Changed title';
+    server.remove(2);
+    await view.dashboard.submit();
+    assert.equal(view.get('posting-editor').hidden, true);
+    assert.equal(view.get('mutation-notice').textContent, GONE);
+    assert.notEqual(view.get('form-notice').textContent, 'This service is not available right now. Please try again later.');
+
+    // Deleting a posting that was already deleted is reported as done, not as a failure.
+    server = liveApi([job({ id: 3 })]);
+    view = fixture(server.api);
+    await view.dashboard.load();
+    view.dashboard.askDelete(server.find(3));
+    server.remove(3);
+    await view.dashboard.confirmDelete();
+    assert.equal(view.get('delete-dialog').open, false);
+    assert.equal(view.get('mutation-notice').textContent, 'This posting had already been deleted. Your list has been refreshed.');
+    assert.equal(view.get('mutation-notice').getAttribute('role'), 'status');
+  });
+
+  test('closing and reopening keep focus on the posting and explain what each status means', async () => {
+    const server = liveApi([job({ id: 1, title: 'First' }), job({ id: 2, title: 'Second', applicationCount: 2 })]);
+    const { dashboard, document, get } = fixture(server.api);
+    await dashboard.load();
+    assert.match(card(get, 'Second').textContent, /can’t be deleted\. Close it instead to stop new applications/);
+
+    await dashboard.changeStatus(server.find(2));
+    const closed = card(get, 'Second');
+    assert.equal(closed.className, 'panel recruiter-card recruiter-card-closed');
+    assert.match(closed.textContent, /Hidden from job search and closed to new applications\. Existing applications are kept\./);
+    assert.doesNotMatch(closed.textContent, /Close it instead/);
+    assert.equal(document.activeElement.textContent, 'Reopen posting');
+    assert.equal(document.activeElement.getAttribute('data-job-id'), '2');
+    assert.match(get('mutation-notice').textContent, /“Second” is closed\. It is hidden from job search/);
+    assert.equal(card(get, 'First').className, 'panel recruiter-card');
+
+    await dashboard.changeStatus(server.find(2));
+    assert.equal(card(get, 'Second').className, 'panel recruiter-card');
+    assert.equal(document.activeElement.textContent, 'Close posting');
+    assert.match(get('mutation-notice').textContent, /“Second” is open again and visible in job search/);
+
+    // Editing a closed posting says its changes stay hidden until it is reopened.
+    const edited = fixture(async () => ({ job: job({ status: 'closed' }) }));
+    await edited.dashboard.edit(1);
+    assert.match(edited.get('editor-help').textContent, /closed, so your changes stay hidden from job seekers until you reopen it/);
+  });
+
+  test('every invalid field is reported at once and nothing is sent until the form is valid', async () => {
+    const empty = model.postingPayload(model.postingDraft(null));
+    assert.deepEqual(empty.errors.map(({ field }) => field), ['title', 'company', 'location', 'category', 'description']);
+    assert.equal(empty.error, 'Job title is required.');
+    assert.equal(empty.field, 'title');
+    assert.equal(model.postingPayload(model.postingDraft(job())).errors, undefined);
+
+    let requests = 0;
+    const { dashboard, document, get } = fixture(async () => { requests++; return {}; });
+    dashboard.newPosting();
+    await dashboard.submit();
+    for (const key of ['title', 'company', 'location', 'category', 'description']) {
+      assert.equal(get(`posting-${key}`).getAttribute('aria-invalid'), 'true', key);
+    }
+    assert.equal(get('posting-employmentType').getAttribute('aria-invalid'), null);
+    assert.equal(get('form-notice').textContent,
+      'Fix 5 fields: Job title is required. Company is required. Location is required. Category is required. Description is required.');
+    assert.equal(document.activeElement, get('posting-title'));
+
+    get('posting-title').value = 'Engineer';
+    await dashboard.submit();
+    assert.equal(get('posting-title').getAttribute('aria-invalid'), null);
+    assert.match(get('form-notice').textContent, /^Fix 4 fields: Company is required\./);
+    assert.equal(document.activeElement, get('posting-company'));
+    assert.equal(requests, 0);
+  });
+
+  test('a closing date that has passed is flagged while the posting is still open', async () => {
+    const document = page();
+    const items = [
+      job({ id: 1, title: 'Late', closingDate: '2026-11-14' }),
+      job({ id: 2, title: 'Upcoming', closingDate: '2026-11-20' }),
+      job({ id: 3, title: 'Closed late', status: 'closed', closingDate: '2026-11-14' }),
+    ];
+    const dashboard = createRecruiterDashboard({ document, request: responses(items), formatDate: String, now: () => new Date(2026, 10, 15, 9) });
+    await dashboard.load();
+    const get = (id) => document.getElementById(id);
+    // A card is [heading row, facts row, actions, optional note].
+    const closingFact = (title) => card(get, title).children[1].children.find((span) => /Clos/.test(span.textContent));
+    assert.match(closingFact('Late').textContent, /^Closing date passed:/);
+    assert.equal(closingFact('Late').className, 'recruiter-warning');
+    assert.match(card(get, 'Late').textContent, /The closing date has passed, but job seekers can still apply until you close this posting\./);
+    assert.match(closingFact('Upcoming').textContent, /^Closes /);
+    assert.equal(card(get, 'Upcoming').querySelectorAll('p').length, 1); // company line only, no note
+    assert.match(closingFact('Closed late').textContent, /^Closing date passed:/);
+    assert.equal(closingFact('Closed late').className, undefined);
+    assert.doesNotMatch(card(get, 'Closed late').textContent, /can still apply/);
+  });
+
+  test('confirmations appear beside the postings list and take focus after create and delete', async () => {
+    const position = (id) => html.indexOf(`id="${id}"`);
+    assert.ok(position('postings-heading') < position('mutation-notice') && position('mutation-notice') < position('posting-list'));
+
+    const server = liveApi([job({ id: 4, title: 'Removable' })]);
+    const { dashboard, document, get } = fixture(server.api);
+    await dashboard.load();
+    dashboard.newPosting();
+    for (const [key, value] of Object.entries(model.postingDraft(job({ details: null })))) if (!Array.isArray(value)) get(`posting-${key}`).value = value;
+    await dashboard.submit();
+    assert.equal(get('mutation-notice').textContent, 'Posting created successfully. Job seekers can now find it in job search.');
+    assert.equal(document.activeElement, get('mutation-notice'));
+
+    dashboard.askDelete(server.find(4));
+    await dashboard.confirmDelete();
+    assert.equal(get('mutation-notice').textContent, '“Removable” was permanently deleted.');
+    assert.equal(document.activeElement, get('mutation-notice'));
+    assert.equal(server.find(4), undefined);
+  });
+});
