@@ -44,7 +44,7 @@ function idleWarningNotification() {
   return {
     type: 'idle_warning',
     title: '67',
-    message: 'SIX SEVEN HAHAHAHAHAHAHAHAHA',
+    message: 'It appears, you have been inactive for 67 seconds. Are you still there?',
     link: null,
   };
 }
