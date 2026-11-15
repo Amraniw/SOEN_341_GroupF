@@ -168,19 +168,19 @@ if (session) {
     }
   }
 
-  // Shows the resume saved through the existing Resume page; it is not managed here.
+  // Shows the default resume chosen on the Resume page; resumes are not managed here.
   async function loadResume() {
     const summary = document.querySelector('#profile-resume');
     const link = document.querySelector('#profile-resume-link');
     try {
       const { resume } = await request('/resumes/current', undefined, 'GET');
       if (resume) {
-        summary.innerHTML = `<ul class="receipt-list" aria-label="Current resume"><li class="resume-receipt">
+        summary.innerHTML = `<ul class="receipt-list" aria-label="Default resume"><li class="resume-receipt">
           <span class="document-icon">${icon('file')}<span>PDF</span></span>
           <div class="min-width-zero"><h3 class="break-word">${escapeHtml(resume.originalName)}</h3><p>Uploaded ${escapeHtml(formatDate(resume.uploadedAt))}</p></div>
-          <span class="badge badge-success">${icon('check')} Saved</span>
+          <span class="badge badge-success">${icon('check')} Default</span>
         </li></ul>`;
-        link.innerHTML = `Manage resume ${icon('arrow')}`;
+        link.innerHTML = `Manage your resumes ${icon('arrow')}`;
       } else {
         summary.innerHTML = `<div class="empty-state"><span class="icon-tile">${icon('file')}</span><div><h3>No resume saved yet</h3><p>Upload a PDF on the Resume page and it will appear here.</p></div></div>`;
         link.innerHTML = `Upload resume ${icon('arrow')}`;

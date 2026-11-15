@@ -12,7 +12,31 @@
     <script src="/assets/theme.js"></script>
     <link rel="stylesheet" href="/assets/styles.css" />
     <script type="module" src="/assets/resume.js"></script>
-    
+    <style>
+      /* Resume-only rule for the "Make default" action, sized like the existing
+         delete action. Colours use the theme tokens so dark mode still applies. */
+      .resume-default-button {
+        display: inline-flex;
+        align-items: center;
+        min-height: 34px;
+        padding: 7px 10px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        color: var(--brand);
+        background: var(--surface);
+        font: inherit;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .resume-default-button:hover:not(:disabled) {
+        background: var(--brand-soft);
+      }
+      .resume-default-button:disabled {
+        cursor: wait;
+        opacity: 0.65;
+      }
+    </style>
   </head>
   <body data-page="resume">
     <a class="skip-link" href="#main">Skip to content</a>
@@ -39,7 +63,7 @@
           <div class="page-heading page-heading-row">
             <div>
               <h1>Your experience, on file.</h1>
-              <p>Keep your resume ready for future applications.</p>
+              <p>Keep your resumes ready for future applications.</p>
             </div>
             <span class="badge badge-neutral">PDF · Up to 5 MB</span>
           </div>
@@ -101,33 +125,45 @@
                   </div>
                 </form>
                 <p class="help-note">
-                  Uploading a newer PDF makes it your current resume. You can
-                  delete the resume saved to your account at any time.
+                  Each upload is added to your saved resumes and becomes your
+                  default. You can choose a different default or delete any
+                  resume at any time.
                 </p>
               </section>
               <section class="panel receipts-panel">
                 <div class="panel-heading">
-                  <h2>Current resume</h2>
-                  <span class="badge badge-neutral">Saved to your account</span>
+                  <h2>Saved resumes</h2>
+                  <span class="badge badge-neutral" id="resume-count"
+                    >Saved to your account</span
+                  >
                 </div>
                 <p>
-                  This information comes from CareerConnect, so it remains here
-                  after you refresh or sign in again.
+                  Your default resume is the one shown on your profile. Saved
+                  resumes remain here after you refresh or sign in again.
                 </p>
-                <div class="empty-state" id="receipt-empty">
+                <div
+                  id="resumes-notice"
+                  role="status"
+                  tabindex="-1"
+                  hidden
+                ></div>
+                <p id="resumes-loading" role="status">
+                  Loading your saved resumes…
+                </p>
+                <div class="empty-state" id="receipt-empty" hidden>
                   <span class="icon-tile" data-icon="file"></span>
                   <div>
                     <h3>No resume saved yet</h3>
                     <p>
-                      Choose a PDF above. Your current resume will appear here
-                      after it is uploaded.
+                      Choose a PDF above. Your saved resumes will appear here
+                      after you upload them.
                     </p>
                   </div>
                 </div>
                 <ul
                   class="receipt-list"
                   id="receipt-list"
-                  aria-label="Current resume"
+                  aria-label="Saved resumes"
                 ></ul>
               </section>
             </div>
