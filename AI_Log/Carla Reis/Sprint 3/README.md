@@ -1,6 +1,6 @@
 # AI Logs — Sprint 3
 
-This document records the main AI-assisted planning and requirements activities carried out during Sprint 3 of CareerConnect. Claude was used to implement the notifications and reminders and to write the Sprint 3 user cases.
+This document records the main AI-assisted planning and requirements activities carried out during Sprint 3 of CareerConnect. Claude was used to implement the notifications and reminders and to write the user cases.
 
 ## Task 3 — Notifications and Reminders (US-16)
 **Claude Chat Link:** https://claude.ai/share/c6a02c8c-1454-45bf-8e0a-c9045ffc5253
