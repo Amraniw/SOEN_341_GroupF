@@ -25,7 +25,7 @@ function requireSameOrigin(request, response, next) {
   // this application grants no cross-origin access. Simple form posts fail.
   const hasBody = Number(request.get('content-length')) > 0 || Boolean(request.get('transfer-encoding'));
   if ((request.method !== 'DELETE' || hasBody) && !request.is('application/json')) {
-    return response.status(400).json({ error: 'Recruiter request bodies must use application/json.' });
+    return response.status(400).json({ error: 'Request bodies must use application/json.' });
   }
   return next();
 }

@@ -40,7 +40,10 @@ function createApp(database, options = {}) {
   app.use('/api/recruiter', createRecruiterRouter(database));
   app.use(
     '/api/resumes',
-    createResumeRouter(database, { uploadDirectory: options.uploadDirectory })
+    createResumeRouter(database, {
+      uploadDirectory: options.uploadDirectory,
+      analyzeResume: options.analyzeResume,
+    })
   );
   app.use('/api/profile', createProfileRouter(database));
   app.use('/api/notifications', createNotificationRouter(database));

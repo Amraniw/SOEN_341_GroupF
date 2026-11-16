@@ -2,6 +2,9 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const express = require('express');
 const { createAuthenticateUser } = require('../middleware/authenticateUser');
+const { requireSameOrigin } = require('../middleware/requireSameOrigin');
+const { createResumeAnalyzer, ResumeAnalysisError } = require('../services/resumeAnalysis');
+const { extractResumeText } = require('../services/resumeText');
 const {
   DEFAULT_UPLOAD_DIRECTORY,
   createResumeUpload,
@@ -9,6 +12,9 @@ const {
 
 const PROJECT_ROOT = path.join(__dirname, '..', '..');
 const RESUME_NOT_FOUND = { error: 'This resume could not be found.' };
+const UNREADABLE_RESUME = {
+  error: 'We could not read enough text in this PDF. Select a PDF with searchable text and try again.',
+};
 
 function readResumeId(value) {
   return /^[1-9]\d*$/.test(value) && Number.isSafeInteger(Number(value)) ? Number(value) : null;
@@ -41,6 +47,8 @@ function createResumeRouter(database, options = {}) {
   const authenticateUser = createAuthenticateUser(database);
   const uploadDirectory = options.uploadDirectory || DEFAULT_UPLOAD_DIRECTORY;
   const upload = createResumeUpload(uploadDirectory);
+  const analyzeResume = options.analyzeResume || createResumeAnalyzer();
+  const reviewsInProgress = new Set();
 
   function toPublicResume(resume, isDefault) {
     return {
@@ -180,6 +188,50 @@ function createResumeRouter(database, options = {}) {
       });
     } catch (error) {
       return next(error);
+    }
+  });
+
+  router.post('/:resumeId/ai-feedback', authenticateUser, requireSameOrigin, async (request, response) => {
+    response.set('Cache-Control', 'no-store');
+    const userId = request.authenticatedUser.id;
+    if (request.authenticatedUser.role !== 'job_seeker') {
+      return response.status(403).json({ error: 'AI resume review is available to job seekers.' });
+    }
+    const resumeId = readResumeId(request.params.resumeId);
+    if (!resumeId) return response.status(404).json(RESUME_NOT_FOUND);
+
+    const resume = await database.get(
+      'SELECT stored_name FROM resumes WHERE id = ? AND user_id = ?',
+      resumeId,
+      userId
+    );
+    if (!resume || !resume.stored_name || path.basename(resume.stored_name) !== resume.stored_name) {
+      return response.status(404).json(RESUME_NOT_FOUND);
+    }
+    if (reviewsInProgress.has(userId)) {
+      return response.status(429).json({ error: 'A resume review is already running. Wait a moment and try again.' });
+    }
+
+    reviewsInProgress.add(userId);
+    try {
+      let text;
+      try {
+        text = await extractResumeText(path.join(uploadDirectory, resume.stored_name));
+      } catch (error) {
+        if (error.code === 'ENOENT') return response.status(404).json(RESUME_NOT_FOUND);
+        return response.status(422).json(UNREADABLE_RESUME);
+      }
+      if (!text) return response.status(422).json(UNREADABLE_RESUME);
+
+      const feedback = await analyzeResume(text);
+      return response.json({ resumeId, feedback });
+    } catch (error) {
+      if (error instanceof ResumeAnalysisError) {
+        return response.status(error.status).json({ error: error.message });
+      }
+      return response.status(502).json({ error: 'AI resume review could not be completed. Please try again.' });
+    } finally {
+      reviewsInProgress.delete(userId);
     }
   });
 
