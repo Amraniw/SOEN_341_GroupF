@@ -2,18 +2,17 @@
 
 This document records the main AI-assisted planning and requirements activities carried out during Sprint 3 of CareerConnect. Claude was used in order to implement the notifications and reminders. Added 
 
-**Claude Chat Link:** https://claude.ai/share/30e9701d-72fa-48d7-9d11-ed2dd90b25e5
+**Claude Chat Link:** https://claude.ai/share/c6a02c8c-1454-45bf-8e0a-c9045ffc5253
 
 ## Task 3 — Notifications and Reminders (US-16)
 
 **Purpose of AI Use:**
 Code review of existing notification work, feature implementation, and testing.
 
-**Chat Link or Prompt/Response:**
-See Claude Chat Link above.
-
 **Prompt:**
-"Ok so i just saw that my partner already made some changes for the notifications, from the changes he made can you tell me which notifications he implemented or anything related to notifications and reminders" — followed by — "I dont want you to change any of the stuff he implemented add a notification when a new job that matches your headline or your location, also add a reminder when a job posting is about to close" — and later — "I want that only if you want to be reminded of the job posting closing you select the option of getting reminded."
+- "Ok so i just saw that my partner already made some changes for the notifications, from the changes he made can you tell me which notifications he implemented or anything related to notifications and reminders"
+- "I dont want you to change any of the stuff he implemented add a notification when a new job that matches your headline or your location, also add a reminder when a job posting is about to close"
+- "I want that only if you want to be reminded of the job posting closing you select the option of getting reminded."
 
 **AI-Suggested Content:**
 Claude reviewed the project's Git history and summarized the notification system already merged by my partner (PR #147): application, status-update and interview notifications, the welcome and idle notifications, the notification bell, popups and the notifications API. It pointed out that `deadline_reminder` was reserved but never created. It then implemented:
