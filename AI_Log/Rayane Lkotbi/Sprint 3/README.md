@@ -4,7 +4,7 @@ This document records the main AI-assisted planning and requirements activities 
 
 **ChatGPT Chat Link:** [https://chatgpt.com/share/6afb4569-39a4-83ea-ab8a-9424fcaba9f0]
 
-**Codex Chat Link:**
+**Codex Chat Link:** [https://chatgpt.com/s/cx_6afb4f0191008191ac05e755c2ab6aa9]
 
 ---
 
