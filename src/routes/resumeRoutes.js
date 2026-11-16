@@ -219,7 +219,10 @@ function createResumeRouter(database, options = {}) {
         text = await extractResumeText(path.join(uploadDirectory, resume.stored_name));
       } catch (error) {
         if (error.code === 'ENOENT') return response.status(404).json(RESUME_NOT_FOUND);
-        return response.status(422).json(UNREADABLE_RESUME);
+        return response.status(503).json({
+          code: 'pdf_extraction_unavailable',
+          error: 'PDF text extraction is unavailable. Ask the site administrator to check the server.',
+        });
       }
       if (!text) return response.status(422).json(UNREADABLE_RESUME);
 
@@ -227,7 +230,7 @@ function createResumeRouter(database, options = {}) {
       return response.json({ resumeId, feedback });
     } catch (error) {
       if (error instanceof ResumeAnalysisError) {
-        return response.status(error.status).json({ error: error.message });
+        return response.status(error.status).json({ error: error.message, code: error.code });
       }
       return response.status(502).json({ error: 'AI resume review could not be completed. Please try again.' });
     } finally {

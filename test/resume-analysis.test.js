@@ -225,3 +225,25 @@ test('reports missing configuration, malformed response, and provider timeout sa
   } });
   await assert.rejects(timeout('text'), { status: 504 });
 });
+
+test('distinguishes OpenAI authentication, model, usage limit, and network errors', async () => {
+  for (const [status, providerCode, expectedStatus, code] of [
+    [401, 'invalid_api_key', 502, 'ai_authentication'],
+    [404, 'model_not_found', 502, 'ai_model_unavailable'],
+    [429, 'insufficient_quota', 503, 'ai_usage_limit'],
+  ]) {
+    const analyze = createResumeAnalyzer({ apiKey: 'test-only', fetchResponse: async () => new Response(
+      JSON.stringify({ error: { code: providerCode, message: 'private provider message' } }), { status }
+    ) });
+    await assert.rejects(analyze('text'), (error) => {
+      assert.equal(error.status, expectedStatus);
+      assert.equal(error.code, code);
+      assert.doesNotMatch(error.message, /private provider message/);
+      return true;
+    });
+  }
+  const disconnected = createResumeAnalyzer({ apiKey: 'test-only', fetchResponse: async () => {
+    throw new TypeError('fetch failed');
+  } });
+  await assert.rejects(disconnected('text'), { status: 502, code: 'ai_connection' });
+});

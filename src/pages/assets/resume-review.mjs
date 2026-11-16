@@ -1,4 +1,11 @@
 function failureMessage(error) {
+  switch (error.code) {
+    case 'pdf_extraction_unavailable': return 'PDF text extraction is unavailable. Ask the site administrator to check the server.';
+    case 'ai_authentication': return 'OpenAI rejected the server’s API key. Ask the site administrator to check it.';
+    case 'ai_model_unavailable': return 'The configured OpenAI model is unavailable. Ask the site administrator to check it.';
+    case 'ai_usage_limit': return 'OpenAI rate or usage limits blocked this review. Try again later or contact the site administrator.';
+    case 'ai_connection': return 'The server could not connect to OpenAI. Please try again.';
+  }
   switch (error.status) {
     case 404: return 'This resume is no longer available. Select a different saved resume.';
     case 502: return 'AI resume review could not be completed. Please try again.';
