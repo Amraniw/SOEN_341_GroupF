@@ -88,6 +88,27 @@ function toPublicProfile(row) {
   };
 }
 
+// Every job a job seeker has accepted and not left. They are what the profile shows
+// as their current jobs.
+const CURRENT_JOBS_SELECT = `
+  SELECT a.id AS application_id, a.job_id, a.offer_responded_at AS started_at,
+         j.title, j.company, j.location
+  FROM applications a
+  JOIN jobs j ON j.id = a.job_id
+  WHERE a.user_id = ? AND a.offer_response = 'accepted' AND a.quit_at IS NULL
+  ORDER BY a.offer_responded_at DESC, a.id DESC`;
+
+function toPublicJob(row) {
+  return {
+    applicationId: row.application_id,
+    jobId: row.job_id,
+    title: row.title,
+    company: row.company,
+    location: row.location,
+    startedAt: row.started_at,
+  };
+}
+
 function createProfileRouter(database) {
   const router = express.Router();
   const authenticateUser = createAuthenticateUser(database);
@@ -129,6 +150,101 @@ function createProfileRouter(database) {
   router.delete('/picture', requireSameOrigin, async (req, res, next) => {
     try { await picturesReady(); await database.run('DELETE FROM profile_pictures WHERE user_id = ?', req.authenticatedUser.id); return res.json({ message: 'Profile picture removed.' }); }
     catch (error) { return next(error); }
+  });
+
+  async function employmentFor(userId) {
+    const user = await database.get('SELECT employment_status FROM users WHERE id = ?', userId);
+    const jobs = await database.all(CURRENT_JOBS_SELECT, userId);
+    return { employmentStatus: user?.employment_status ?? null, currentJobs: jobs.map(toPublicJob) };
+  }
+
+  const jobSeekersOnly = (request, response, next) =>
+    request.authenticatedUser.role === 'job_seeker'
+      ? next()
+      : response.status(403).json({ error: 'Employment is only for job seekers.' });
+
+  // Whether the job seeker is employed and the jobs they accepted and have not left.
+  router.get('/employment', jobSeekersOnly, async (request, response, next) => {
+    try {
+      return response.json(await employmentFor(request.authenticatedUser.id));
+    } catch (error) {
+      return next(error);
+    }
+  });
+
+  // Leaves one of the jobs they accepted: it leaves their profile and the recruiter is
+  // told. Leaving the last one makes them unemployed again (a database trigger does
+  // that in the same statement), which brings the welcome notification back at sign-in.
+  router.post('/employment/jobs/:applicationId/leave', requireSameOrigin, jobSeekersOnly, async (request, response, next) => {
+    if (Object.keys(request.body || {}).length > 0) {
+      return response.status(400).json({ error: 'This request does not accept any fields.' });
+    }
+    const applicationId = Number(request.params.applicationId);
+    if (!Number.isInteger(applicationId) || applicationId < 1 || String(applicationId) !== request.params.applicationId) {
+      return response.status(404).json({ error: 'This job could not be found.' });
+    }
+
+    try {
+      const userId = request.authenticatedUser.id;
+      const left = await database.run(
+        `UPDATE applications SET quit_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+         WHERE id = ? AND user_id = ? AND offer_response = 'accepted' AND quit_at IS NULL`,
+        applicationId,
+        userId
+      );
+      if (left.changes === 0) {
+        const existing = await database.get(
+          "SELECT quit_at FROM applications WHERE id = ? AND user_id = ? AND offer_response = 'accepted'",
+          applicationId,
+          userId
+        );
+        return existing
+          ? response.status(409).json({ error: 'You have already left this job.' })
+          : response.status(404).json({ error: 'This job could not be found.' });
+      }
+
+      // Telling the recruiter is a convenience: it must never undo leaving.
+      try {
+        await database.run(
+          `INSERT INTO notifications (user_id, type, title, message, link, application_id, job_id)
+           SELECT j.recruiter_id, 'application_update', 'Position left',
+                  u.name || ' has left the ' || j.title || ' position.', '/recruiter/dashboard', a.id, j.id
+           FROM applications a JOIN jobs j ON j.id = a.job_id JOIN users u ON u.id = a.user_id
+           WHERE a.id = ? AND j.recruiter_id IS NOT NULL`,
+          applicationId
+        );
+      } catch (error) {
+        console.error('Could not notify the recruiter that the position was left:', error.message);
+      }
+      return response.json({ message: 'You left this job.', ...(await employmentFor(userId)) });
+    } catch (error) {
+      return next(error);
+    }
+  });
+
+  // For someone who says they are employed but has no accepted job on record (for
+  // example they chose "employed" at sign-up): switches them to unemployed. Jobs
+  // taken through offers are left one at a time instead.
+  router.post('/employment/unemployed', requireSameOrigin, jobSeekersOnly, async (request, response, next) => {
+    if (Object.keys(request.body || {}).length > 0) {
+      return response.status(400).json({ error: 'This request does not accept any fields.' });
+    }
+    try {
+      const userId = request.authenticatedUser.id;
+      if ((await database.all(CURRENT_JOBS_SELECT, userId)).length > 0) {
+        return response.status(409).json({ error: 'Leave your current jobs first. You become unemployed when none are left.' });
+      }
+      const changed = await database.run(
+        "UPDATE users SET employment_status = 'unemployed' WHERE id = ? AND employment_status = 'employed'",
+        userId
+      );
+      if (changed.changes === 0) {
+        return response.status(409).json({ error: 'You are not currently marked as employed.' });
+      }
+      return response.json({ message: 'You are now marked as unemployed.', ...(await employmentFor(userId)) });
+    } catch (error) {
+      return next(error);
+    }
   });
 
   router.get('/', async (request, response, next) => {

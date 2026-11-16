@@ -6,5 +6,6 @@ export async function loadJobApplication(jobId, { resolveSession, request }) {
   if (session.user.role === 'recruiter') return { kind: 'recruiter' };
   if (session.user.role !== 'job_seeker') throw new Error('Your account type could not be verified. Please try again.');
   const { application } = await request(`/applications/job/${jobId}`, undefined, 'GET');
-  return application ? { kind: 'applied', application } : { kind: 'ready' };
+  // A job the person accepted and later left can be applied for again.
+  return application && !application.quitAt ? { kind: 'applied', application } : { kind: 'ready' };
 }
