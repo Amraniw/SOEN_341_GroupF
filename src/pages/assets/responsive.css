@@ -365,6 +365,12 @@
     font-size: 9px;
   }
 }
+@media (max-width: 380px) {
+  .workspace-header .brand {
+    font-size: 0;
+    gap: 0;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

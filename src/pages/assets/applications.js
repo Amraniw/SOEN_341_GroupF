@@ -12,6 +12,7 @@ if (session) {
   const feedback = document.querySelector('#applications-feedback');
   let applications = [];
   let statuses = [];
+  let loadGeneration = 0;
   const analytics = document.createElement('section');
   analytics.className = 'application-analytics';
   analytics.setAttribute('aria-label', 'Application analytics');
@@ -37,6 +38,7 @@ if (session) {
   function card(application) {
     return `<li class="application-card">
       <div class="application-card-top">${companyMark(application.job.company)}<div class="application-card-title"><p>${escapeHtml(application.job.company)}</p><h3>${escapeHtml(application.job.title)}</h3><span>${escapeHtml(application.job.location)}</span></div>${statusBadge(application)}</div>
+      <details data-history="${application.id}"><summary>View status history</summary><div class="actual-history"></div></details>
       <div class="application-card-footer"><span>Applied ${escapeHtml(formatDateTime(application.appliedAt))}</span><span>Updated ${escapeHtml(formatDateTime(application.updatedAt))}</span><a class="text-link" href="/workspace/jobs/${application.jobId}">View job →</a></div>
     </li>`;
   }
@@ -59,12 +61,14 @@ if (session) {
   }
 
   async function loadApplications() {
+    const generation = ++loadGeneration;
     list.setAttribute('aria-busy', 'true');
     feedback.hidden = true;
     status.textContent = 'Loading applications…';
     try {
       insights.textContent = 'Loading insights…';
       const result = await request(`/applications/analytics?range=${range.value}`, undefined, 'GET');
+      if (generation !== loadGeneration) return;
       applications = result.items;
       statuses = result.statuses;
       const peak = Math.max(1, ...result.activity.map((item) => item.count));
@@ -75,6 +79,7 @@ if (session) {
       analytics.querySelector('.applications-toolbar + p').textContent = 'Submission metrics and the list below follow this range. Recent activity shows each application’s latest status. Dates use UTC.';
       render();
     } catch (error) {
+      if (generation !== loadGeneration) return;
       insights.textContent = 'Insights are unavailable. Use Try again below.';
       total.textContent = '—';
       status.textContent = 'Applications could not be loaded.';
@@ -82,7 +87,7 @@ if (session) {
       feedback.innerHTML = `<div class="empty-state" role="alert"><h3>We couldn’t load your applications.</h3><p>${escapeHtml(error.message)}</p><button class="button button-secondary" type="button" data-retry-applications>Try again</button></div>`;
       feedback.hidden = false;
     } finally {
-      list.setAttribute('aria-busy', 'false');
+      if (generation === loadGeneration) list.setAttribute('aria-busy', 'false');
     }
   }
 
