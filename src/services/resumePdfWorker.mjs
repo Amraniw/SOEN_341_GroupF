@@ -19,6 +19,9 @@ process.once('message', async (data) => {
       if (text.length >= MAX_TEXT_LENGTH) break;
       text += '\n\n';
     }
+  } catch (error) {
+    if (!['InvalidPDFException', 'PasswordException', 'FormatError'].includes(error.name)) throw error;
+    text = '';
   } finally {
     await task.destroy();
   }

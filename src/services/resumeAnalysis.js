@@ -26,9 +26,10 @@ const format = {
 };
 
 class ResumeAnalysisError extends Error {
-  constructor(status, message) {
+  constructor(status, message, code) {
     super(message);
     this.status = status;
+    this.code = code;
   }
 }
 
@@ -88,6 +89,7 @@ function createResumeAnalyzer({
     }
 
     const signal = AbortSignal.timeout(PROVIDER_TIMEOUT_MS);
+    let receivedResponse = false;
     try {
       const response = await fetchResponse('https://api.openai.com/v1/responses', {
         method: 'POST',
@@ -104,7 +106,22 @@ function createResumeAnalyzer({
           text: { format },
         }),
       });
-      if (!response.ok) throw new Error('AI request failed.');
+      receivedResponse = true;
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new ResumeAnalysisError(502, 'OpenAI rejected the server’s API key. Ask the site administrator to check it.', 'ai_authentication');
+        }
+        const failure = await response.json().catch(() => null);
+        const providerError = failure?.error;
+        if (['model_not_found', 'unsupported_model'].includes(providerError?.code) ||
+            (response.status === 400 && providerError?.param === 'model')) {
+          throw new ResumeAnalysisError(502, 'The configured OpenAI model is unavailable. Ask the site administrator to check it.', 'ai_model_unavailable');
+        }
+        if (response.status === 429) {
+          throw new ResumeAnalysisError(503, 'OpenAI rate or usage limits blocked this review. Try again later or contact the site administrator.', 'ai_usage_limit');
+        }
+        throw new Error('AI request failed.');
+      }
       const data = await response.json();
       if (data.status !== 'completed') throw new Error('AI response was incomplete.');
       const content = data.output.filter((item) => item.type === 'message' && item.role === 'assistant')
@@ -113,8 +130,12 @@ function createResumeAnalyzer({
       const output = content.filter((item) => item.type === 'output_text').map((item) => item.text).join('');
       return normalizeFeedback(JSON.parse(output));
     } catch (error) {
+      if (error instanceof ResumeAnalysisError) throw error;
       if (signal.aborted || error.name === 'TimeoutError') {
         throw new ResumeAnalysisError(504, 'AI resume review took too long. Please try again.');
+      }
+      if (!receivedResponse && error instanceof TypeError) {
+        throw new ResumeAnalysisError(502, 'The server could not connect to OpenAI. Please try again.', 'ai_connection');
       }
       throw new ResumeAnalysisError(502, 'AI resume review could not be completed. Please try again.');
     }
