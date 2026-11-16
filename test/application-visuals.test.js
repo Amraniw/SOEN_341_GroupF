@@ -1,5 +1,27 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
+test('coherent timeline retains real forward stages and excludes conflicting outcomes', async () => {
+  const { coherentHistory } = await import('../src/pages/assets/application-visuals.mjs');
+  const cases = [
+    [[], []],
+    [['applied'], ['applied']],
+    [['applied', 'under_review', 'interview', 'offered'], ['applied', 'under_review', 'interview', 'offered']],
+    [['applied', 'interview'], ['applied', 'interview']],
+    [['applied', 'under_review', 'interview', 'rejected'], ['applied', 'under_review', 'interview', 'rejected']],
+    [['applied', 'offered', 'interview', 'rejected'], ['applied', 'interview', 'rejected']],
+    [['applied', 'rejected', 'under_review', 'interview'], ['applied', 'under_review', 'interview']],
+    [['applied', 'interview', 'under_review'], ['applied', 'under_review']],
+    [['applied', 'under_review', 'under_review', 'interview'], ['applied', 'under_review', 'interview']],
+  ];
+  for (const [input, expected] of cases) {
+    const history = input.map((status, index) => ({ status, changedAt: index }));
+    const copy = structuredClone(history);
+    const actual = coherentHistory(history);
+    assert.deepEqual(actual.map((event) => event.status), expected);
+    assert.deepEqual(history, copy);
+    for (let index = 1; index < actual.length; index++) assert.ok(actual[index].changedAt > actual[index - 1].changedAt);
+  }
+});
 test('seeker timeline shows submission and current state without superseded decisions', async () => {
   const { renderHistory } = await import('../src/pages/assets/application-visuals.mjs');
   const history = ['applied', 'offered', 'interview', 'offered', 'under_review'].map((status) => ({ status, statusLabel: status, changedAt: '2026-11-16' }));

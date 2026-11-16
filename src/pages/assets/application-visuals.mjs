@@ -26,9 +26,26 @@ export function renderActivity(items, range, escape, now = new Date()) {
   return `<section class="activity-calendar"><div class="calendar-heading"><div><h3>Application activity</h3><p>${days.reduce((sum, day) => sum + day.count, 0)} applications in ${year}</p></div><span class="calendar-year">${year}</span></div><div class="calendar-scroll"><div class="calendar-grid"><div class="calendar-weekdays"><span></span><span>Mon</span><span>Wed</span><span>Fri</span></div>${weeks.map((week) => `<div class="calendar-week"><span class="calendar-month">${escape(week.find((day) => day.month)?.month || '')}</span>${week.map((day) => { if (!day.inYear) return '<span class="calendar-padding"></span>'; const label = day.future ? `${day.date}: upcoming day` : `${day.date}: ${day.count} ${day.count === 1 ? 'application' : 'applications'}`; return `<button type="button" class="calendar-day ${day.future ? 'calendar-future' : ''} level-${day.count ? Math.max(1, Math.ceil(day.count / max * 4)) : 0}" title="${label}" aria-label="${label}" data-day-label="${label}"></button>`; }).join('')}</div>`).join('')}</div></div><div class="calendar-footer"><span class="calendar-selection" role="status">January–December ${year} · Each square is one day (UTC).</span><div class="calendar-legend">Less ${[0,1,2,3,4].map((n) => `<i class="calendar-day level-${n}"></i>`).join('')} More</div></div></section>`;
 }
 
-export function renderHistory(history, escape, format) {
-  const first = history[0];
+export function coherentHistory(history) {
+  if (!history.length) return [];
   const latest = history.at(-1);
-  const visible = !first ? [] : first === latest || latest.status === 'applied' ? [latest] : [first, latest];
+  const stages = ['applied', 'under_review', 'interview', 'offered'];
+  const visible = [latest];
+  let ceiling = latest.status === 'rejected' ? 3 : stages.indexOf(latest.status);
+  // Walk backward from the authoritative current state. Strictly decreasing
+  // ranks retain real chronological stages without repeats or conflicting ends.
+  for (let index = history.length - 2; index >= 0; index -= 1) {
+    const event = history[index];
+    const rank = stages.indexOf(event.status);
+    if (rank >= 0 && rank < ceiling) {
+      visible.unshift(event);
+      ceiling = rank;
+    }
+  }
+  return visible;
+}
+
+export function renderHistory(history, escape, format) {
+  const visible = coherentHistory(history);
   return `<ol class="event-timeline">${visible.map((event, index) => `<li class="event-node ${index === visible.length - 1 ? 'event-current' : ''}"><span class="event-pin" aria-hidden="true"></span><div><strong>${escape(event.statusLabel)}</strong>${index === visible.length - 1 ? '<span class="event-current-label">Current status</span>' : ''}<time>${escape(format(event.changedAt))}</time></div></li>`).join('')}</ol><p class="timeline-note">Your submission and current application status.</p>`;
 }
