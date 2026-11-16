@@ -11,6 +11,7 @@
     <link rel="icon" href="/assets/brand.svg" type="image/svg+xml" />
     <script src="/assets/theme.js"></script>
     <link rel="stylesheet" href="/assets/styles.css" />
+    <link rel="stylesheet" href="/assets/resume-review.css" />
     <script type="module" src="/assets/resume.js"></script>
     <style>
       /* Resume-only rule for the "Make default" action, sized like the existing
@@ -67,8 +68,8 @@
             </div>
             <span class="badge badge-neutral">PDF · Up to 5 MB</span>
           </div>
-          <div class="content-grid">
-            <div class="stack">
+          <div class="resume-layout">
+            <div class="stack resume-management">
               <section class="panel">
                 <div class="panel-heading">
                   <h2>Upload resume</h2>
@@ -166,43 +167,96 @@
                   aria-label="Saved resumes"
                 ></ul>
               </section>
+              <details class="panel resume-tips">
+                <summary>PDF upload tips</summary>
+                <ul class="upload-guidance">
+                  <li>
+                    <span data-icon="check"></span>
+                    <div>
+                      <strong>Keep it current</strong>
+                      <p>
+                        Include your latest experience and up-to-date contact
+                        details.
+                      </p>
+                    </div>
+                  </li>
+                  <li>
+                    <span data-icon="check"></span>
+                    <div>
+                      <strong>Give it a clear name</strong>
+                      <p>
+                        A filename like Firstname_Lastname_Resume.pdf is easy to
+                        recognize.
+                      </p>
+                    </div>
+                  </li>
+                  <li>
+                    <span data-icon="check"></span>
+                    <div>
+                      <strong>Review your PDF</strong>
+                      <p>
+                        Check that the text is readable and the layout looks as
+                        expected.
+                      </p>
+                    </div>
+                  </li>
+                </ul>
+              </details>
             </div>
-            <aside class="panel">
-              <p class="eyebrow">BEFORE YOU UPLOAD</p>
-              <h2>Make a clear impression.</h2>
-              <ul class="upload-guidance">
-                <li>
-                  <span data-icon="check"></span>
-                  <div>
-                    <strong>Keep it current</strong>
-                    <p>
-                      Include your latest experience and up-to-date contact
-                      details.
-                    </p>
+            <section class="panel review-panel" id="resume-review" aria-labelledby="resume-review-title" hidden>
+              <header class="review-header">
+                <span class="icon-tile" data-icon="applications"></span>
+                <div>
+                  <h2 id="resume-review-title">AI Resume Review</h2>
+                  <p>See what comes through in your resume and where to make it stronger.</p>
+                </div>
+              </header>
+              <form class="review-form">
+                <label for="review-resume">Resume to analyze</label>
+                <div class="review-controls">
+                  <select id="review-resume" aria-describedby="review-data-use" disabled>
+                    <option value="">Choose a saved resume</option>
+                  </select>
+                  <button class="button" type="submit" disabled>
+                    <span class="review-activity" aria-hidden="true" hidden></span>
+                    <span id="review-action-label">Analyze resume</span>
+                  </button>
+                </div>
+                <p id="review-data-use">Review sends extracted text from the selected PDF to OpenAI.</p>
+              </form>
+              <div id="review-output">
+                <p class="review-status" role="status">
+                  <span class="review-status-mark" aria-hidden="true"><span data-icon="check"></span></span>
+                  <span>
+                    <span id="review-status-message">Loading saved resumes…</span><span id="review-status-file" class="review-status-file" hidden></span>
+                  </span>
+                </p>
+                <div id="review-content">
+                  <div id="review-loading" class="review-loading" aria-hidden="true" hidden>
+                    <div class="review-skeleton-copy"><span></span><span></span><span></span></div>
+                    <div class="review-skeleton-roles"><span></span><span></span><span></span></div>
                   </div>
-                </li>
-                <li>
-                  <span data-icon="check"></span>
-                  <div>
-                    <strong>Give it a clear name</strong>
-                    <p>
-                      A filename like Firstname_Lastname_Resume.pdf is easy to
-                      recognize.
-                    </p>
+                  <div id="resume-review-result" class="review-feedback" hidden>
+                    <section class="review-section review-profile">
+                      <h3><span data-icon="user"></span>Candidate profile</h3>
+                      <p></p>
+                    </section>
+                    <section class="review-section review-roles">
+                      <h3><span data-icon="briefcase"></span>Aligned roles</h3>
+                      <ul id="review-roles" role="list"></ul>
+                    </section>
+                    <section class="review-section review-strengths">
+                      <h3><span data-icon="check"></span>Strengths</h3>
+                      <ul id="review-strengths"></ul>
+                    </section>
+                    <section class="review-section review-improvements">
+                      <h3><span data-icon="arrow"></span>Areas to improve</h3>
+                      <ul id="review-improvements"></ul>
+                    </section>
                   </div>
-                </li>
-                <li>
-                  <span data-icon="check"></span>
-                  <div>
-                    <strong>Review your PDF</strong>
-                    <p>
-                      Check that the text is readable and the layout looks as
-                      expected.
-                    </p>
-                  </div>
-                </li>
-              </ul>
-            </aside>
+                </div>
+              </div>
+            </section>
           </div>
           <footer class="workspace-footer">
             <span>© 2026 CareerConnect</span
