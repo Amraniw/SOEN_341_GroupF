@@ -1,8 +1,6 @@
 
 ## Team Contributions
 
-## Team Contributions
-
 ### Rayane Lkotbi
 
 - **Work completed:** Created and organized Sprint 3 issues and tasks, developed the AI-Powered Resume Feedback feature, prepared acceptance tests for all user stories, maintained sprint planning and documentation, and updated the project backlog and work plan.
