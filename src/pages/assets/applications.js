@@ -37,7 +37,6 @@ if (session) {
   function card(application) {
     return `<li class="application-card">
       <div class="application-card-top">${companyMark(application.job.company)}<div class="application-card-title"><p>${escapeHtml(application.job.company)}</p><h3>${escapeHtml(application.job.title)}</h3><span>${escapeHtml(application.job.location)}</span></div>${statusBadge(application)}</div>
-      <details data-history="${application.id}"><summary>View status history</summary><div class="actual-history"></div></details>
       <div class="application-card-footer"><span>Applied ${escapeHtml(formatDateTime(application.appliedAt))}</span><span>Updated ${escapeHtml(formatDateTime(application.updatedAt))}</span><a class="text-link" href="/workspace/jobs/${application.jobId}">View job →</a></div>
     </li>`;
   }
@@ -71,6 +70,9 @@ if (session) {
       const peak = Math.max(1, ...result.activity.map((item) => item.count));
       insights.innerHTML = `<div class="analytics-metrics"><div><strong>${result.total}</strong><span>Submitted in range</span></div><div><strong>${result.active}</strong><span>Currently active</span></div><div><strong>${result.statuses.find((s) => s.id === 'offered').count}</strong><span>Offers</span></div></div><div class="analytics-grid"><section><h3>Current status breakdown</h3><p>Current outcomes of applications submitted in this range.</p>${result.statuses.map((s) => `<div class="analytics-bar"><span>${escapeHtml(s.name)}</span><meter min="0" max="${Math.max(1, result.total)}" value="${s.count}" aria-label="${escapeHtml(s.name)}"></meter><strong>${s.count}</strong></div>`).join('')}</section><section><h3>Applications over time</h3><p>Monthly submission totals within the selected range.</p>${result.activity.length ? result.activity.map((a) => `<div class="analytics-bar"><span>${escapeHtml(a.month)}</span><meter min="0" max="${peak}" value="${a.count}" aria-label="Applications in ${escapeHtml(a.month)}"></meter><strong>${a.count}</strong></div>`).join('') : '<p>No submissions in this period.</p>'}</section></div><section><h3>Recent activity</h3><p>Latest 100 recorded status events in this period.</p><ol class="analytics-history">${result.history.map((h) => `<li><strong>${escapeHtml(h.title)}</strong> · ${escapeHtml(h.company)}<br>${escapeHtml(h.statusLabel)} · ${escapeHtml(formatDateTime(h.changedAt))}</li>`).join('') || '<li>No status activity in this period.</li>'}</ol></section>`;
       filter.innerHTML = '<option value="">All statuses</option>' + statuses.map(({ id, name }) => `<option value="${escapeHtml(id)}">${escapeHtml(name)}</option>`).join('');
+      const activityHeading = [...insights.querySelectorAll('h3')].find((heading) => heading.textContent === 'Recent activity');
+      if (activityHeading) activityHeading.nextElementSibling.textContent = 'Latest status for each application updated in this period.';
+      analytics.querySelector('.applications-toolbar + p').textContent = 'Submission metrics and the list below follow this range. Recent activity shows each application’s latest status. Dates use UTC.';
       render();
     } catch (error) {
       insights.textContent = 'Insights are unavailable. Use Try again below.';

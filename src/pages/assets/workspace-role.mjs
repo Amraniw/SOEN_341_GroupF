@@ -25,7 +25,6 @@ export async function resolveWorkspaceAccess({ resolveSession, pathname, signInU
 export function workspaceLinks(role) {
   if (role === 'recruiter') return [
     ['recruiter', 'Recruiter dashboard', 'home', RECRUITER_HOME],
-    ['postings', 'My job postings', 'briefcase', `${RECRUITER_HOME}#postings`],
     ['jobs', 'Browse jobs', 'briefcase', '/workspace/jobs/'],
     ['profile', 'My account', 'user', '/profile/index.html'],
   ];
