@@ -2,9 +2,8 @@
 
 This document records the main AI-assisted planning and requirements activities carried out during Sprint 3 of CareerConnect. Claude was used to implement the notifications and reminders and to write the Sprint 3 user cases.
 
-**Claude Chat Link:** https://claude.ai/share/c6a02c8c-1454-45bf-8e0a-c9045ffc5253
-
 ## Task 3 — Notifications and Reminders (US-16)
+**Claude Chat Link:** https://claude.ai/share/c6a02c8c-1454-45bf-8e0a-c9045ffc5253
 
 **Purpose of AI Use:**
 Code review of existing notification work, feature implementation, and testing.
@@ -35,34 +34,29 @@ Carla Sophia Reis Lopez
 
 ---
 
-## Sprint 3 User Cases
-
+User Cases for All User Stories and GitHub Issues
 **Claude Chat Link:** https://claude.ai/share/a7532ae5-b1bf-48fc-8aff-44834a0e8f72
 
-**Purpose of AI Use:**
-Requirements documentation: writing the Sprint 3 user cases and acceptance criteria based on the features we implemented.
+**Purpose of AI Use:** 
+Requirements documentation: writing user cases with acceptance criteria based on our implementation, and preparing them to be added as GitHub Issues.
 
 **Prompt:**
 - "I have to implement user cases for Sprint 3, these the features we implemented for the sprint [...] Can you please give me some user cases"
-- "You have to do them based on our implementation, ill send it now"
-- Uploaded the project repository (`SOEN_341_GroupF-main.zip`).
+- "You have to do them based on our implementation, ill send it now" (then uploaded the project repository, SOEN_341_GroupF-main.zip)
+- "Can you actually do a user case for all the user stories we have so far"
+- "Can you do like one user case per like user story"
 
-**AI-Suggested Content:**
-Claude first wrote generic user stories from my feature descriptions. After I uploaded the repository, it read the routes, domain logic, database triggers and front-end pages, and rewrote the user cases to match what is actually implemented. The result is `Documentation/User_Cases.md`, organized by our backlog IDs (US-08, US-10, US-16, US-17), with each feature split into smaller cases (e.g. US-08.1 to US-08.8) written as "As a… I want… so that…" with acceptance criteria. It also pointed out where my feature descriptions did not match the code:
-(1) postings are archived with Close/Reopen, and a posting with applications cannot be deleted;
-(2) the recruiter applicant filter only offers status in the UI, even though the backend also supports a date range;
-(3) the closing reminder is sent to matching job seekers, not to recruiters;
-(4) the application statuses are Applied, Under Review, Interview, Offered and Rejected (there is no "Pending");
-(5) AI feedback only works on saved PDF resumes and is not stored, so job-tailored feedback and feedback history were listed as Sprint 4 work.
+**AI-Suggested Content:** 
+Claude first wrote generic user stories from my feature descriptions. After I uploaded the repository, it read the routes, domain logic, database triggers and front-end pages and rewrote the user cases to match what is actually implemented. When I asked for all user stories, it extended Documentation/User_Cases.md to cover the 12 stories implemented so far (US-01 to US-10, US-16, US-17), each split into smaller user cases written as "As a… I want… so that…" with acceptance criteria, and a table showing which sprint each story belongs to. It separated US-08 (reviewing applicants) from US-09 (posting management) to match our sprint documents. It also pointed out where my feature descriptions did not match the code: (1) postings are archived with Close/Reopen, and postings with applications cannot be deleted; (2) the recruiter applicant filter only offers status in the UI, although the backend supports a date range; (3) the closing reminder is sent to matching job seekers, not recruiters; (4) the statuses are Applied, Under Review, Interview, Offered and Rejected (no "Pending"); (5) AI feedback only works on saved PDF resumes and is not stored; (6) no US-11 to US-15 were found in our documents, and saved jobs/favourites are not implemented. Since Claude could not access our GitHub repository directly, it generated a GitHub CLI script (create_user_case_issues.sh) and a copy-paste file (User_Case_Issues.md) to create one issue per user story, each containing all its user cases and labelled user case and its story ID (e.g. US-08).
 
-**Validation:**
-Compared each user case and acceptance criterion with the running app and the code (recruiter dashboard, applications dashboard, notification bell, AI Resume Review page). Checked that the statuses, field names, limits (5 MB PDF, 3-day reminder window, 30-second notification refresh) and error messages listed in the user cases match the implementation, and that the acceptance criteria can be linked to our acceptance tests in GitHub Issues.
+**Validation:** 
+Compared the user cases and acceptance criteria with the running app and the code (sign-up and login, profile, resumes, job search, applications, recruiter dashboard, notifications and AI Resume Review). Checked that statuses, field limits, file limits (5 MB PDF resumes, 2 MB JPG/PNG pictures) and error messages match the implementation. Previewed the script with its dry-run mode before creating the issues, and checked the created issues on GitHub.
 
-**Decision:**
-Modified before use. I rejected the first generic version because it described features we did not build (for example an "Archived" tab and a "Hired" status) and had Claude rewrite the user cases from our code instead. I left out the welcome and idle-warning notifications since they are not Sprint 3 requirements.
+**Decision:** 
+Modified before use. I rejected the first generic version because it described features we did not build (for example an "Archived" tab and a "Hired" status). I first had one issue per user case (37 issues), then changed it to one issue per user story (12 issues) as requested by my teammate. I left out the welcome and idle-warning notifications since they are not part of our user stories.
 
-**Reflection:**
-Writing the user cases from the actual implementation made them accurate and testable, and it exposed gaps between what we planned and what we built, such as the missing date filter in the recruiter UI and the closing reminder going to job seekers instead of recruiters. These are things to either fix in Sprint 4 or reflect in our feature descriptions. It also showed me that AI-generated requirements need to be checked against the real system, because the first version sounded reasonable but did not match our app.
+**Reflection:** 
+Writing the user cases from the code made them accurate and testable, and it exposed gaps between what we planned and what we built, such as the missing date filter in the recruiter UI. AI-generated requirements still need to be checked against the real system, because the first version sounded reasonable but did not match our app.
 
-**Responsible Person:**
+**Responsible Person:** 
 Carla Sophia Reis Lopez
