@@ -41,4 +41,4 @@
 
 ## Next Meeting
 
-- To be determined.
+- November 23rd 2026
