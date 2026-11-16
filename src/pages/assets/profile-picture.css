@@ -1,0 +1,20 @@
+.picture-editor { margin: 0 28px 28px; padding-top: 24px; border-top: 1px solid var(--border); }
+.picture-editor-heading { display: flex; align-items: start; justify-content: space-between; gap: 20px; margin-bottom: 18px; }
+.picture-editor-heading h3 { margin: 0 0 6px; font-size: 14px; font-weight: 650; }
+.picture-editor-heading p { margin: 0; font-size: 12px; line-height: 1.6; color: var(--muted); }
+.picture-format { font-size: 10px; color: var(--muted); white-space: nowrap; padding-top: 3px; }
+.picture-editor-actions, .picture-pending { display: flex; align-items: center; gap: 16px; }
+.picture-editor .button { min-height: 40px; padding: 9px 16px; font-size: 12px; }
+.picture-remove { border: 0; background: transparent; font: inherit; font-size: 12px; color: var(--muted); padding: 10px 4px; cursor: pointer; }
+.picture-remove:hover { color: var(--error); }
+.picture-selection { display: flex; align-items: center; gap: 14px; padding: 16px; margin-top: 20px; background: var(--canvas); border: 1px solid var(--border); border-radius: 10px; }
+.picture-selection img { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; flex: 0 0 auto; }
+.picture-selection div { min-width: 0; }
+.picture-selection strong { display: block; font-size: 12px; overflow-wrap: anywhere; }
+.picture-selection span { display: block; color: var(--muted); font-size: 11px; margin-top: 5px; }
+.picture-pending { margin-top: 16px; }
+.picture-message { margin: 12px 0 0; font-size: 12px; color: var(--muted); }
+.picture-message:empty { display: none; }
+.picture-editor [hidden] { display: none !important; }
+#profile-avatar, .account-link .avatar { overflow: hidden; }
+@media (max-width: 600px) { .picture-editor { margin: 0 20px 24px; } .picture-editor-heading { flex-direction: column; gap: 8px; } }

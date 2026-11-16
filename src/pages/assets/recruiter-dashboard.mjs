@@ -7,7 +7,13 @@ function closingDateLabel(day) {
   return Number.isNaN(date.getTime()) ? day : date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-export function createRecruiterDashboard({ document, request, formatDate, onUnauthorized = () => {} }) {
+// Today's calendar day in the recruiter's time zone, comparable with closing dates.
+function localDay(date) {
+  const pad = (value) => String(value).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+export function createRecruiterDashboard({ document, request, formatDate, onUnauthorized = () => {}, now = () => new Date() }) {
   const byId = (id) => document.getElementById(id);
   const form = byId('posting-form');
   const fieldset = byId('editor-fields');
@@ -53,6 +59,24 @@ export function createRecruiterDashboard({ document, request, formatDate, onUnau
     button.type = 'button';
     button.addEventListener('click', handler);
     return button;
+  }
+  // The shared request helper words every 404 as an unavailable service. Here a
+  // 404 means the posting no longer exists (for example, it was deleted in
+  // another tab): say so, close its editor, and show the current list.
+  async function postingGone(id, message = 'This posting no longer exists. Your list has been refreshed.', isError = true) {
+    if (original?.id === id) { original = null; editor.hidden = true; }
+    notice(byId('mutation-notice'), message, isError);
+    await load();
+    byId('mutation-notice').focus();
+  }
+  // Marks every invalid field at once and focuses the first one.
+  function showInvalid(errors) {
+    for (const input of Object.values(controls)) input.removeAttribute('aria-invalid');
+    for (const { rows } of Object.values(listEditors)) for (const input of rows.querySelectorAll('textarea')) input.removeAttribute('aria-invalid');
+    const inputs = errors.map(({ field }) => controls[field] || listEditors[field]?.rows.querySelector('textarea')).filter(Boolean);
+    for (const input of inputs) input.setAttribute('aria-invalid', 'true');
+    notice(byId('form-notice'), errors.length === 1 ? errors[0].message : `Fix ${errors.length} fields: ${errors.map(({ message }) => message).join(' ')}`, true);
+    (inputs[0] || byId('form-notice')).focus();
   }
 
   const optional = element('details', undefined, 'recruiter-details');
@@ -151,6 +175,9 @@ export function createRecruiterDashboard({ document, request, formatDate, onUnau
     byId('form-notice').hidden = true;
     byId('editor-heading').textContent = job ? 'Edit posting' : 'Create posting';
     byId('save-posting').textContent = job ? 'Save changes' : 'Create posting';
+    byId('editor-help').textContent = `Fields marked * are required. ${!job ? 'Your posting becomes available to job seekers when created.'
+      : job.status === 'closed' ? 'This posting is closed, so your changes stay hidden from job seekers until you reopen it.'
+        : 'Saved changes appear in job search right away.'}`;
     controls.title.focus();
   }
   function newPosting() {
@@ -176,6 +203,7 @@ export function createRecruiterDashboard({ document, request, formatDate, onUnau
       byId('mutation-notice').hidden = true;
     } catch (error) {
       accessError(error);
+      if (error.status === 404) { await postingGone(id); return; }
       notice(byId('mutation-notice'), error.message, true);
     } finally { setBusy(false); }
     if (!editor.hidden) controls.title.focus();
@@ -192,19 +220,27 @@ export function createRecruiterDashboard({ document, request, formatDate, onUnau
       empty.append(element('h3', 'Your next opportunity starts here.'), element('p', 'You have no job postings yet. Create your first posting to get started.'), action('Create first posting', newPosting, 'button'));
       list.append(empty);
     }
+    const today = localDay(now());
     for (const job of items) {
+      const closed = job.status === 'closed';
+      const deadlinePassed = Boolean(job.closingDate) && job.closingDate < today;
       const item = element('li');
-      const card = element('article', undefined, 'panel recruiter-card');
+      const card = element('article', undefined, `panel recruiter-card${closed ? ' recruiter-card-closed' : ''}`);
       const top = element('div', undefined, 'recruiter-card-top');
       const identity = element('div');
       identity.append(element('h3', job.title), element('p', `${job.company} · ${job.location}`));
-      top.append(identity, element('span', job.status === 'open' ? 'Open' : 'Closed', `recruiter-status${job.status === 'closed' ? ' recruiter-status-closed' : ''}`));
+      top.append(identity, element('span', closed ? 'Closed' : 'Open', `recruiter-status${closed ? ' recruiter-status-closed' : ''}`));
       const facts = element('div', undefined, 'recruiter-facts');
-      facts.append(element('span', job.categoryName), element('span', `Created ${formatDate(job.createdAt)}`), ...(job.closingDate ? [element('span', `Closes ${closingDateLabel(job.closingDate)}`)] : []), element('span', `${job.applicationCount} ${job.applicationCount === 1 ? 'application' : 'applications'}`));
+      const closing = job.closingDate
+        ? [element('span', `${deadlinePassed ? 'Closing date passed:' : 'Closes'} ${closingDateLabel(job.closingDate)}`, deadlinePassed && !closed ? 'recruiter-warning' : undefined)]
+        : [];
+      facts.append(element('span', job.categoryName), element('span', `Created ${formatDate(job.createdAt)}`), ...closing, element('span', `${job.applicationCount} ${job.applicationCount === 1 ? 'application' : 'applications'}`));
       const actions = element('div', undefined, 'recruiter-actions');
       const editButton = action('Edit', () => edit(job.id));
       editButton.setAttribute('aria-label', `Edit ${job.title}`);
-      const lifecycle = action(job.status === 'open' ? 'Close posting' : 'Reopen posting', () => changeStatus(job));
+      const lifecycle = action(closed ? 'Reopen posting' : 'Close posting', () => changeStatus(job));
+      lifecycle.setAttribute('data-lifecycle', '');
+      lifecycle.setAttribute('data-job-id', String(job.id));
       const remove = action('Delete', () => askDelete(job), 'button recruiter-danger');
       remove.disabled = job.applicationCount > 0;
       remove.setAttribute('data-has-applications', String(job.applicationCount > 0));
@@ -223,7 +259,16 @@ export function createRecruiterDashboard({ document, request, formatDate, onUnau
         actions.append(view);
       }
       card.append(top, facts, actions);
-      if (job.applicationCount > 0) card.append(element('p', 'This posting has applications. Close it to preserve their records.'));
+      // Explain what the status means and why Delete may be unavailable, so
+      // closing (reversible) and deleting (permanent) are not confused.
+      const notes = [];
+      if (closed) notes.push('Hidden from job search and closed to new applications. Existing applications are kept.');
+      else if (deadlinePassed) notes.push('The closing date has passed, but job seekers can still apply until you close this posting.');
+      if (job.applicationCount > 0) {
+        notes.push(closed ? 'This posting has applications, so it can’t be deleted.'
+          : 'This posting has applications, so it can’t be deleted. Close it instead to stop new applications; its applications are kept.');
+      }
+      if (notes.length) card.append(element('p', notes.join(' '), 'recruiter-card-note'));
       item.append(card);
       list.append(item);
     }
@@ -279,26 +324,24 @@ export function createRecruiterDashboard({ document, request, formatDate, onUnau
     if (busy) return;
     const draft = Object.fromEntries(Object.entries(controls).map(([key, input]) => [key, input.value]));
     for (const key of Object.keys(LISTS)) draft[key] = [...listEditors[key].rows.querySelectorAll('textarea')].map((input) => input.value);
-    const { payload, error, field } = postingPayload(draft, original);
-    if (error) {
-      notice(byId('form-notice'), error, true);
-      const input = controls[field] || listEditors[field]?.rows.querySelector('textarea');
-      if (input) { input.setAttribute('aria-invalid', 'true'); input.focus(); }
-      return;
-    }
+    const { payload, errors } = postingPayload(draft, original);
+    if (errors) { showInvalid(errors); return; }
     if (!Object.keys(payload).length) { notice(byId('form-notice'), 'No changes to save.'); return; }
     setBusy(true);
     byId('form-notice').hidden = true;
     byId('save-posting').textContent = 'Saving…';
+    const editing = original;
     try {
-      await request(original ? `/recruiter/jobs/${original.id}` : '/recruiter/jobs', payload, original ? 'PATCH' : 'POST');
-      notice(byId('mutation-notice'), original ? 'Posting updated successfully.' : 'Posting created successfully.');
+      await request(editing ? `/recruiter/jobs/${editing.id}` : '/recruiter/jobs', payload, editing ? 'PATCH' : 'POST');
+      notice(byId('mutation-notice'), editing ? 'Posting updated successfully.' : 'Posting created successfully. Job seekers can now find it in job search.');
       editor.hidden = true;
       original = null;
       await load();
-      byId('postings-heading').focus();
+      // The confirmation sits above the list, so focusing it also scrolls it into view.
+      byId('mutation-notice').focus();
     } catch (error) {
       accessError(error);
+      if (editing && error.status === 404) { await postingGone(editing.id); return; }
       notice(byId('form-notice'), error.message, true);
       byId('form-notice').focus();
     } finally {
@@ -312,10 +355,17 @@ export function createRecruiterDashboard({ document, request, formatDate, onUnau
     try {
       const status = job.status === 'open' ? 'closed' : 'open';
       await request(`/recruiter/jobs/${job.id}/status`, { status }, 'PATCH');
-      notice(byId('mutation-notice'), status === 'closed' ? 'Posting closed. Existing applications are preserved.' : 'Posting reopened and available to job seekers.');
+      notice(byId('mutation-notice'), status === 'closed'
+        ? `“${job.title}” is closed. It is hidden from job search and its existing applications are kept.`
+        : `“${job.title}” is open again and visible in job search.`);
       await load();
-    } catch (error) { accessError(error); notice(byId('mutation-notice'), error.message, true); }
-    finally { setBusy(false); }
+      // The list was redrawn: keep keyboard focus on the posting that changed.
+      [...list.querySelectorAll('[data-lifecycle]')].find((button) => button.getAttribute('data-job-id') === String(job.id))?.focus();
+    } catch (error) {
+      accessError(error);
+      if (error.status === 404) { await postingGone(job.id); return; }
+      notice(byId('mutation-notice'), error.message, true);
+    } finally { setBusy(false); }
   }
   function askDelete(job) {
     if (busy) return;
@@ -333,14 +383,15 @@ export function createRecruiterDashboard({ document, request, formatDate, onUnau
   async function confirmDelete() {
     if (busy || !deletion) return;
     setBusy(true);
+    const target = deletion;
     try {
-      await request(`/recruiter/jobs/${deletion.id}`, undefined, 'DELETE');
-      if (original?.id === deletion.id) { original = null; editor.hidden = true; }
+      await request(`/recruiter/jobs/${target.id}`, undefined, 'DELETE');
+      if (original?.id === target.id) { original = null; editor.hidden = true; }
       deletion = null;
       dialog.close();
-      notice(byId('mutation-notice'), 'Posting permanently deleted.');
+      notice(byId('mutation-notice'), `“${target.title}” was permanently deleted.`);
       await load();
-      byId('postings-heading').focus();
+      byId('mutation-notice').focus();
     } catch (error) {
       accessError(error);
       if (error.status === 409) {
@@ -349,6 +400,10 @@ export function createRecruiterDashboard({ document, request, formatDate, onUnau
         notice(byId('mutation-notice'), 'This posting now has applications and cannot be deleted. Close it instead.', true);
         await load();
         byId('mutation-notice').focus();
+      } else if (error.status === 404) {
+        deletion = null;
+        dialog.close();
+        await postingGone(target.id, 'This posting had already been deleted. Your list has been refreshed.', false);
       } else { notice(byId('delete-notice'), error.message, true); byId('delete-notice').focus(); }
     } finally { setBusy(false); }
   }

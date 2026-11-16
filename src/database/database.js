@@ -128,6 +128,22 @@ async function initializeDatabase(databasePath = process.env.DB_PATH || DEFAULT_
     END;
   `);
 
+  // Users keep several resumes and choose one default. A separate table leaves
+  // existing resume rows untouched: user_id as the primary key allows a single
+  // default per user, and the (resume_id, user_id) foreign key only accepts the
+  // user's own resume. Deleting that resume deletes the row, so the user has no
+  // explicit choice until they make one or upload again.
+  await database.exec(`
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_resumes_id_user ON resumes(id, user_id);
+
+    CREATE TABLE IF NOT EXISTS default_resumes (
+      user_id INTEGER PRIMARY KEY,
+      resume_id INTEGER NOT NULL,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (resume_id, user_id) REFERENCES resumes(id, user_id) ON DELETE CASCADE
+    );
+  `);
+
   // Additive migrations also run on fresh databases, keeping one definition for
   // each new column. Nullable foreign keys are compatible with existing rows.
   const userColumns = new Set((await database.all('PRAGMA table_info(users)')).map(({ name }) => name));

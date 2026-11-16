@@ -20,10 +20,13 @@ if (session) {
   const progress = document.querySelector('#upload-progress');
   const dropTitle = drop.querySelector('h3');
   const dropHelp = document.querySelector('#file-help');
-  const currentEmpty = document.querySelector('#receipt-empty');
-  const currentList = document.querySelector('#receipt-list');
+  const listEmpty = document.querySelector('#receipt-empty');
+  const list = document.querySelector('#receipt-list');
+  const listNotice = document.querySelector('#resumes-notice');
+  const listLoading = document.querySelector('#resumes-loading');
+  const count = document.querySelector('#resume-count');
   let file = null;
-  let currentResume = null;
+  let resumes = [];
   let busy = false;
   let selectionVersion = 0;
   let deleteConfirmationTimeout = null;
@@ -36,49 +39,120 @@ if (session) {
   function resetDeleteConfirmation() {
     window.clearTimeout(deleteConfirmationTimeout);
     deleteConfirmationTimeout = null;
-    const button = currentList.querySelector('[data-delete-resume]');
+    const button = list.querySelector('[data-delete-resume].is-confirming');
     if (!button) return;
     button.classList.remove('is-confirming');
     button.querySelector('[data-delete-label]').textContent = 'Delete';
-    button.setAttribute('aria-label', 'Delete uploaded resume');
+    button.setAttribute('aria-label', button.dataset.label);
   }
 
-  function renderCurrentResume(resume) {
-    currentResume = resume;
-    resetDeleteConfirmation();
-    currentEmpty.hidden = Boolean(resume);
+  // One change at a time: list actions and uploads wait for each other.
+  function setBusy(value) {
+    busy = value;
+    picker.disabled = value;
+    upload.disabled = value || !file;
+    const removeSelection = selected.querySelector('button');
+    if (removeSelection) removeSelection.disabled = value;
+    list.setAttribute('aria-busy', String(value));
+    list.querySelectorAll('button').forEach((button) => {
+      button.disabled = value;
+    });
+  }
 
-    if (!resume) {
-      currentList.replaceChildren();
-      return;
-    }
+  function isResume(value) {
+    return (
+      Number.isSafeInteger(value?.id) &&
+      value.id > 0 &&
+      typeof value.originalName === 'string' &&
+      typeof value.isDefault === 'boolean'
+    );
+  }
 
-    currentList.innerHTML = `<li class="resume-receipt">
+  function resumeItem(resume) {
+    const name = escapeHtml(resume.originalName);
+    const defaultAction = resume.isDefault
+      ? `<span class="badge badge-success">${icon('check')} Default</span>`
+      : `<button class="resume-default-button" type="button" data-default-resume aria-label="Make ${name} your default resume">Make default</button>`;
+    return `<li class="resume-receipt" data-resume-id="${resume.id}">
       <span class="document-icon">${icon('file')}<span>PDF</span></span>
       <div class="min-width-zero">
-        <h3 class="break-word">${escapeHtml(resume.originalName)}</h3>
+        <h3 class="break-word">${name}</h3>
         <p>Uploaded ${escapeHtml(formatDate(resume.uploadedAt))}</p>
       </div>
       <div class="resume-receipt-actions">
-        <span class="badge badge-success">${icon('check')} Ready</span>
-        <button class="resume-delete-button" type="button" data-delete-resume aria-label="Delete uploaded resume">
+        ${defaultAction}
+        <button class="resume-delete-button" type="button" data-delete-resume data-label="Delete ${name}" aria-label="Delete ${name}">
           ${icon('trash')}<span data-delete-label>Delete</span>
         </button>
       </div>
     </li>`;
   }
 
-  async function loadCurrentResume() {
+  // Throws, so each caller decides how to report a failure.
+  async function refreshResumes() {
+    const result = await request('/resumes', undefined, 'GET');
+    if (!Array.isArray(result.items) || !result.items.every(isResume)) {
+      throw new Error(
+        'Your saved resumes could not be shown. Refresh the page to try again.'
+      );
+    }
+    resumes = result.items;
+    resetDeleteConfirmation();
+    listLoading.hidden = true;
+    listEmpty.hidden = resumes.length > 0;
+    list.innerHTML = resumes.map(resumeItem).join('');
+    list.querySelectorAll('button').forEach((button) => {
+      button.disabled = busy;
+    });
+    count.textContent = `${resumes.length} saved`;
+  }
+
+  async function loadResumes() {
     try {
-      const result = await request('/resumes/current', undefined, 'GET');
-      renderCurrentResume(result.resume);
+      await refreshResumes();
     } catch (error) {
       if (error.status === 401) {
         expireSession();
         return;
       }
-      showMessage(notice, error.message);
+      listLoading.hidden = true;
+      showMessage(listNotice, error.message);
     }
+  }
+
+  // Reports a completed change once the list shows it.
+  async function showChange(message) {
+    try {
+      await refreshResumes();
+      showMessage(listNotice, message, 'success');
+    } catch (error) {
+      if (error.status === 401) {
+        expireSession();
+        return;
+      }
+      showMessage(
+        listNotice,
+        `${message} Refresh the page to see your updated list.`,
+        'success'
+      );
+    }
+  }
+
+  async function showFailure(error) {
+    if (error.status === 401) {
+      expireSession();
+      return;
+    }
+    if (error.status === 404) {
+      // For example, deleted in another tab: show what is saved now.
+      await loadResumes();
+      showMessage(
+        listNotice,
+        'That resume is no longer saved. Your list has been refreshed.'
+      );
+      return;
+    }
+    showMessage(listNotice, error.message);
   }
 
   function resetSelection() {
@@ -162,14 +236,30 @@ if (session) {
     selectFiles([...event.dataTransfer.files]);
   });
 
-  currentList.addEventListener('click', async (event) => {
-    const button = event.target.closest('[data-delete-resume]');
-    if (!button || busy || !currentResume) return;
+  async function makeDefault(resume) {
+    resetDeleteConfirmation();
+    setBusy(true);
+    hideMessage(notice);
+    hideMessage(listNotice);
+    try {
+      await request(`/resumes/${resume.id}/default`, undefined, 'PUT');
+      await showChange(`“${resume.originalName}” is now your default resume.`);
+    } catch (error) {
+      await showFailure(error);
+    } finally {
+      setBusy(false);
+    }
+  }
 
+  async function deleteResume(resume, button) {
     if (!button.classList.contains('is-confirming')) {
+      resetDeleteConfirmation();
       button.classList.add('is-confirming');
       button.querySelector('[data-delete-label]').textContent = 'Confirm delete';
-      button.setAttribute('aria-label', 'Confirm deletion of uploaded resume');
+      button.setAttribute(
+        'aria-label',
+        `Confirm deletion of ${resume.originalName}`
+      );
       deleteConfirmationTimeout = window.setTimeout(
         resetDeleteConfirmation,
         5000
@@ -178,45 +268,53 @@ if (session) {
     }
 
     window.clearTimeout(deleteConfirmationTimeout);
-    busy = true;
-    button.disabled = true;
+    setBusy(true);
     button.setAttribute('aria-busy', 'true');
     hideMessage(notice);
+    hideMessage(listNotice);
     try {
-      await request('/resumes/current', undefined, 'DELETE');
-      renderCurrentResume(null);
-      resetSelection();
-      showMessage(
-        notice,
-        'Resume deleted. Your profile readiness is back to 60%. Upload a new PDF whenever you are ready.',
-        'success'
+      const { defaultResume } = await request(
+        `/resumes/${resume.id}`,
+        undefined,
+        'DELETE'
       );
+      // The upload area may still describe the upload that was just deleted.
+      if (drop.dataset.uploadState === 'complete') resetSelection();
+      let message = `“${resume.originalName}” was deleted. Your other resumes are unchanged.`;
+      if (!defaultResume) {
+        message =
+          'Resume deleted. You have no saved resumes, so your profile readiness is back to 60%. Upload a new PDF whenever you are ready.';
+      } else if (resume.isDefault) {
+        message = `“${resume.originalName}” was deleted. “${defaultResume.originalName}” is now your default resume.`;
+      }
+      await showChange(message);
     } catch (error) {
-      if (error.status === 401) {
-        expireSession();
-        return;
-      }
-      if (error.status === 404) renderCurrentResume(null);
-      showMessage(notice, error.message);
+      await showFailure(error);
     } finally {
-      busy = false;
-      const activeButton = currentList.querySelector('[data-delete-resume]');
-      if (activeButton) {
-        activeButton.disabled = false;
-        activeButton.removeAttribute('aria-busy');
-      }
+      button.removeAttribute('aria-busy');
       resetDeleteConfirmation();
+      setBusy(false);
     }
+  }
+
+  list.addEventListener('click', (event) => {
+    const button = event.target.closest('button');
+    if (!button || busy) return;
+    const id = Number(button.closest('[data-resume-id]')?.dataset.resumeId);
+    const resume = resumes.find((item) => item.id === id);
+    if (!resume) return;
+    if (button.hasAttribute('data-default-resume')) makeDefault(resume);
+    else if (button.hasAttribute('data-delete-resume'))
+      deleteResume(resume, button);
   });
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     if (!file || busy) return;
-    busy = true;
+    setBusy(true);
+    resetDeleteConfirmation();
     hideMessage(notice);
-    upload.disabled = true;
-    picker.disabled = true;
-    selected.querySelector('button').disabled = true;
+    hideMessage(listNotice);
     upload.classList.add('is-busy');
     upload.innerHTML =
       '<span class="button-spinner" aria-hidden="true"></span>Uploading…';
@@ -235,7 +333,6 @@ if (session) {
           'The upload response was incomplete. Please check before uploading again.'
         );
       const uploadedFile = file;
-      renderCurrentResume(result.resume);
       selectionVersion += 1;
       file = null;
       picker.value = '';
@@ -245,12 +342,13 @@ if (session) {
       drop.dataset.uploadState = 'complete';
       dropTitle.textContent = 'Resume saved to your account.';
       dropHelp.innerHTML =
-        'Your profile readiness is now 100%.<br>You can manage the saved resume below.';
+        'Your profile readiness is now 100%.<br>This upload is now your default resume.';
       showMessage(
         notice,
-        'Resume uploaded successfully. It will remain available after refresh and future sign-ins.',
+        'Resume uploaded successfully. It is now your default resume and will remain available after refresh and future sign-ins.',
         'success'
       );
+      await loadResumes();
     } catch (error) {
       if (error.status === 401) {
         expireSession();
@@ -258,19 +356,15 @@ if (session) {
       }
       showMessage(notice, error.message);
     } finally {
-      busy = false;
-      picker.disabled = false;
-      upload.disabled = !file;
+      setBusy(false);
       upload.classList.remove('is-busy');
       upload.innerHTML = `${icon('upload')} Upload resume`;
       progress.hidden = true;
       if (drop.dataset.uploadState === 'uploading')
         drop.dataset.uploadState = file ? 'selected' : 'empty';
-      const remove = selected.querySelector('button');
-      if (remove) remove.disabled = false;
       form.removeAttribute('aria-busy');
     }
   });
 
-  loadCurrentResume();
+  loadResumes();
 }

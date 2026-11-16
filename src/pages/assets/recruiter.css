@@ -11,6 +11,9 @@
 .recruiter-card h3 { font-size: 19px; overflow-wrap: anywhere; }
 .recruiter-card p { overflow-wrap: anywhere; color: var(--muted); }
 .recruiter-card-top { display: flex; justify-content: space-between; align-items: start; gap: 12px; }
+.recruiter-card-closed { background: var(--canvas); }
+.recruiter-card .recruiter-card-note { margin: 0; font-size: 13px; }
+.recruiter-warning { color: var(--warning); font-weight: 600; }
 .recruiter-status { border-radius: 20px; padding: 5px 12px; background: var(--brand-soft); color: var(--brand); font-size: 12px; white-space: nowrap; }
 .recruiter-status-closed { background: var(--canvas); color: var(--muted); border: 1px solid var(--border); }
 .recruiter-facts, .recruiter-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
@@ -37,7 +40,11 @@
 .recruiter-list-row label { display: grid; gap: 4px; font-size: 12px; }
 .recruiter-danger { color: var(--error); background: var(--surface); border: 1px solid var(--error); }
 .recruiter-danger:hover:not(:disabled) { color: var(--surface); background: var(--error); }
+/* dark.css gives every .button dark text for the teal fill; keep the delete label readable. */
+:root[data-theme='dark'] .recruiter-danger { color: var(--error); }
+:root[data-theme='dark'] .recruiter-danger:hover:not(:disabled) { color: var(--surface); }
 .recruiter-main .notice { margin: 0; overflow-wrap: anywhere; }
+#postings > .notice { margin-top: 16px; }
 .recruiter-empty { padding: 28px; border: 1px dashed var(--border); border-radius: var(--radius-md); }
 #postings { scroll-margin-top: 100px; }
 #delete-dialog, #decision-dialog { width: min(460px, calc(100% - 32px)); padding: 28px; margin: auto; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); color: var(--ink); }

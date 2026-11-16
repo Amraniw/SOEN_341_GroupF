@@ -86,4 +86,5 @@ if (session) {
       closeNavigation();
   });
   document.querySelector('[data-workspace]').hidden = false;
+  import('./profile-picture.js').then(({ refreshPictures }) => refreshPictures());
 }
