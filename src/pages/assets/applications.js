@@ -2,6 +2,7 @@ import { request } from './api.js';
 import { companyMark } from './job-shared.js';
 import { escapeHtml, formatDateTime } from './ui.js';
 import { session } from './workspace.js';
+import { renderActivity, renderHistory } from './application-visuals.mjs';
 
 if (session) {
   const list = document.querySelector('#application-list');
@@ -67,7 +68,10 @@ if (session) {
     status.textContent = 'Loading applications…';
     try {
       insights.textContent = 'Loading insights…';
-      const result = await request(`/applications/analytics?range=${range.value}`, undefined, 'GET');
+      const [result, yearly] = await Promise.all([
+        request(`/applications/analytics?range=${range.value}`, undefined, 'GET'),
+        request('/applications/analytics?range=all', undefined, 'GET'),
+      ]);
       if (generation !== loadGeneration) return;
       applications = result.items;
       statuses = result.statuses;
@@ -75,6 +79,11 @@ if (session) {
       insights.innerHTML = `<div class="analytics-metrics"><div><strong>${result.total}</strong><span>Submitted in range</span></div><div><strong>${result.active}</strong><span>Currently active</span></div><div><strong>${result.statuses.find((s) => s.id === 'offered').count}</strong><span>Offers</span></div></div><div class="analytics-grid"><section><h3>Current status breakdown</h3><p>Current outcomes of applications submitted in this range.</p>${result.statuses.map((s) => `<div class="analytics-bar"><span>${escapeHtml(s.name)}</span><meter min="0" max="${Math.max(1, result.total)}" value="${s.count}" aria-label="${escapeHtml(s.name)}"></meter><strong>${s.count}</strong></div>`).join('')}</section><section><h3>Applications over time</h3><p>Monthly submission totals within the selected range.</p>${result.activity.length ? result.activity.map((a) => `<div class="analytics-bar"><span>${escapeHtml(a.month)}</span><meter min="0" max="${peak}" value="${a.count}" aria-label="Applications in ${escapeHtml(a.month)}"></meter><strong>${a.count}</strong></div>`).join('') : '<p>No submissions in this period.</p>'}</section></div><section><h3>Recent activity</h3><p>Latest 100 recorded status events in this period.</p><ol class="analytics-history">${result.history.map((h) => `<li><strong>${escapeHtml(h.title)}</strong> · ${escapeHtml(h.company)}<br>${escapeHtml(h.statusLabel)} · ${escapeHtml(formatDateTime(h.changedAt))}</li>`).join('') || '<li>No status activity in this period.</li>'}</ol></section>`;
       filter.innerHTML = '<option value="">All statuses</option>' + statuses.map(({ id, name }) => `<option value="${escapeHtml(id)}">${escapeHtml(name)}</option>`).join('');
       const activityHeading = [...insights.querySelectorAll('h3')].find((heading) => heading.textContent === 'Recent activity');
+      const oldChart = [...insights.querySelectorAll('h3')].find((heading) => heading.textContent === 'Applications over time');
+      if (oldChart) {
+        oldChart.closest('section').remove();
+        insights.querySelector('.analytics-grid').insertAdjacentHTML('afterend', renderActivity(yearly.items, 'all', escapeHtml));
+      }
       if (activityHeading) activityHeading.nextElementSibling.textContent = 'Latest status for each application updated in this period.';
       analytics.querySelector('.applications-toolbar + p').textContent = 'Submission metrics and the list below follow this range. Recent activity shows each application’s latest status. Dates use UTC.';
       render();
@@ -101,11 +110,13 @@ if (session) {
     target.textContent = 'Loading history…';
     try {
       const result = await request(`/applications/${detail.dataset.history}`, undefined, 'GET');
-      target.innerHTML = `<ol>${result.application.history.map((h) => `<li>${escapeHtml(h.statusLabel)} · ${escapeHtml(formatDateTime(h.changedAt))}</li>`).join('')}</ol>`;
+      target.innerHTML = renderHistory(result.application.history, escapeHtml, formatDateTime);
       detail.dataset.loaded = 'true';
     } catch { target.textContent = 'History could not be loaded. Close and reopen to retry.'; }
   }, true);
   document.addEventListener('click', (event) => {
+    const day = event.target.closest('[data-day-label]');
+    if (day) analytics.querySelector('.calendar-selection').textContent = day.dataset.dayLabel;
     const summaryFilter = event.target.closest('[data-status-filter]');
     if (summaryFilter) {
       filter.value = filter.value === summaryFilter.dataset.statusFilter ? '' : summaryFilter.dataset.statusFilter;
