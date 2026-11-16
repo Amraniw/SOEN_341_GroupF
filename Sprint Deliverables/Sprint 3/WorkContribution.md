@@ -43,7 +43,7 @@ Around 12 commits, mostly done for work on the notification system and on status
 
 - **Reviews or testing performed:**
 1. November 12th: Tested the notification system (Verdict: All tests pass)
-2. November 15th: Final check-up ()
+2. November 15th: Notifs, Statuses and Recruiter tests (Verdict: All tests pass)
 
 - **Time spent:**
 6 to 7 hours
