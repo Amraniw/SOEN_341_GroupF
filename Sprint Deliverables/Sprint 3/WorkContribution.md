@@ -39,11 +39,11 @@
 4. Backend (Pair Programming)
 
 - **Pull requests / commits:**
-Around 10 commits, mostly done for work on the notification system
+Around 10 commits, mostly done for work on the notification system and the statuses
 
 - **Reviews or testing performed:**
 1. November 12th: Tested the notification system (Verdict: All tests pass)
-2. November 15th: Final check-up ()
+2. November 15th: Tested the offer and statuses system (Verdict: All tests pass)
 
 - **Time spent:**
 6 to 7 hours
