@@ -196,25 +196,6 @@
     inset 0 1px 0 rgb(255 255 255 / 6%),
     var(--shadow-lg);
 }
-:root[data-theme='dark'] .product-preview::after {
-  background: radial-gradient(
-    260px circle at var(--pointer-x, 50%) var(--pointer-y, 50%),
-    rgb(79 184 163 / 14%),
-    transparent 70%
-  );
-}
-:root[data-theme='dark'] .preview-topline,
-:root[data-theme='dark'] .preview-caption {
-  color: #8fb0a5;
-}
-:root[data-theme='dark'] .preview-state-controls button {
-  color: #8ea49d;
-}
-:root[data-theme='dark'] .preview-state-controls button:hover,
-:root[data-theme='dark'] .preview-state-controls button[aria-pressed='true'] {
-  color: var(--brand);
-  background: rgb(255 255 255 / 8%);
-}
 :root[data-theme='dark'] .preview-window {
   border-color: rgb(48 70 64 / 85%);
   background: rgb(19 31 28 / 96%);
@@ -222,41 +203,8 @@
     0 1px 2px rgb(0 0 0 / 30%),
     0 22px 55px rgb(0 0 0 / 35%);
 }
-:root[data-theme='dark']
-  .product-preview[data-preview-state='resume']
-  [data-preview-resume] {
-  background: linear-gradient(90deg, transparent, rgb(79 184 163 / 10%));
-}
 :root[data-theme='dark'] .window-dots i {
   background: #3a4f49;
-}
-:root[data-theme='dark'] .preview-float {
-  border-color: rgb(255 255 255 / 8%);
-  background: rgb(24 38 34 / 88%);
-  box-shadow: 0 16px 42px rgb(0 0 0 / 40%);
-}
-:root[data-theme='dark'] .float-icon {
-  color: var(--on-brand);
-}
-:root[data-theme='dark'] .status-pulse {
-  border-color: var(--surface);
-}
-
-/* Principles strip, feature cards, footer */
-:root[data-theme='dark'] .principles {
-  border-color: rgb(38 55 51 / 76%);
-  background: rgb(19 31 28 / 78%);
-}
-:root[data-theme='dark'] .principles > div:hover,
-:root[data-theme='dark'] .principles > div:focus-within {
-  background: rgb(79 184 163 / 8%);
-}
-:root[data-theme='dark'] .feature:nth-child(3) {
-  border-color: #264038;
-  background: linear-gradient(145deg, #15241f, #121e1b);
-}
-:root[data-theme='dark'] .future-banner {
-  border-color: rgb(79 184 163 / 30%);
 }
 :root[data-theme='dark'] .public-footer {
   background: var(--surface);

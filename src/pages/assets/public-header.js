@@ -8,7 +8,7 @@ const NAVIGATION = [
   ['looking-ahead', 'Looking ahead', '/index.html#looking-ahead'],
 ];
 
-export function initPublicHeader() {
+export function initPublicHeader({ onSessionChange } = {}) {
   const header = document.querySelector('[data-public-header]');
   if (!header) return;
   header.innerHTML = `<div class="container">
@@ -51,6 +51,7 @@ export function initPublicHeader() {
         ? `<a class="button button-secondary workspace-entry" href="${workspaceHome(session.user.role)}"><span>${session.user.role === 'recruiter' ? 'Recruiter dashboard' : '<span class="workspace-entry-prefix">Your </span>workspace'}</span></a><button class="button button-quiet signout-button" type="button" aria-label="Sign out">${icon('logout')}<span class="signout-label">Sign out</span></button>`
         : '<a class="button button-quiet" href="/auth/login.html">Sign in</a><a class="button header-create-account" href="/auth/signup.html">Create account</a>';
       actions.querySelector('.signout-button')?.addEventListener('click', (event) => signOut(event.currentTarget));
+      onSessionChange?.(session);
     } catch (error) {
       // A failed session lookup is unknown state, not evidence of logout.
       actions.innerHTML = `<div class="account-status-error"><p role="alert">Account status unavailable.</p><div class="account-status-actions"><button class="button button-secondary" type="button" title="${escapeHtml(error.message)}">Retry account status</button><a class="text-link" href="/auth/login.html">Sign in</a></div></div>`;

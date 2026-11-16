@@ -5,216 +5,259 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="CareerConnect — your professional account and resume, in one career workspace."
+      content="Browse jobs, get feedback on your resume, and track your applications in CareerConnect."
     />
-    <title>CareerConnect | CareerConnect</title>
+    <title>CareerConnect | Job search and application workspace</title>
     <link rel="icon" href="/assets/brand.svg" type="image/svg+xml" />
     <script src="/assets/theme.js"></script>
     <link rel="stylesheet" href="/assets/styles.css" />
+    <link rel="stylesheet" href="/assets/home.css" />
     <script type="module" src="/assets/home.js"></script>
   </head>
-  <body>
+  <body class="home-page">
     <a class="skip-link" href="#main">Skip to content</a>
-    <header class="public-header" data-public-header><noscript><a class="text-link" href="/index.html">CareerConnect home</a></noscript></header>
-    <main id="main" class="landing-main">
-      <section class="container hero">
+    <header class="public-header" data-public-header>
+      <noscript>
+        <nav class="container home-static-nav" aria-label="Main navigation">
+          <a class="text-link" href="/index.html">CareerConnect</a>
+          <a href="/jobs/">Find jobs</a>
+          <a href="#how-it-works">How it works</a>
+          <a href="#looking-ahead">Looking ahead</a>
+          <a href="/auth/login.html">Sign in</a>
+          <a href="/auth/signup.html">Create account</a>
+        </nav>
+      </noscript>
+    </header>
+    <main id="main" class="landing-main" tabindex="-1">
+      <section class="container hero" aria-labelledby="home-title">
         <div class="hero-copy">
-          <p class="eyebrow">YOUR CAREER, WITH DIRECTION</p>
-          <h1>
-            Build your career.<br /><span
-              >Be ready for<br />what comes next.</span
-            >
+          <p class="eyebrow">YOUR CAREER WORKSPACE</p>
+          <h1 id="home-title">
+            Your job search,<br /><span>in focus.</span>
           </h1>
           <p>
-            Your experience deserves a place of its own. Bring your account and
-            resume together in one focused career workspace.
+            Find roles that fit, strengthen your resume, and follow every
+            application in one workspace.
           </p>
           <div class="hero-actions">
-            <a class="button" href="/auth/signup.html"
-              >Create account <span data-icon="arrow"></span></a
-            ><a class="button button-secondary" href="/auth/login.html"
-              >Sign in</a
-            >
+            <a class="button" href="/dashboard/index.html" data-home-primary>
+              <span data-entry-label>Open workspace</span><span data-icon="arrow"></span>
+            </a>
+            <a class="button button-secondary" href="/jobs/" data-home-jobs>Find jobs</a>
           </div>
           <p class="hero-footnote">
-            <span data-icon="check"></span>Start with the essentials. Grow from
-            there.
+            <span data-icon="check"></span>Browse jobs without an account.
           </p>
         </div>
-        <div class="product-preview" data-preview-state="account">
-          <div class="preview-topline">
-            <span>A CLEARER PICTURE OF YOUR CAREER</span>
-            <div class="preview-state-controls" aria-label="Preview step">
-              <button
-                type="button"
-                aria-pressed="true"
-                data-preview-step="account"
-              >
-                <span class="sr-only">Show account step</span>01
-              </button>
-              <span aria-hidden="true">/</span>
-              <button
-                type="button"
-                aria-pressed="false"
-                data-preview-step="resume"
-              >
-                <span class="sr-only">Show resume step</span>02
-              </button>
-            </div>
+
+        <div class="product-preview">
+          <div class="home-preview-header">
+            <span class="home-preview-name"><span data-icon="applications"></span>Explore the workspace</span>
+            <span class="preview-caption">Illustrative data</span>
           </div>
-          <div
-            class="preview-window"
-            role="img"
-            aria-live="polite"
-            aria-label="Illustrative workspace preview. Account created; resume is the next step."
-          >
+          <div class="preview-window">
             <div class="preview-toolbar">
-              <span>CareerConnect.</span
-              ><span class="window-dots" aria-hidden="true"
-                ><i></i><i></i><i></i
-              ></span>
+              <span class="home-preview-brand"><img src="/assets/brand.svg" width="23" height="23" alt="" />CareerConnect<span class="home-brand-period">.</span></span>
+              <span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span>
             </div>
-            <div class="preview-content">
-              <p class="eyebrow">YOUR WORKSPACE</p>
-              <h2 data-preview-title>A good place to start.</h2>
-              <p data-preview-copy>One account. Your next chapter.</p>
-              <div class="preview-person">
-                <span class="avatar">JD</span>
+            <div class="home-preview-tabs" role="tablist" aria-label="Workspace features" hidden>
+              <button type="button" role="tab" id="preview-tab-jobs" aria-controls="preview-jobs" aria-selected="true"><span data-icon="search"></span>Jobs</button>
+              <button type="button" role="tab" id="preview-tab-resumes" aria-controls="preview-resumes" aria-selected="false" tabindex="-1"><span data-icon="file"></span>Resumes</button>
+              <button type="button" role="tab" id="preview-tab-review" aria-controls="preview-review" aria-selected="false" tabindex="-1"><span data-icon="check"></span>AI Review</button>
+              <button type="button" role="tab" id="preview-tab-applications" aria-controls="preview-applications" aria-selected="false" tabindex="-1"><span data-icon="applications"></span>Applications</button>
+            </div>
+            <section class="home-preview-panel" id="preview-jobs" aria-labelledby="preview-jobs-title">
+              <h2 id="preview-jobs-title">Find jobs</h2>
+              <div class="sample-search"><span data-icon="search"></span>Software</div>
+              <ul class="sample-filters" aria-label="Example filters">
+                <li>Seattle, WA</li>
+                <li>Software Engineering</li>
+              </ul>
+              <ul class="sample-rows">
+                <li>
+                  <span class="sample-icon" data-icon="briefcase"></span>
+                  <div><strong>Software Engineering Intern</strong><small>Amazon · Seattle, WA</small></div>
+                  <span class="sample-tail sample-status is-positive">Internship</span>
+                </li>
+                <li>
+                  <span class="sample-icon" data-icon="briefcase"></span>
+                  <div><strong>Robotics Software Engineer</strong><small>NVIDIA · Seattle, WA</small></div>
+                  <span class="sample-tail sample-status">Full-time</span>
+                </li>
+              </ul>
+            </section>
+            <section class="home-preview-panel" id="preview-resumes" aria-labelledby="preview-resumes-title" hidden>
+              <h2 id="preview-resumes-title">Saved resumes</h2>
+              <ul class="sample-rows">
+                <li>
+                  <span class="sample-icon" data-icon="file"></span>
+                  <div><strong>Software_Resume.pdf</strong><small>PDF resume</small></div>
+                  <span class="sample-tail sample-status is-positive">Default</span>
+                </li>
+                <li>
+                  <span class="sample-icon" data-icon="file"></span>
+                  <div><strong>Engineering_Resume.pdf</strong><small>PDF resume</small></div>
+                </li>
+              </ul>
+              <p class="sample-note"><span data-icon="applications"></span>Choose a saved PDF for AI Resume Review.</p>
+            </section>
+            <section class="home-preview-panel" id="preview-review" aria-labelledby="preview-review-title" hidden>
+              <h2 id="preview-review-title">AI Resume Review</h2>
+              <div class="sample-search"><span data-icon="file"></span>Software_Resume.pdf</div>
+              <dl class="preview-feedback">
+                <div><dt>Aligned role</dt><dd>Software Engineering Intern</dd></div>
+                <div><dt>Area to improve</dt><dd>Describe what your API tests caught and which endpoints they covered.</dd></div>
+              </dl>
+            </section>
+            <section class="home-preview-panel" id="preview-applications" aria-labelledby="preview-applications-title" hidden>
+              <h2 id="preview-applications-title">Applications</h2>
+              <ul class="sample-rows">
+                <li>
+                  <span class="sample-icon" data-icon="applications"></span>
+                  <div><strong>Software Engineering Intern</strong><small>Application status</small></div>
+                  <span class="sample-tail sample-status is-positive">Interview</span>
+                </li>
+                <li>
+                  <span class="sample-icon" data-icon="applications"></span>
+                  <div><strong>Backend Software Engineer</strong><small>Application status</small></div>
+                  <span class="sample-tail sample-status">Under review</span>
+                </li>
+              </ul>
+              <p class="sample-note"><span data-icon="check"></span>See submission trends and recent status activity.</p>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <div class="home-workflow-surface">
+        <section class="container home-workflow" id="how-it-works" aria-labelledby="workflow-title">
+          <header class="home-section-heading">
+            <div>
+              <p class="eyebrow">HOW IT WORKS</p>
+              <h2 id="workflow-title">From search to follow-up.</h2>
+            </div>
+            <p>Anyone can browse jobs. An account gives you a place to prepare your resumes, apply, and see what happens next.</p>
+          </header>
+
+          <article class="home-story home-story-jobs">
+            <div class="home-story-copy">
+              <p class="home-story-label"><span data-icon="search"></span>Job discovery</p>
+              <h3>Know the role before you apply.</h3>
+              <p>Search by keyword, location, and category. Read the responsibilities and qualifications in each posting before deciding where to apply.</p>
+              <a class="text-link" href="/jobs/" data-home-jobs>Browse jobs <span data-icon="arrow"></span></a>
+            </div>
+
+            <figure class="home-story-visual job-example" data-home-reveal>
+              <figcaption>Demo job posting</figcaption>
+              <div class="job-example-summary">
+                <span class="job-example-mark" aria-hidden="true">A</span>
                 <div>
-                  <strong>Jordan Davis</strong>
-                  <p>Your professional identity</p>
+                  <strong>Software Engineering Intern</strong>
+                  <span>Amazon · Seattle, WA</span>
                 </div>
               </div>
-              <div class="preview-row" data-preview-account>
-                <span data-icon="check"></span>Account created
-                <span class="badge badge-success">Ready</span>
-              </div>
-              <div class="preview-row" data-preview-resume>
-                <span data-icon="file"></span
-                ><span data-preview-resume-label>Add your resume</span>
-                <span class="badge badge-neutral" data-preview-resume-badge
-                  >Next step</span
-                >
-              </div>
+              <ul class="sample-filters" aria-label="Job details">
+                <li>Internship</li><li>Hybrid</li><li>Software Engineering</li>
+              </ul>
+              <dl class="home-example-details">
+                <div><dt>What you’ll do</dt><dd>Build a small feature and write tests for failure paths.</dd></div>
+                <div><dt>Qualifications</dt><dd>Computer science or related studies, plus experience with Java, Python, or JavaScript.</dd></div>
+              </dl>
+            </figure>
+          </article>
+
+          <article class="home-story home-story-review">
+            <div class="home-story-copy">
+              <p class="home-story-label"><span data-icon="file"></span>Resumes &amp; AI feedback</p>
+              <h3>Improve the resume you’re about to send.</h3>
+              <p>Keep several PDF versions and set the one you want to submit as your default. Where AI Resume Review is enabled, review any saved PDF for aligned roles, strengths, and practical edits.</p>
+              <a class="text-link" href="/auth/login.html?next=%2Fresume%2Findex.html" data-seeker-entry="/resume/index.html" data-signed-in-label="Open AI Resume Review">
+                <span data-entry-label>Sign in to review a resume</span><span data-icon="arrow"></span>
+              </a>
             </div>
-          </div>
-          <div class="preview-float preview-float-resume" aria-hidden="true">
-            <span class="float-icon"><span data-icon="check"></span></span>
-            <span
-              ><strong>Resume uploaded</strong
-              ><small>Ready for what comes next</small></span
-            >
-          </div>
-          <div class="preview-float preview-float-profile" aria-hidden="true">
-            <span class="status-pulse"></span>
-            <span
-              ><strong>Account established</strong
-              ><small>Your essentials are together</small></span
-            >
-          </div>
-          <p class="preview-caption">
-            A glimpse of your workspace · Illustrative preview
-          </p>
-        </div>
-      </section>
-      <div class="container principles">
-        <div>
-          <span data-icon="user"></span>
-          <div>
-            <strong>A professional starting point</strong
-            ><span>Your account, in one place</span>
-          </div>
-        </div>
-        <div>
-          <span data-icon="file"></span>
-          <div>
-            <strong>Experience, organized</strong
-            ><span>A home for your resume</span>
-          </div>
-        </div>
-        <div>
-          <span data-icon="briefcase"></span>
-          <div>
-            <strong>Built for your next step</strong
-            ><span>A foundation for future opportunities</span>
-          </div>
-        </div>
+            <figure class="home-story-visual home-review-sample" data-home-reveal>
+              <figcaption><span data-icon="applications"></span>AI Resume Review <small>Illustrative review</small></figcaption>
+              <div class="home-review-file"><span data-icon="file"></span><span>Software_Resume.pdf</span><span class="sample-status is-positive">Review complete</span></div>
+              <dl class="home-example-details">
+                <div>
+                  <dt>Strength</dt>
+                  <dd>Shows how you used API tests to verify a project.</dd>
+                </div>
+                <div>
+                  <dt>Area to improve</dt>
+                  <dd>Add the number of endpoints you tested and what the tests caught.</dd>
+                </div>
+              </dl>
+            </figure>
+          </article>
+
+          <article class="home-story home-story-track">
+            <div class="home-story-copy">
+              <p class="home-story-label"><span data-icon="applications"></span>Application tracking</p>
+              <h3>See what changed after you applied.</h3>
+              <p>Review application history and submission trends. Get in-app notifications for status changes, interview invitations, and upcoming deadlines on matching jobs.</p>
+              <a class="text-link" href="/auth/login.html?next=%2Fapplications%2Findex.html" data-seeker-entry="/applications/index.html" data-signed-in-label="Open applications">
+                <span data-entry-label>Sign in to view applications</span><span data-icon="arrow"></span>
+              </a>
+            </div>
+            <figure class="home-story-visual activity-example" data-home-reveal>
+              <figcaption>Recent activity <small>Illustrative history</small></figcaption>
+              <ol aria-label="Example application status history">
+                <li>
+                  <span class="activity-mark is-current" data-icon="check"></span>
+                  <div><strong>Interview</strong><span>Software Engineering Intern</span></div>
+                  <span class="activity-date">Nov 15</span>
+                </li>
+                <li>
+                  <span class="activity-mark" data-icon="applications"></span>
+                  <div><strong>Under Review</strong><span>Software Engineering Intern</span></div>
+                  <span class="activity-date">Nov 12</span>
+                </li>
+                <li>
+                  <span class="activity-mark" data-icon="file"></span>
+                  <div><strong>Applied</strong><span>Software Engineering Intern</span></div>
+                  <span class="activity-date">Nov 10</span>
+                </li>
+              </ol>
+            </figure>
+          </article>
+        </section>
       </div>
-      <section class="container features" id="how-it-works">
-        <div class="section-intro">
-          <div>
-            <p class="eyebrow">START SIMPLE. MOVE FORWARD.</p>
-            <h2>Career essentials.<br />Considered from the start.</h2>
-          </div>
-          <p>
-            A focused place to prepare, so you can spend more time thinking
-            about where you want to go.
-          </p>
-        </div>
-        <div class="feature-grid">
-          <article class="feature">
-            <span class="feature-number">01 / YOUR IDENTITY</span>
-            <h3>Start with you.</h3>
-            <p>
-              Create your account and bring your name and contact information
-              into one workspace.
-            </p>
-            <a class="text-link" href="/auth/signup.html"
-              >Create account <span data-icon="arrow"></span
-            ></a>
-          </article>
-          <article class="feature">
-            <span class="feature-number">02 / YOUR EXPERIENCE</span>
-            <h3>Keep your resume ready.</h3>
-            <p>
-              Upload a PDF, receive a clear confirmation, and keep a copy of
-              your experience with your account.
-            </p>
-            <a class="text-link" href="/auth/login.html"
-              >Sign in to upload <span data-icon="arrow"></span
-            ></a>
-          </article>
-          <article class="feature">
-            <span class="feature-number">03 / YOUR NEXT CHAPTER</span>
-            <h3>Find your next role.</h3>
-            <p>
-              Browse available opportunities and narrow your search by keyword,
-              location, and category.
-            </p>
-            <a class="text-link" href="/jobs/">Find jobs <span data-icon="arrow"></span></a>
-          </article>
-        </div>
-      </section>
-      <section class="container future-banner" id="looking-ahead">
+
+      <section class="container home-recruiters" id="looking-ahead" aria-labelledby="looking-ahead-title">
         <div>
-          <p class="eyebrow">FOR PROFESSIONALS AND THE TEAMS THEY JOIN</p>
-          <h2>Better prepared. Better connected.</h2>
-          <p>
-            We’re building toward a place where professionals and employers can
-            find their next opportunity. Today, it starts with your account and
-            resume.
-          </p>
+          <p class="eyebrow">FOR RECRUITERS</p>
+          <h2 id="looking-ahead-title">Manage postings and applicants.</h2>
+          <p>Publish and manage postings, review submitted resumes, and update each applicant’s status.</p>
+          <a class="text-link" href="/recruiter/dashboard" data-home-recruiter>
+            Recruiter dashboard <span data-icon="arrow"></span>
+          </a>
         </div>
-        <span class="badge badge-neutral">Employer tools coming later</span>
-        <div class="connection-motif" aria-hidden="true">
-          <span></span><span></span><span></span>
+        <p class="home-future"><strong>Looking ahead</strong><span>A dedicated Companies section is planned for a future release.</span></p>
+      </section>
+
+      <section class="home-start" aria-labelledby="home-start-title">
+        <div class="container">
+          <div>
+            <h2 id="home-start-title">Start your search.</h2>
+            <p>Browse the listings now, or open your workspace to manage resumes and applications.</p>
+          </div>
+          <div class="home-start-actions">
+            <a class="button button-secondary" href="/jobs/" data-home-jobs>Find jobs</a>
+            <a class="button" href="/dashboard/index.html" data-home-primary>
+              <span data-entry-label>Open workspace</span><span data-icon="arrow"></span>
+            </a>
+          </div>
         </div>
       </section>
     </main>
     <footer class="public-footer">
       <div class="container">
-        <a class="brand" href="/index.html"
-          ><img
-            src="/assets/brand.svg"
-            width="36"
-            height="36"
-            alt=""
-          />CareerConnect<span class="brand-dot">.</span></a
-        >
-        <p>© 2026 CareerConnect. A considered next step.</p>
-        <a class="text-link" href="/dashboard/index.html"
-          >Your workspace <span data-icon="arrow"></span
-        ></a>
+        <a class="brand" href="/index.html"><img src="/assets/brand.svg" width="36" height="36" alt="" />CareerConnect<span class="brand-dot">.</span></a>
+        <p>© 2026 CareerConnect</p>
+        <a class="text-link" href="/auth/login.html" data-home-footer>
+          <span data-entry-label>Sign in</span><span data-icon="arrow"></span>
+        </a>
       </div>
     </footer>
   </body>

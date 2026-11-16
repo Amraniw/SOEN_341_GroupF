@@ -1,4 +1,5 @@
 const paths = {
+  search: '<circle cx="10.5" cy="10.5" r="5.5"/><path d="m15 15 4 4"/>',
   arrow: '<path d="M5 12h14m-6-6 6 6-6 6"/>',
   home: '<path d="m3 10 9-7 9 7v10H3zM9 20v-7h6v7"/>',
   user: '<circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/>',
@@ -109,7 +110,7 @@ if (!reduceMotion) {
     document.documentElement.classList.add('page-ready')
   );
   const revealTargets = document.querySelectorAll(
-    '.principles > div, .section-intro, .feature, .future-banner, .panel, .next-card, .roadmap'
+    '.panel, .next-card, .roadmap, [data-home-reveal]'
   );
   revealTargets.forEach((element, index) => {
     element.classList.add('reveal');
