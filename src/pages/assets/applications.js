@@ -34,6 +34,9 @@ if (session) {
   // The accept/decline area on an application that has an offer. Both answers are
   // final, so each asks for a confirmation first.
   function offerPanel(application) {
+    if (application.quitAt) {
+      return `<div class="offer-panel is-declined" role="status"><strong>You left this job</strong><p>You left this position on ${escapeHtml(formatDateTime(application.quitAt))}. You can apply for it again from the job page.</p></div>`;
+    }
     if (application.offerResponse === 'accepted') {
       return '<div class="offer-panel is-accepted" role="status"><strong>Offer accepted</strong><p>Congratulations! Your profile now shows you as employed.</p></div>';
     }

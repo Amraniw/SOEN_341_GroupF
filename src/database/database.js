@@ -226,7 +226,7 @@ async function initializeDatabase(databasePath = process.env.DB_PATH || DEFAULT_
     DROP TRIGGER IF EXISTS applications_notify_applicant;
     CREATE TRIGGER applications_notify_applicant
     AFTER UPDATE OF status ON applications
-    WHEN NEW.status <> OLD.status
+    WHEN NEW.status <> OLD.status AND NOT (OLD.quit_at IS NOT NULL AND NEW.quit_at IS NULL)
     BEGIN
       INSERT INTO notifications (user_id, type, title, message, link, application_id, job_id)
       SELECT NEW.user_id,

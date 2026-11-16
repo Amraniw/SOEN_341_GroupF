@@ -21,6 +21,7 @@ function publicApplication(row) {
     updatedAt: row.updated_at,
     offerResponse: row.offer_response ?? null,
     offerRespondedAt: row.offer_responded_at ?? null,
+    quitAt: row.quit_at ?? null,
     job: {
       id: row.job_id,
       title: row.title,
@@ -36,7 +37,7 @@ function publicApplication(row) {
 
 const APPLICATION_SELECT = `
   SELECT a.id, a.user_id, a.job_id, a.status, a.applied_at, a.updated_at,
-         a.offer_response, a.offer_responded_at,
+         a.offer_response, a.offer_responded_at, a.quit_at,
          j.title, j.company, j.location, j.category,
          c.name AS category_name, j.employment_type, j.workplace_type
   FROM applications a
@@ -146,10 +147,15 @@ function createApplicationRouter(database) {
       const result = await database.run(
         `UPDATE applications
          SET offer_response = ?, offer_responded_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
-         WHERE id = ? AND user_id = ? AND status = 'offered' AND offer_response IS NULL`,
+         WHERE id = ? AND user_id = ? AND status = 'offered' AND offer_response IS NULL
+           AND (? <> 'accepted' OR NOT EXISTS (
+             SELECT 1 FROM applications other
+             WHERE other.user_id = applications.user_id
+               AND other.offer_response = 'accepted' AND other.quit_at IS NULL))`,
         body.response,
         applicationId,
-        userId
+        userId,
+        body.response
       );
 
       if (result.changes === 0) {
@@ -165,6 +171,11 @@ function createApplicationRouter(database) {
           return response.status(409).json({
             error: `You already ${existing.offer_response} this offer.`,
             application: publicApplication(existing),
+          });
+        }
+        if (existing.status === 'offered' && body.response === 'accepted') {
+          return response.status(409).json({
+            error: 'You already accepted another offer. Leave your current job before accepting a new one.',
           });
         }
         return response.status(409).json({ error: 'This application does not have an offer to respond to.' });
@@ -223,7 +234,7 @@ function createApplicationRouter(database) {
         request.authenticatedUser.id,
         jobId
       );
-      if (existing) {
+      if (existing && !existing.quit_at) {
         return response.status(409).json({
           error: 'You have already applied for this job.',
           application: publicApplication(existing),
@@ -236,6 +247,43 @@ function createApplicationRouter(database) {
       );
       if (!job) {
         return response.status(404).json({ error: 'This job posting is no longer available.' });
+      }
+
+      // Someone who left a job they accepted may apply to it again. The same
+      // application starts over, so its history stays in one place.
+      if (existing) {
+        const restart = await database.run(
+          `UPDATE applications
+           SET status = 'applied', applied_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP,
+               offer_response = NULL, offer_responded_at = NULL, quit_at = NULL
+           WHERE id = ? AND user_id = ? AND quit_at IS NOT NULL`,
+          existing.id,
+          request.authenticatedUser.id
+        );
+        if (restart.changes === 0) {
+          return response.status(409).json({ error: 'You have already applied for this job.' });
+        }
+        try {
+          await database.run(
+            `INSERT INTO notifications (user_id, type, title, message, link, application_id, job_id)
+             SELECT j.recruiter_id, 'new_application', 'New application',
+                    u.name || ' applied again for ' || j.title || '.', '/recruiter/dashboard', a.id, j.id
+             FROM applications a JOIN jobs j ON j.id = a.job_id JOIN users u ON u.id = a.user_id
+             WHERE a.id = ? AND j.recruiter_id IS NOT NULL`,
+            existing.id
+          );
+        } catch (error) {
+          console.error('Could not notify the recruiter about the new application:', error.message);
+        }
+        const restarted = await database.get(
+          `${APPLICATION_SELECT} WHERE a.id = ? AND a.user_id = ?`,
+          existing.id,
+          request.authenticatedUser.id
+        );
+        return response.status(201).json({
+          message: 'Application submitted successfully.',
+          application: publicApplication(restarted),
+        });
       }
 
       let result;

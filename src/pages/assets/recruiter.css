@@ -58,6 +58,7 @@
 .applicant-main .applicant-offer { display: block; margin-top: 2px; font-size: 12px; font-style: normal; font-weight: 650; color: var(--muted); }
 .applicant-main .applicant-offer-accepted { color: var(--success); }
 .applicant-main .applicant-offer-declined { color: var(--error); }
+.applicant-main .applicant-offer-left { color: var(--error); }
 .applicant-actions { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .applicant-actions select { min-width: 150px; padding: 9px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); color: var(--ink); font: inherit; font-size: 13px; }
 .applicant-actions .button { min-height: 40px; }

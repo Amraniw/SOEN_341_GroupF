@@ -54,11 +54,34 @@
       .profile-details dd {
         white-space: pre-line;
       }
+      .employment-confirm {
+        display: grid;
+        gap: 6px;
+        margin-top: 14px;
+        padding: 16px 18px;
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--brand);
+        border-radius: var(--radius-md);
+        background: var(--brand-soft);
+      }
+      .employment-confirm p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .employment-confirm .profile-actions {
+        justify-content: flex-start;
+        margin-top: 8px;
+      }
+      #employment-message:empty {
+        display: none;
+      }
       .profile-details .text-link {
         min-height: 0;
       }
     </style>
     <script type="module" src="/assets/profile.js"></script>
+    <script type="module" src="/assets/profile-employment.js"></script>
 
   </head>
   <body data-page="profile">
@@ -105,6 +128,98 @@
                   ></p>
                   <p class="break-word" id="profile-email"></p>
                   <span class="badge badge-neutral">CareerConnect member</span>
+                </div>
+              </section>
+              <section
+                class="panel"
+                id="employment-panel"
+                aria-labelledby="employment-heading"
+                hidden
+              >
+                <div class="panel-heading">
+                  <h2 id="employment-heading">Employment</h2>
+                  <span
+                    class="badge badge-neutral"
+                    id="employment-badge"
+                    hidden
+                  ></span>
+                </div>
+                <p id="employment-loading" role="status">
+                  Loading your employment status…
+                </p>
+                <div id="employment-error" hidden>
+                  <p id="employment-error-message" role="alert"></p>
+                  <button
+                    class="button button-secondary"
+                    type="button"
+                    id="employment-retry"
+                  >
+                    Try again
+                  </button>
+                </div>
+                <div id="employment-body" hidden>
+                  <p id="employment-message" role="status" tabindex="-1"></p>
+                  <dl class="details-list" id="employment-job" hidden>
+                    <div>
+                      <dt>Current job</dt>
+                      <dd id="employment-job-title"></dd>
+                    </div>
+                    <div>
+                      <dt>Company</dt>
+                      <dd id="employment-job-company"></dd>
+                    </div>
+                    <div>
+                      <dt>Location</dt>
+                      <dd id="employment-job-location"></dd>
+                    </div>
+                    <div>
+                      <dt>Since</dt>
+                      <dd id="employment-job-since"></dd>
+                    </div>
+                  </dl>
+                  <p>
+                    <a
+                      class="text-link"
+                      id="employment-browse"
+                      href="/workspace/jobs/"
+                      hidden
+                      >Browse open jobs →</a
+                    >
+                  </p>
+                  <div class="profile-actions" id="employment-actions" hidden>
+                    <button
+                      class="button button-secondary"
+                      type="button"
+                      id="employment-leave"
+                    ></button>
+                  </div>
+                  <div
+                    class="employment-confirm"
+                    id="employment-confirm"
+                    role="group"
+                    aria-labelledby="employment-confirm-title"
+                    hidden
+                  >
+                    <strong id="employment-confirm-title"></strong>
+                    <p id="employment-confirm-text"></p>
+                    <p id="employment-confirm-error" role="alert" hidden></p>
+                    <div class="profile-actions">
+                      <button
+                        class="button"
+                        type="button"
+                        id="employment-confirm-yes"
+                      >
+                        Yes, continue
+                      </button>
+                      <button
+                        class="button button-secondary"
+                        type="button"
+                        id="employment-confirm-no"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </section>
               <section

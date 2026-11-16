@@ -204,13 +204,16 @@ describe('Recruiter applicant review panel', () => {
       { ...applicant(3, 'Dan Declined', 'offered'), offerResponse: 'declined' },
       { ...applicant(2, 'Wes Waiting', 'offered'), offerResponse: null },
       applicant(1, 'Ian Interview', 'interview'),
+      { ...applicant(5, 'Quinn Quit', 'offered'), offerResponse: 'accepted', quitAt: '2026-11-16 10:00:00' },
     ]));
     await view.button.fire('click');
-    const [accepted, declined, waiting, interview] = [...rows(view.card)];
+    const [accepted, declined, waiting, interview, quit] = [...rows(view.card)];
     assert.match(accepted.textContent, /Offer accepted/);
     assert.match(declined.textContent, /Offer declined/);
     assert.match(waiting.textContent, /Awaiting response/);
     assert.doesNotMatch(interview.textContent, /Offer accepted|Offer declined|Awaiting response/);
+    assert.match(quit.textContent, /Left the position/);
+    assert.doesNotMatch(quit.textContent, /Offer accepted/);
   });
 
   test('applicant text is rendered as text, never as markup, and load errors are reported', async () => {

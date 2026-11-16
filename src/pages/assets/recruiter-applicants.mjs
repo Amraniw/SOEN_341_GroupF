@@ -42,11 +42,14 @@ export function createApplicantsPanel({ document, request, formatDate, onUnautho
       element('small', `Applied ${formatDate(application.appliedAt)}`),
     );
     // Once an offer is out, show the applicant's answer, or that it is still waiting.
-    const offerNote = application.offerResponse
-      ? OFFER_NOTES[application.offerResponse]
-      : application.status === 'offered' ? 'Awaiting response' : '';
+    const offerNote = application.quitAt
+      ? 'Left the position'
+      : application.offerResponse
+        ? OFFER_NOTES[application.offerResponse]
+        : application.status === 'offered' ? 'Awaiting response' : '';
     if (offerNote) {
-      main.append(element('em', offerNote, `applicant-offer applicant-offer-${application.offerResponse || 'pending'}`));
+      const kind = application.quitAt ? 'left' : application.offerResponse || 'pending';
+      main.append(element('em', offerNote, `applicant-offer applicant-offer-${kind}`));
     }
     const badge = element('span', application.statusLabel, `applicant-status applicant-status-${application.status}`);
 
