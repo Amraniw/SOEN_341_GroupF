@@ -66,9 +66,9 @@ Around 10 commits, mostly done for work on the notification system
 
 ### Suheil Almouhassel
 
-- **Work completed:** 
-- **Issues worked on:** 
-- **Pull requests / commits:**
-- **Reviews or testing performed:**
-- **Time spent:** 
+- **Work completed:** xtended the existing Resume Management system to support multiple PDF uploads, default-resume selection, individual resume deletion, and persistent SQLite storage. Also reviewed and improved the Recruiter Dashboard and Job Posting Management interface, fixing eight usability issues related to form validation, error handling, posting status visibility, confirmation messages, dark-mode compatibility, and accessibility.
+- **Issues worked on:** US-04 (Multiple Resume Management enhancement, #104), US-09 (Recruiter Job Posting Management), and Sprint 3 Recruiter Dashboard improvements.
+- **Pull requests / commits:** Implemented and pushed Multiple Resume Management on branch recruiter-dashboard, commit c07d9e7. Additional Recruiter Dashboard improvements were implemented on the same branch.
+- **Reviews or testing performed:** Conducted code reviews, automated testing, and browser verification for both features. Added 12 automated tests for Multiple Resume Management and 5 tests for Recruiter Dashboard improvements. Verified resume uploads, default selection, individual deletion, posting management, form validation, authorization, and dark-mode functionality. All 183 automated tests and 19 browser checks passed.
+- **Time spent:** 4-5 hours
 
