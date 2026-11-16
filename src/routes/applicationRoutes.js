@@ -2,8 +2,10 @@ const express = require('express');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const { createAuthenticateUser } = require('../middleware/authenticateUser');
+const { requireSameOrigin } = require('../middleware/requireSameOrigin');
 const {
   APPLICATION_STATUSES,
+  OFFER_RESPONSES,
   applicationStatusName,
 } = require('../domain/applications');
 
@@ -19,6 +21,9 @@ function publicApplication(row) {
     statusLabel: applicationStatusName(row.status),
     appliedAt: row.applied_at,
     updatedAt: row.updated_at,
+    offerResponse: row.offer_response ?? null,
+    offerRespondedAt: row.offer_responded_at ?? null,
+    quitAt: row.quit_at ?? null,
     job: {
       id: row.job_id,
       title: row.title,
@@ -34,6 +39,7 @@ function publicApplication(row) {
 
 const APPLICATION_SELECT = `
   SELECT a.id, a.user_id, a.job_id, a.status, a.applied_at, a.updated_at,
+         a.offer_response, a.offer_responded_at, a.quit_at,
          j.title, j.company, j.location, j.category,
          c.name AS category_name, j.employment_type, j.workplace_type
   FROM applications a
@@ -135,6 +141,87 @@ function createApplicationRouter(database) {
     }
   });
 
+  // A job seeker accepts or declines an offer they received. Accepting also marks
+  // them as employed (see the trigger in database/offerResponses.js). One answer
+  // only: the conditional UPDATE lets exactly one of any simultaneous requests win.
+  router.patch('/:applicationId/offer', requireSameOrigin, async (request, response, next) => {
+    if (request.authenticatedUser.role !== 'job_seeker') {
+      return response.status(403).json({ error: 'Only job seekers can respond to offers.' });
+    }
+    const applicationId = positiveInteger(Number(request.params.applicationId));
+    if (!applicationId || String(applicationId) !== request.params.applicationId) {
+      return response.status(404).json({ error: 'This application could not be found.' });
+    }
+    const body = request.body || {};
+    if (Object.keys(body).some((key) => key !== 'response')) {
+      return response.status(400).json({ error: 'The offer response contains unsupported information.' });
+    }
+    if (!OFFER_RESPONSES.includes(body.response)) {
+      return response.status(400).json({ error: 'Choose whether to accept or decline the offer.' });
+    }
+
+    try {
+      const userId = request.authenticatedUser.id;
+      const result = await database.run(
+        `UPDATE applications
+         SET offer_response = ?, offer_responded_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+         WHERE id = ? AND user_id = ? AND status = 'offered' AND offer_response IS NULL`,
+        body.response,
+        applicationId,
+        userId
+      );
+
+      if (result.changes === 0) {
+        const existing = await database.get(
+          `${APPLICATION_SELECT} WHERE a.id = ? AND a.user_id = ?`,
+          applicationId,
+          userId
+        );
+        if (!existing) {
+          return response.status(404).json({ error: 'This application could not be found.' });
+        }
+        if (existing.offer_response) {
+          return response.status(409).json({
+            error: `You already ${existing.offer_response} this offer.`,
+            application: publicApplication(existing),
+          });
+        }
+        return response.status(409).json({ error: 'This application does not have an offer to respond to.' });
+      }
+
+      // Letting the recruiter know is a convenience: it must never undo the answer.
+      try {
+        await database.run(
+          `INSERT INTO notifications (user_id, type, title, message, link, application_id, job_id)
+           SELECT j.recruiter_id, 'application_update', ?,
+                  u.name || ' ' || ? || ' your offer for ' || j.title || '.',
+                  '/recruiter/dashboard', a.id, j.id
+           FROM applications a
+           JOIN jobs j ON j.id = a.job_id
+           JOIN users u ON u.id = a.user_id
+           WHERE a.id = ? AND j.recruiter_id IS NOT NULL`,
+          body.response === 'accepted' ? 'Offer accepted' : 'Offer declined',
+          body.response,
+          applicationId
+        );
+      } catch (error) {
+        console.error('Could not notify the recruiter about the offer response:', error.message);
+      }
+
+      const row = await database.get(
+        `${APPLICATION_SELECT} WHERE a.id = ? AND a.user_id = ?`,
+        applicationId,
+        userId
+      );
+      return response.json({
+        message: body.response === 'accepted' ? 'Offer accepted.' : 'Offer declined.',
+        application: publicApplication(row),
+      });
+    } catch (error) {
+      return next(error);
+    }
+  });
+
   router.post('/', async (request, response, next) => {
     if (request.authenticatedUser.role !== 'job_seeker') {
       return response.status(403).json({ error: 'Only job seekers can submit applications.' });
@@ -155,7 +242,7 @@ function createApplicationRouter(database) {
         request.authenticatedUser.id,
         jobId
       );
-      if (existing) {
+      if (existing && !existing.quit_at) {
         return response.status(409).json({
           error: 'You have already applied for this job.',
           application: publicApplication(existing),
@@ -173,6 +260,50 @@ function createApplicationRouter(database) {
       let result;
       const resume = await database.get(`SELECT r.* FROM resumes r LEFT JOIN default_resumes d ON d.resume_id = r.id AND d.user_id = r.user_id WHERE r.user_id = ? ORDER BY (d.resume_id IS NOT NULL) DESC, r.uploaded_at DESC, r.id DESC LIMIT 1`, request.authenticatedUser.id);
       const resumeContent = resume ? await fs.readFile(path.resolve(__dirname, '../..', resume.file_path)) : null;
+      // Someone who left a job they accepted may apply to it again. The same
+      // application starts over, so its history stays in one place.
+      if (existing) {
+        const restart = await database.run(
+          `UPDATE applications
+           SET status = 'applied', applied_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP,
+               offer_response = NULL, offer_responded_at = NULL, quit_at = NULL
+           WHERE id = ? AND user_id = ? AND quit_at IS NOT NULL`,
+          existing.id,
+          request.authenticatedUser.id
+        );
+        if (restart.changes === 0) {
+          return response.status(409).json({ error: 'You have already applied for this job.' });
+        }
+        await database.run('DELETE FROM application_resumes WHERE application_id = ?', existing.id);
+        if (resumeContent) {
+          await database.run(
+            'INSERT INTO application_resumes (application_id, original_name, content) VALUES (?, ?, ?)',
+            existing.id, resume.original_name, resumeContent
+          );
+        }
+        try {
+          await database.run(
+            `INSERT INTO notifications (user_id, type, title, message, link, application_id, job_id)
+             SELECT j.recruiter_id, 'new_application', 'New application',
+                    u.name || ' applied again for ' || j.title || '.', '/recruiter/dashboard', a.id, j.id
+             FROM applications a JOIN jobs j ON j.id = a.job_id JOIN users u ON u.id = a.user_id
+             WHERE a.id = ? AND j.recruiter_id IS NOT NULL`,
+            existing.id
+          );
+        } catch (error) {
+          console.error('Could not notify the recruiter about the new application:', error.message);
+        }
+        const restarted = await database.get(
+          `${APPLICATION_SELECT} WHERE a.id = ? AND a.user_id = ?`,
+          existing.id,
+          request.authenticatedUser.id
+        );
+        return response.status(201).json({
+          message: 'Application submitted successfully.',
+          application: publicApplication(restarted),
+        });
+      }
+
       try {
         result = await database.run(
           `INSERT INTO applications (user_id, job_id)
