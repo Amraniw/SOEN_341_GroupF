@@ -75,3 +75,9 @@
 .candidate-card details { padding:16px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
 .candidate-card summary { font-weight:650; font-size:13px; }
 .candidate-card form { justify-content:space-between; }
+.inline-candidate-review { margin-top:24px; padding-top:24px; border-top:1px solid var(--border); animation:applicants-reveal 180ms ease-out; }
+.inline-candidate-review[hidden] { display:none; }
+.inline-candidate-review h2 { font-size:18px; }
+.recruiter-card { scroll-margin-top:110px; }
+@keyframes applicants-reveal { from { opacity:0; transform:translateY(-5px); } to { opacity:1; transform:translateY(0); } }
+@media(prefers-reduced-motion:reduce) { .inline-candidate-review { animation:none; } }

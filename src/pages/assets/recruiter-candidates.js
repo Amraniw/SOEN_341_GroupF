@@ -1,14 +1,13 @@
 import { request } from './api.js';
 import { escapeHtml } from './ui.js';
 
-export function setupCandidateReview() {
-  const id = new URLSearchParams(location.search).get('applicants');
+function mountCandidateReview(id, card) {
   if (!id || !/^[1-9]\d*$/.test(id)) return;
   const panel = document.createElement('section');
-  panel.className = 'panel';
-  panel.id = 'candidate-review';
+  panel.className = 'inline-candidate-review';
+  panel.id = `candidate-review-${id}`;
   panel.innerHTML = `<h2 tabindex="-1">Review applicants</h2><form class="candidate-filters"><label>Status<select name="status"><option value="">All statuses</option></select></label><button class="button button-secondary">Filter applicants</button></form><p role="status" aria-live="polite"></p><div class="candidate-list"></div>`;
-  document.querySelector('#postings').before(panel);
+  card.append(panel);
   const form = panel.querySelector('form');
   const notice = panel.querySelector('[role=status]');
   const list = panel.querySelector('.candidate-list');
@@ -50,4 +49,39 @@ export function setupCandidateReview() {
     finally { button.disabled = false; }
   });
   load();
+}
+
+export function setupCandidateReview() {
+  const postings = document.querySelector('#posting-list');
+  if (!postings) return;
+  function expand(link) {
+    const id = new URL(link.href, location.href).searchParams.get('applicants');
+    const card = link.closest('.recruiter-card');
+    if (!card || !/^[1-9]\d*$/.test(id || '')) return;
+    let panel = card.querySelector('.inline-candidate-review');
+    if (!panel) { mountCandidateReview(id, card); panel = card.querySelector('.inline-candidate-review'); }
+    else panel.hidden = !panel.hidden;
+    link.setAttribute('aria-expanded', String(!panel.hidden));
+    link.setAttribute('aria-controls', panel.id);
+    link.textContent = panel.hidden ? 'Review applicants' : 'Hide applicants';
+  }
+  postings.addEventListener('click', (event) => {
+    const link = event.target.closest('a[data-review-applicants]');
+    if (!link || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    expand(link);
+  });
+  const requested = new URLSearchParams(location.search).get('applicants');
+  if (!requested) return;
+  function openRequested() {
+    const link = [...postings.querySelectorAll('a[data-review-applicants]')].find((item) => new URL(item.href, location.href).searchParams.get('applicants') === requested);
+    if (!link) return false;
+    expand(link);
+    link.closest('.recruiter-card').scrollIntoView({ block: 'start' });
+    return true;
+  }
+  if (!openRequested()) {
+    const observer = new MutationObserver(() => { if (openRequested()) observer.disconnect(); });
+    observer.observe(postings, { childList: true });
+  }
 }

@@ -247,6 +247,8 @@ export function createRecruiterDashboard({ document, request, formatDate, onUnau
       actions.append(editButton, lifecycle, remove);
       const applicants = element('a', 'Review applicants', 'button button-secondary');
       applicants.href = `?applicants=${job.id}#candidate-review`;
+      applicants.setAttribute('data-review-applicants', '');
+      applicants.setAttribute('aria-expanded', 'false');
       actions.append(applicants);
       if (job.status === 'open') {
         const view = element('a', 'View public posting', 'text-link');
