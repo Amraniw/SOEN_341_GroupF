@@ -1,13 +1,15 @@
 
 ## Team Contributions
 
+## Team Contributions
+
 ### Rayane Lkotbi
 
-- **Work completed:** 
-- **Issues worked on:** 
-- **Pull requests / commits:**
-- **Reviews or testing performed:**
-- **Time spent:** 
+- **Work completed:** Created and organized Sprint 3 issues and tasks, developed the AI-Powered Resume Feedback feature, prepared acceptance tests for all user stories, maintained sprint planning and documentation, and updated the project backlog and work plan.
+- **Issues worked on:** US-17 (AI-Powered Resume Feedback), US-16 (Notifications and Reminders), US-08 (Recruiter Application Dashboard), US-10 (Job-Seeker Application Dashboard), acceptance testing issues, and Sprint 3 project management tasks.
+- **Pull requests / commits:** Created pull requests for the Notifications and Reminders feature and Recruiter Application Dashboard. Contributed to the implementation of AI-Powered Resume Feedback and related documentation.
+- **Reviews or testing performed:** Developed acceptance tests for all user stories, reviewed feature implementations, verified requirements coverage, and participated in reviewing and integrating Sprint 3 functionality.
+- **Time spent:** Approximately 6 hours.
 
 
 ### Wassim Amrani
@@ -16,7 +18,7 @@
 - **Issues worked on:** Feature 2 – Application Analytics and History Dashboard; user profile picture enhancement; Sprint 3 project management.
 - **Pull requests / commits:** Implemented and pushed changes on branch `codex/application-analytics-dashboard`, commit `c9bcc08`. Created a pull request for the Sprint 3 implementation.
 - **Reviews or testing performed:** Reviewed the dashboard visually and manually tested its main functionality. Verified the application statistics, filters, history display, and interface. Fixed the profile picture upload issue and confirmed the feature worked. Ran automated regression tests with 185 tests passing and 0 failures.
-- **Time spent:** Approximately 1–2 hours.
+- **Time spent:** Approximately 5-6 hours.
 
 
 ### Carla Reis
