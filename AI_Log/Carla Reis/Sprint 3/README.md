@@ -34,7 +34,7 @@ Carla Sophia Reis Lopez
 
 ---
 
-User Cases for All User Stories and GitHub Issues
+## User Cases for All User Stories and GitHub Issues
 **Claude Chat Link:** https://claude.ai/share/a7532ae5-b1bf-48fc-8aff-44834a0e8f72
 
 **Purpose of AI Use:** 
