@@ -245,6 +245,9 @@ export function createRecruiterDashboard({ document, request, formatDate, onUnau
       remove.setAttribute('aria-label', `Delete ${job.title}`);
       for (const button of [editButton, lifecycle, remove]) button.setAttribute('data-management', '');
       actions.append(editButton, lifecycle, remove);
+      const applicants = element('a', 'Review applicants', 'button button-secondary');
+      applicants.href = `?applicants=${job.id}#candidate-review`;
+      actions.append(applicants);
       if (job.status === 'open') {
         const view = element('a', 'View public posting', 'text-link');
         view.href = `/jobs/${job.id}`;

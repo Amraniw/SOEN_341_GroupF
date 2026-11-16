@@ -1,0 +1,344 @@
+body[data-page='resume'] .workspace-main {
+  max-width: 1380px;
+}
+
+.resume-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 24px;
+}
+
+@media (min-width: 1120px) {
+  .resume-layout:has(.review-panel:not([hidden])) {
+    grid-template-columns: minmax(315px, 0.9fr) minmax(0, 1.55fr);
+  }
+}
+
+.resume-management, .review-panel {
+  container-type: inline-size;
+  min-width: 0;
+}
+
+@container (max-width: 470px) {
+  .resume-management .resume-receipt {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    align-items: start;
+    gap: 10px 12px;
+  }
+
+  .resume-management .resume-receipt-actions {
+    grid-column: 2;
+    margin-inline-start: 0;
+    flex-wrap: wrap;
+  }
+
+  .resume-management .resume-receipt .badge { margin-inline-start: 0; }
+  .resume-management .resume-receipt-actions button { white-space: nowrap; }
+}
+
+.resume-tips {
+  padding-block: 16px;
+}
+
+.resume-tips summary {
+  cursor: pointer;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.review-panel {
+  padding: 0;
+  overflow-wrap: anywhere;
+}
+
+.review-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: clamp(18px, 3vw, 28px);
+  border-bottom: 1px solid var(--border);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: var(--brand-soft);
+}
+
+.review-header .icon-tile {
+  flex-shrink: 0;
+  color: var(--brand);
+  background: var(--surface);
+}
+
+.review-header h2 {
+  margin: 0;
+  font-size: clamp(20px, 2vw, 25px);
+  letter-spacing: -0.035em;
+}
+
+.review-header p, .review-form p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.review-form, #review-output {
+  margin-inline: clamp(18px, 3vw, 28px);
+}
+
+.review-form {
+  margin-block: 23px 0;
+}
+
+.review-form label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.review-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 158px;
+  gap: 10px;
+}
+
+.review-controls select {
+  min-width: 0;
+  width: 100%;
+  min-height: 46px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  transition: border-color 140ms ease, background-color 140ms ease;
+}
+
+.review-controls select:hover:not(:disabled) { border-color: var(--brand); }
+.review-controls select:disabled { color: var(--muted); }
+
+.review-controls :is(select, button):focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.review-controls .button {
+  display: grid;
+  grid-template-columns: 13px auto 13px;
+  justify-content: center;
+  gap: 5px;
+  padding-inline: 10px;
+  transition: background-color 140ms ease, transform 140ms var(--ease-standard);
+}
+
+.review-controls .button:hover:not(:disabled), .review-controls .button.is-busy {
+  box-shadow: var(--shadow-sm);
+  transform: none;
+}
+
+.review-controls .button:active:not(:disabled):not(.is-busy) { transform: translateY(1px); }
+
+.review-controls .button.is-busy {
+  background: var(--brand);
+  opacity: 0.9;
+  cursor: progress;
+}
+
+#review-action-label { grid-column: 2; grid-row: 1; }
+
+.review-activity {
+  grid-column: 1;
+  grid-row: 1;
+  width: 13px;
+  height: 13px;
+  border: 1.5px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: review-start 440ms var(--ease-out) both;
+}
+
+@keyframes review-start {
+  from { opacity: 0.45; transform: rotate(-140deg); }
+  to { opacity: 0.9; transform: rotate(0); }
+}
+
+.review-form p { margin-top: 8px; font-size: 12px; }
+
+#review-output { display: flow-root; }
+
+.review-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 16px 0 19px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.review-status-file { color: var(--muted); font-weight: 500; }
+
+.review-status[data-state='complete'] .review-status-file::before {
+  content: ' ·';
+  white-space: pre;
+}
+
+.review-status[data-state='pending'], .review-status[data-state='complete'] {
+  color: var(--brand);
+  font-weight: 650;
+}
+
+.review-status-mark {
+  display: none;
+  flex: 0 0 18px;
+  place-items: center;
+  height: 18px;
+  margin-top: 1px;
+  border-radius: 50%;
+}
+
+.review-status[data-state='pending'] .review-status-mark,
+.review-status[data-state='complete'] .review-status-mark {
+  display: grid;
+  background: var(--brand-soft);
+}
+
+.review-status[data-state='pending'] .review-status-mark::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+}
+
+.review-status-mark > span { display: none; }
+.review-status[data-state='complete'] .review-status-mark > span { display: grid; }
+.review-status-mark .icon { width: 12px; height: 12px; stroke-width: 2; }
+
+.review-status[data-state='complete'] .review-status-mark {
+  animation: review-enter 180ms var(--ease-out) both;
+}
+
+.review-status[data-state='error'], .review-status[data-state='non-resume'] {
+  padding: 11px 13px;
+  border: 1px solid var(--border);
+  border-inline-start: 3px solid currentColor;
+  border-radius: var(--radius-sm);
+}
+
+.review-status[data-state='error'] {
+  color: var(--error);
+  background: color-mix(in srgb, var(--error) 4%, var(--surface));
+}
+
+.review-loading {
+  display: grid;
+  gap: 15px;
+  padding: 18px 0 24px;
+  border-top: 1px solid var(--border);
+  animation: review-enter 180ms var(--ease-out) 100ms both;
+}
+
+.review-skeleton-copy { display: grid; gap: 8px; }
+.review-skeleton-roles { display: flex; gap: 7px; }
+
+.review-loading span {
+  display: block;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--brand-soft);
+}
+
+.review-skeleton-copy span:first-child { width: min(32%, 130px); height: 10px; margin-bottom: 3px; }
+.review-skeleton-copy span:nth-child(2) { width: min(93%, 520px); }
+.review-skeleton-copy span:last-child { width: min(70%, 400px); }
+.review-skeleton-roles span { width: clamp(42px, 22%, 112px); height: 20px; }
+.review-skeleton-roles span:nth-child(2) { width: clamp(42px, 17%, 85px); }
+
+.review-feedback {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: 24px;
+  padding-bottom: 10px;
+}
+
+.review-section {
+  padding-block: 18px 19px;
+  border-top: 1px solid var(--border);
+}
+
+.review-profile, .review-roles { grid-column: 1 / -1; }
+
+.review-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 9px;
+  font-size: 16px;
+  letter-spacing: -0.015em;
+}
+
+.review-section h3 .icon { width: 17px; height: 17px; color: var(--brand); }
+
+.review-section p, .review-section ul {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.review-profile p { max-width: 68ch; }
+.review-section ul { padding-inline-start: 19px; }
+.review-section li + li { margin-block-start: 7px; }
+.review-section li::marker { color: var(--brand); }
+
+.review-roles ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  list-style: none;
+  padding: 0;
+}
+
+.review-roles li {
+  padding: 5px 9px;
+  border-radius: var(--radius-sm);
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.review-roles li + li { margin-block-start: 0; }
+
+.review-reveal .review-section {
+  animation: review-enter 190ms var(--ease-out) both;
+}
+
+.review-reveal .review-roles { animation-delay: 40ms; }
+.review-reveal .review-strengths { animation-delay: 80ms; }
+.review-reveal .review-improvements { animation-delay: 110ms; }
+
+@keyframes review-enter {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+@container (max-width: 480px) {
+  .review-feedback { grid-template-columns: minmax(0, 1fr); }
+}
+
+@container (max-width: 390px) {
+  .review-controls { grid-template-columns: minmax(0, 1fr); }
+  .review-status-file { display: block; }
+  .review-status[data-state='complete'] .review-status-file::before { content: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .review-reveal .review-section, .review-activity, .review-loading,
+  .review-status[data-state='complete'] .review-status-mark { animation: none; }
+  .review-controls :is(select, button) { transition: none; }
+  .review-controls .button:active:not(:disabled):not(.is-busy) { transform: none; }
+}

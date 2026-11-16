@@ -5,7 +5,7 @@ const { publicNotification, idleWarningNotification } = require('../domain/notif
 
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 50;
-const COLUMNS = 'id, type, title, message, link, created_at, read_at';
+const COLUMNS = 'id, type, title, message, link, created_at, read_at, job_id';
 
 function readListQuery(query) {
   if (Object.keys(query).some((key) => !['limit', 'unread'].includes(key))) {

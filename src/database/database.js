@@ -127,6 +127,10 @@ async function initializeDatabase(databasePath = process.env.DB_PATH || DEFAULT_
     END;
   `);
 
+  await database.exec(`CREATE TABLE IF NOT EXISTS application_resumes (
+    application_id INTEGER PRIMARY KEY REFERENCES applications(id) ON DELETE CASCADE,
+    original_name TEXT NOT NULL, content BLOB NOT NULL
+  )`);
   // Users keep several resumes and choose one default. A separate table leaves
   // existing resume rows untouched: user_id as the primary key allows a single
   // default per user, and the (resume_id, user_id) foreign key only accepts the

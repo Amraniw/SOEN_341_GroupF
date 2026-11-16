@@ -1,8 +1,9 @@
 // Same-origin requests use the backend's HttpOnly session cookie.
 export class ApiError extends Error {
-  constructor(message, status = 0) {
+  constructor(message, status = 0, code) {
     super(message);
     this.status = status;
+    this.code = code;
   }
 }
 
@@ -26,7 +27,8 @@ export async function request(path, body, method = 'POST') {
       if (response.status >= 500) {
         throw new ApiError(
           'The service is having trouble right now. Your details are still here—please try again.',
-          response.status
+          response.status,
+          data?.code
         );
       }
       if (response.status === 404 || response.status === 405) {

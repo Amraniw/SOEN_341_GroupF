@@ -1,10 +1,12 @@
 import { session } from './workspace.js';
 import { request } from './api.js';
 import { clearDisplaySession } from './session.js';
+import { createResumeReview } from './resume-review.mjs';
 import {
   escapeHtml,
   icon,
   formatDate,
+  formatDateTime,
   formatSize,
   hideMessage,
   showMessage,
@@ -30,6 +32,9 @@ if (session) {
   let busy = false;
   let selectionVersion = 0;
   let deleteConfirmationTimeout = null;
+  const review = session.user.role === 'job_seeker'
+    ? createResumeReview({ document, request, formatDateTime, onUnauthorized: expireSession })
+    : null;
 
   function expireSession() {
     clearDisplaySession();
@@ -105,6 +110,7 @@ if (session) {
       button.disabled = busy;
     });
     count.textContent = `${resumes.length} saved`;
+    review?.setResumes(resumes);
   }
 
   async function loadResumes() {
@@ -116,6 +122,7 @@ if (session) {
         return;
       }
       listLoading.hidden = true;
+      review?.showLoadError();
       showMessage(listNotice, error.message);
     }
   }
@@ -278,6 +285,7 @@ if (session) {
         undefined,
         'DELETE'
       );
+      review?.setResumes(resumes.filter(({ id }) => id !== resume.id));
       // The upload area may still describe the upload that was just deleted.
       if (drop.dataset.uploadState === 'complete') resetSelection();
       let message = `“${resume.originalName}” was deleted. Your other resumes are unchanged.`;

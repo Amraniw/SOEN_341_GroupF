@@ -1,96 +1,76 @@
-import { icon } from './ui.js';
+import './ui.js';
 import { initPublicHeader } from './public-header.js';
+import { workspaceHome } from './workspace-role.mjs';
 
-initPublicHeader();
+const primaryLinks = document.querySelectorAll('[data-home-primary]');
+const footer = document.querySelector('[data-home-footer]');
+const jobLinks = document.querySelectorAll('[data-home-jobs]');
+const seekerLinks = document.querySelectorAll('[data-seeker-entry]');
+const recruiterLink = document.querySelector('[data-home-recruiter]');
 
-const preview = document.querySelector('.product-preview');
+function setEntry(link, path, label) {
+  link.href = path;
+  link.querySelector('[data-entry-label]').textContent = label;
+}
 
-if (preview) {
-  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const windowSurface = preview.querySelector('.preview-window');
-  const title = preview.querySelector('[data-preview-title]');
-  const copy = preview.querySelector('[data-preview-copy]');
-  const resumeRow = preview.querySelector('[data-preview-resume]');
-  const resumeLabel = preview.querySelector('[data-preview-resume-label]');
-  const resumeBadge = preview.querySelector('[data-preview-resume-badge]');
-  const controls = [...preview.querySelectorAll('[data-preview-step]')];
-  const states = {
-    account: {
-      title: 'A good place to start.',
-      copy: 'One account. Your next chapter.',
-      resumeLabel: 'Add your resume',
-      resumeBadge: 'Next step',
-      label:
-        'Illustrative workspace preview. Account created; resume is the next step.',
-    },
-    resume: {
-      title: 'Your essentials, together.',
-      copy: 'Your workspace is ready for what comes next.',
-      resumeLabel: 'Resume uploaded',
-      resumeBadge: 'Ready',
-      label:
-        'Illustrative workspace preview. Account and resume are complete; workspace is ready.',
-    },
-  };
-  let state = 'account';
-  let changeTimer;
-
-  function render(nextState) {
-    if (nextState === state || !states[nextState]) return;
-    clearTimeout(changeTimer);
-    preview.classList.add('is-changing');
-    changeTimer = setTimeout(
-      () => {
-        state = nextState;
-        const next = states[state];
-        title.textContent = next.title;
-        copy.textContent = next.copy;
-        resumeLabel.textContent = next.resumeLabel;
-        resumeBadge.textContent = next.resumeBadge;
-        resumeBadge.className = `badge ${state === 'resume' ? 'badge-success' : 'badge-neutral'}`;
-        resumeRow.querySelector('.icon').outerHTML = icon(
-          state === 'resume' ? 'check' : 'file'
-        );
-        preview.dataset.previewState = state;
-        windowSurface.setAttribute('aria-label', next.label);
-        controls.forEach((control) =>
-          control.setAttribute(
-            'aria-pressed',
-            String(control.dataset.previewStep === state)
-          )
-        );
-        requestAnimationFrame(() => preview.classList.remove('is-changing'));
-      },
-      reduceMotion ? 0 : 120
-    );
-  }
-
-  controls.forEach((control) =>
-    control.addEventListener('click', () => render(control.dataset.previewStep))
-  );
-
-  const pointerMotion = matchMedia(
-    '(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)'
-  );
-  let frame;
-  function updatePointer(event) {
-    if (!pointerMotion.matches) return;
-    cancelAnimationFrame(frame);
-    frame = requestAnimationFrame(() => {
-      const bounds = preview.getBoundingClientRect();
-      const x = (event.clientX - bounds.left) / bounds.width;
-      const y = (event.clientY - bounds.top) / bounds.height;
-      preview.style.setProperty('--pointer-x', `${x * 100}%`);
-      preview.style.setProperty('--pointer-y', `${y * 100}%`);
-      preview.style.setProperty('--pointer-opacity', '1');
-      preview.style.setProperty('--preview-shift-x', `${(x - 0.5) * 6}px`);
-      preview.style.setProperty('--preview-shift-y', `${(y - 0.5) * 6}px`);
+initPublicHeader({
+  onSessionChange(session) {
+    const role = session?.user.role;
+    const recruiter = role === 'recruiter';
+    const home = workspaceHome(role);
+    const label = recruiter ? 'Recruiter dashboard' : 'Your workspace';
+    primaryLinks.forEach((link) => {
+      setEntry(link, session ? home : '/auth/signup.html', session ? label : 'Create account');
     });
-  }
-  preview.addEventListener('pointermove', updatePointer, { passive: true });
-  preview.addEventListener('pointerleave', () => {
-    preview.style.setProperty('--pointer-opacity', '0');
-    preview.style.setProperty('--preview-shift-x', '0px');
-    preview.style.setProperty('--preview-shift-y', '0px');
+    setEntry(footer, session ? home : '/auth/login.html', session ? label : 'Sign in');
+    jobLinks.forEach((link) => { link.href = session ? '/workspace/jobs/' : '/jobs/'; });
+    recruiterLink.hidden = Boolean(session) && !recruiter;
+    seekerLinks.forEach((link) => {
+      link.hidden = recruiter;
+      if (session && !recruiter) setEntry(link, link.dataset.seekerEntry, link.dataset.signedInLabel);
+    });
+  },
+});
+
+// Keep section links on this document whether the home page opened at / or /index.html.
+document.querySelectorAll('[data-public-header] .public-nav a[href*="#"]').forEach((link) => {
+  link.href = link.hash;
+});
+
+const tabList = document.querySelector('.home-preview-tabs');
+const tabs = Array.from(tabList.querySelectorAll('[role="tab"]'));
+const panels = tabs.map((tab) => document.getElementById(tab.getAttribute('aria-controls')));
+let selected = 0;
+
+function selectTab(index) {
+  if (index === selected) return;
+  selected = index;
+  tabList.style.setProperty('--active-tab', index);
+  tabs.forEach((tab, position) => {
+    const active = position === index;
+    tab.setAttribute('aria-selected', String(active));
+    tab.tabIndex = active ? 0 : -1;
+    panels[position].hidden = !active;
   });
 }
+
+tabs.forEach((tab, index) => {
+  panels[index].setAttribute('role', 'tabpanel');
+  panels[index].setAttribute('aria-labelledby', tab.id);
+  panels[index].tabIndex = 0;
+
+  tab.addEventListener('click', () => selectTab(index));
+  tab.addEventListener('keydown', (event) => {
+    const target = {
+      ArrowRight: (index + 1) % tabs.length,
+      ArrowLeft: (index + tabs.length - 1) % tabs.length,
+      Home: 0,
+      End: tabs.length - 1,
+    }[event.key];
+    if (typeof target !== 'number') return;
+    event.preventDefault();
+    selectTab(target);
+    tabs[target].focus();
+  });
+});
+tabList.hidden = false;

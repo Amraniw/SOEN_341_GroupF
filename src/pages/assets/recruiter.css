@@ -58,3 +58,20 @@
   .recruiter-list-row { grid-template-columns: minmax(0, 1fr); }
   .recruiter-actions .button { flex: 1 1 auto; }
 }
+.candidate-filters { display:flex; flex-wrap:wrap; gap:16px; align-items:end; margin:24px 0; }
+.candidate-filters label, .candidate-card label { display:grid; gap:8px; font-size:12px; }
+.candidate-filters input, .candidate-filters select, .candidate-card select { padding:10px; background:var(--canvas); color:var(--ink); border:1px solid var(--border); border-radius:6px; }
+.candidate-card { padding:24px 0; border-top:1px solid var(--border); overflow-wrap:anywhere; }
+.candidate-card form { display:flex; flex-wrap:wrap; align-items:end; gap:16px; margin-top:20px; }
+.candidate-card summary { cursor:pointer; color:var(--brand); }
+#candidate-review { margin-bottom:24px; scroll-margin-top:100px; }
+#postings { scroll-margin-top: 110px; }
+.candidate-resume { display:block; width:100%; height:75vh; min-height:400px; margin-top:20px; border:1px solid var(--border); border-radius:8px; background:var(--canvas); }
+.candidate-filters[hidden] { display:none; }
+.candidate-list { margin-top:20px; }
+.candidate-card { background:var(--canvas); border:1px solid var(--border); border-radius:12px; padding:24px; margin-bottom:16px; }
+.candidate-card h3 { margin-bottom:4px; }
+.candidate-card > p { font-size:13px; margin-bottom:20px; }
+.candidate-card details { padding:16px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+.candidate-card summary { font-weight:650; font-size:13px; }
+.candidate-card form { justify-content:space-between; }
