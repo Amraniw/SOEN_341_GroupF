@@ -16,7 +16,7 @@
 - **Issues worked on:** Feature 2 – Application Analytics and History Dashboard; user profile picture enhancement; Sprint 3 project management.
 - **Pull requests / commits:** Implemented and pushed changes on branch `codex/application-analytics-dashboard`, commit `c9bcc08`. Created a pull request for the Sprint 3 implementation.
 - **Reviews or testing performed:** Reviewed the dashboard visually and manually tested its main functionality. Verified the application statistics, filters, history display, and interface. Fixed the profile picture upload issue and confirmed the feature worked. Ran automated regression tests with 185 tests passing and 0 failures.
-- **Time spent:** Approximately 1–2 hours.
+- **Time spent:** Approximately 5-6 hours.
 
 
 ### Carla Reis
