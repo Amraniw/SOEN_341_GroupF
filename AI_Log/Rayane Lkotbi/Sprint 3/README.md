@@ -2,7 +2,7 @@
 
 This document records the main AI-assisted planning and requirements activities carried out during Sprint 3 of CareerConnect. ChatGPT was used to interpret the sprint guidelines, review the backlog, and prepare sprint documentation. Codex activities are reserved below for separate reporting. AI-generated material must be checked against the official guidelines, repository issues, and the team's actual implementation before submission.
 
-**ChatGPT Chat Link:**
+**ChatGPT Chat Link:** [https://chatgpt.com/share/6afb4569-39a4-83ea-ab8a-9424fcaba9f0]
 
 **Codex Chat Link:**
 
