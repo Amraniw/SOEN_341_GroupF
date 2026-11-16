@@ -23,11 +23,11 @@
 
 ### Carla Reis
 
-- **Work completed:** 
-- **Issues worked on:** 
-- **Pull requests / commits:**
-- **Reviews or testing performed:**
-- **Time spent:** 
+- **Work completed:** Worked on the notifications and reminders feature. Added to Adam's implementation by creating notifications when a new job posting that matches a job seekers's headline or location. Also recruiters get notifications when someone has applied for their job posting in order to be able to see their profile and resumes (to be implemented). Moreover, added a reminder whenever a job posting is about to close, this was possible by adding the field of deadline to apply when a recruiter is creating a job posting. Worked also on part of the documentation.
+- **Issues worked on:** Feature 3 - Notifications and Reminders; user cases; documentation.
+- **Pull requests / commits:** Pull request for adding some features to the notifications and reminders, and commits for the documentation.
+- **Reviews or testing performed:** Checked that the notifications are in fact received from both ends (job seeker and recruiter), reviewed the documentation for final submission
+- **Time spent:** 4-5 hours
 
 ### Adam El Fadil
 
