@@ -3,7 +3,7 @@
 
 ### Rayane Lkotbi
 
-- **Work completed:** Created and organized Sprint 3 issues and tasks, developed the AI-Powered Resume Feedback feature, prepared acceptance tests for all user stories, maintained sprint planning and documentation, and updated the project backlog and work plan.
+- **Work completed:** Created and organized Sprint 3 issues and tasks, developed the AI-Powered Resume Feedback feature, prepared acceptance tests for all user stories, maintained sprint planning and documentation, and updated the project backlog and work plan. Also developed workflow and CI integrations.
 - **Issues worked on:** US-17 (AI-Powered Resume Feedback), US-16 (Notifications and Reminders), US-08 (Recruiter Application Dashboard), US-10 (Job-Seeker Application Dashboard), acceptance testing issues, and Sprint 3 project management tasks.
 - **Pull requests / commits:** Created pull requests for the Notifications and Reminders feature and Recruiter Application Dashboard. Contributed to the implementation of AI-Powered Resume Feedback and related documentation.
 - **Reviews or testing performed:** Developed acceptance tests for all user stories, reviewed feature implementations, verified requirements coverage, and participated in reviewing and integrating Sprint 3 functionality.
