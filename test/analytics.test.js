@@ -27,6 +27,11 @@ test('analytics enforces identity, validates ranges and keeps accounts isolated'
     await db.run("UPDATE applications SET status = 'rejected' WHERE user_id = ?", user.id);
     const updated = (await agent.get('/api/applications/analytics?range=all').expect(200)).body;
     assert.equal(updated.active, 0);
-    assert.equal(updated.history.length, 2);
+    assert.equal(updated.history.length, 1);
+    assert.equal(updated.history[0].status, 'rejected');
+    await db.run("UPDATE applications SET status = 'interview' WHERE user_id = ?", user.id);
+    const latest = (await agent.get('/api/applications/analytics?range=all').expect(200)).body;
+    assert.equal(latest.history.length, 1);
+    assert.equal(latest.history[0].status, 'interview');
   } finally { await db.close(); }
 });

@@ -1,4 +1,6 @@
 const express = require('express');
+const fs = require('node:fs/promises');
+const path = require('node:path');
 const { createAuthenticateUser } = require('../middleware/authenticateUser');
 const {
   APPLICATION_STATUSES,
@@ -52,7 +54,7 @@ function createApplicationRouter(database) {
     try {
       const cutoff = range === 'all' ? '0000-01-01' : new Date(Date.now() - (Number(range) - 1) * 86400000).toISOString().slice(0, 10);
       const rows = await database.all(`${APPLICATION_SELECT} WHERE a.user_id = ? AND date(a.applied_at) >= ? ORDER BY a.applied_at DESC, a.id DESC`, request.authenticatedUser.id, cutoff);
-      const history = await database.all(`SELECT h.application_id, h.status, h.changed_at, j.title, j.company FROM application_status_history h JOIN applications a ON a.id = h.application_id JOIN jobs j ON j.id = a.job_id WHERE a.user_id = ? AND date(h.changed_at) >= ? ORDER BY h.changed_at DESC, h.id DESC LIMIT 100`, request.authenticatedUser.id, cutoff);
+      const history = await database.all(`SELECT a.id AS application_id, a.status, a.updated_at AS changed_at, j.title, j.company FROM applications a JOIN jobs j ON j.id = a.job_id WHERE a.user_id = ? AND date(a.updated_at) >= ? ORDER BY datetime(a.updated_at) DESC, a.id DESC LIMIT 100`, request.authenticatedUser.id, cutoff);
       const counts = APPLICATION_STATUSES.map(({ id, name }) => ({ id, name, count: rows.filter((row) => row.status === id).length }));
       const months = new Map();
       for (const row of rows) { const month = row.applied_at.slice(0, 7); months.set(month, (months.get(month) || 0) + 1); }
@@ -169,6 +171,8 @@ function createApplicationRouter(database) {
       }
 
       let result;
+      const resume = await database.get(`SELECT r.* FROM resumes r LEFT JOIN default_resumes d ON d.resume_id = r.id AND d.user_id = r.user_id WHERE r.user_id = ? ORDER BY (d.resume_id IS NOT NULL) DESC, r.uploaded_at DESC, r.id DESC LIMIT 1`, request.authenticatedUser.id);
+      const resumeContent = resume ? await fs.readFile(path.resolve(__dirname, '../..', resume.file_path)) : null;
       try {
         result = await database.run(
           `INSERT INTO applications (user_id, job_id)
@@ -183,6 +187,7 @@ function createApplicationRouter(database) {
         throw error;
       }
 
+      if (resumeContent) await database.run('INSERT INTO application_resumes (application_id, original_name, content) VALUES (?, ?, ?)', result.lastID, resume.original_name, resumeContent);
       const application = await database.get(
         `${APPLICATION_SELECT} WHERE a.id = ? AND a.user_id = ?`,
         result.lastID,

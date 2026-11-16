@@ -16,7 +16,9 @@ function publicNotification(row) {
     type: row.type,
     title: row.title,
     message: row.message,
-    link: row.link,
+    link: row.type === 'new_application' && Number.isSafeInteger(row.job_id)
+      ? `/recruiter/dashboard?applicants=${row.job_id}#candidate-review`
+      : row.link,
     createdAt: row.created_at,
     readAt: row.read_at,
     read: row.read_at !== null,

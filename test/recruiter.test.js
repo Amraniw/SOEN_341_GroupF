@@ -55,6 +55,54 @@ describe('Feature 4 Phase 02: secure recruiter posting API', () => {
   async function apply(jobId) {
     return (await seeker.agent.post('/api/applications').send({ jobId }).expect(201)).body.application;
   }
+  test('owned applicant review, filters and status updates preserve history and notify the seeker', async () => {
+    const job = await create();
+    const application = await apply(job.id);
+    const path = `/api/recruiter/jobs/${job.id}/applications`;
+    const received = await recruiter.agent.get('/api/notifications').expect(200);
+    const alert = received.body.items.find((item) => item.type === 'new_application' && item.link.includes(`applicants=${job.id}`));
+    assert.ok(alert);
+    assert.match(alert.message, /Posting QA/);
+    const outsiderAlerts = await other.agent.get('/api/notifications').expect(200);
+    assert.ok(!outsiderAlerts.body.items.some((item) => item.link?.includes(`applicants=${job.id}`)));
+    const list = await recruiter.agent.get(path).expect(200);
+    assert.equal(list.body.items.length, 1);
+    assert.equal(list.body.items[0].email, 'seeker@example.test');
+    await other.agent.get(path).expect(404);
+    await seeker.agent.get(path).expect(403);
+    await recruiter.agent.get(`${path}?from=2026-02-30`).expect(400);
+    assert.equal((await recruiter.agent.get(`${path}?status=offered`).expect(200)).body.items.length, 0);
+    await mutation(other, 'patch', `${path}/${application.id}/status`, { status: 'interview' }).expect(404);
+    await mutation(recruiter, 'patch', `${path}/${application.id}/status`, { status: 'invalid' }).expect(400);
+    await mutation(recruiter, 'patch', `${path}/${application.id}/status`, { status: 'interview' }).expect(200);
+    assert.equal((await recruiter.agent.get(`${path}?status=interview`).expect(200)).body.items.length, 1);
+    const detail = await seeker.agent.get(`/api/applications/${application.id}`).expect(200);
+    assert.equal(detail.body.application.status, 'interview');
+    assert.equal(detail.body.application.history.length, 2);
+    assert.ok(await database.get("SELECT id FROM notifications WHERE user_id = ? AND type = 'interview_invitation'", seeker.id));
+    const beforeRepeat = await database.get('SELECT COUNT(*) AS count FROM application_status_history WHERE application_id = ?', application.id);
+    await mutation(recruiter, 'patch', `${path}/${application.id}/status`, { status: 'interview' }).expect(200);
+    assert.equal((await database.get('SELECT COUNT(*) AS count FROM application_status_history WHERE application_id = ?', application.id)).count, beforeRepeat.count);
+    for (const status of ['under_review', 'offered', 'rejected']) {
+      await mutation(recruiter, 'patch', `${path}/${application.id}/status`, { status }).expect(200);
+      const account = await seeker.agent.get(`/api/applications/${application.id}`).expect(200);
+      assert.equal(account.body.application.status, status);
+      const notes = await seeker.agent.get('/api/notifications').expect(200);
+      assert.ok(notes.body.items.some((item) => item.type === 'application_update' && item.message.includes(job.title)));
+    }
+  });
+  test('recruiter receives the exact submitted PDF and other recruiters cannot read it', async () => {
+    const pdf = Buffer.from('%PDF-1.4\n1 0 obj\n<<>>\nendobj\n%%EOF\n');
+    await seeker.agent.post('/api/resumes').attach('resume', pdf, { filename: 'submitted.pdf', contentType: 'application/pdf' }).expect(201);
+    const job = await create();
+    const application = await apply(job.id);
+    const url = `/api/recruiter/jobs/${job.id}/applications/${application.id}/resume`;
+    const response = await recruiter.agent.get(url).expect(200).expect('Content-Type', /application\/pdf/);
+    assert.deepEqual(response.body, pdf);
+    await other.agent.get(url).expect(404);
+    await seeker.agent.delete('/api/resumes/current').expect(200);
+    assert.deepEqual((await recruiter.agent.get(url).expect(200)).body, pdf);
+  });
   async function applicationState() {
     return {
       applications: await database.all('SELECT * FROM applications ORDER BY id'),
