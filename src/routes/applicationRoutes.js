@@ -44,6 +44,22 @@ function createApplicationRouter(database) {
 
   router.use(authenticateUser);
 
+  router.get('/analytics', async (request, response, next) => {
+    response.set('Cache-Control', 'no-store');
+    if (request.authenticatedUser.role !== 'job_seeker') return response.status(403).json({ error: 'Only job seekers can view application analytics.' });
+    const range = request.query.range || '30';
+    if (Object.keys(request.query).some((key) => key !== 'range') || !['30', '90', 'all'].includes(range)) return response.status(400).json({ error: 'Choose a range of 30, 90, or all.' });
+    try {
+      const cutoff = range === 'all' ? '0000-01-01' : new Date(Date.now() - (Number(range) - 1) * 86400000).toISOString().slice(0, 10);
+      const rows = await database.all(`${APPLICATION_SELECT} WHERE a.user_id = ? AND date(a.applied_at) >= ? ORDER BY a.applied_at DESC, a.id DESC`, request.authenticatedUser.id, cutoff);
+      const history = await database.all(`SELECT h.application_id, h.status, h.changed_at, j.title, j.company FROM application_status_history h JOIN applications a ON a.id = h.application_id JOIN jobs j ON j.id = a.job_id WHERE a.user_id = ? AND date(h.changed_at) >= ? ORDER BY h.changed_at DESC, h.id DESC LIMIT 100`, request.authenticatedUser.id, cutoff);
+      const counts = APPLICATION_STATUSES.map(({ id, name }) => ({ id, name, count: rows.filter((row) => row.status === id).length }));
+      const months = new Map();
+      for (const row of rows) { const month = row.applied_at.slice(0, 7); months.set(month, (months.get(month) || 0) + 1); }
+      return response.json({ range, cutoff, total: rows.length, active: rows.filter((row) => ['applied', 'under_review', 'interview'].includes(row.status)).length, statuses: counts, activity: [...months].sort(([a], [b]) => a.localeCompare(b)).map(([month, count]) => ({ month, count })), items: rows.map(publicApplication), history: history.map((row) => ({ applicationId: row.application_id, status: row.status, statusLabel: applicationStatusName(row.status), changedAt: row.changed_at, title: row.title, company: row.company })) });
+    } catch (error) { return next(error); }
+  });
+
   router.get('/', async (request, response, next) => {
     try {
       const rows = await database.all(

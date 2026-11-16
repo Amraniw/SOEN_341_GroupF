@@ -1,4 +1,6 @@
 const express = require('express');
+const multer = require('multer');
+const { requireSameOrigin } = require('../middleware/requireSameOrigin');
 const { createAuthenticateUser } = require('../middleware/authenticateUser');
 
 // The account name and email stay in users; a profile adds professional details.
@@ -91,6 +93,43 @@ function createProfileRouter(database) {
   const authenticateUser = createAuthenticateUser(database);
 
   router.use(authenticateUser);
+  const picturesReady = () => database.exec(`CREATE TABLE IF NOT EXISTS profile_pictures (
+    user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    mime TEXT NOT NULL, image BLOB NOT NULL
+  )`);
+  const pictureUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 2 * 1024 * 1024, files: 1, fields: 0 } }).single('picture');
+  router.get('/picture', async (req, res, next) => {
+    try {
+      await picturesReady();
+      const row = await database.get('SELECT mime, image FROM profile_pictures WHERE user_id = ?', req.authenticatedUser.id);
+      res.set('Cache-Control', 'no-store');
+      if (!row) return res.sendStatus(404);
+      return res.set('Content-Type', row.mime).set('X-Content-Type-Options', 'nosniff').send(row.image);
+    } catch (error) { return next(error); }
+  });
+  router.post('/picture', (req, res, next) => {
+    // A custom header prevents cross-origin simple form submissions. Browsers
+    // must preflight this request, and this app grants no cross-origin access.
+    if (req.get('X-Profile-Picture') !== '1') return res.status(403).json({ error: 'Use the profile photo uploader.' });
+    return next();
+  }, (req, res, next) => {
+    pictureUpload(req, res, async (error) => {
+      if (error) return res.status(400).json({ error: 'Choose one JPG or PNG image under 2 MB.' });
+      const bytes = req.file?.buffer;
+      const png = bytes && bytes.length > 24 && bytes.subarray(0, 8).equals(Buffer.from([137,80,78,71,13,10,26,10]));
+      const jpeg = bytes && bytes.length > 4 && bytes[0] === 255 && bytes[1] === 216 && bytes[2] === 255 && bytes[bytes.length - 2] === 255 && bytes[bytes.length - 1] === 217;
+      if (!png && !jpeg) return res.status(400).json({ error: 'Choose a valid JPG or PNG image under 2 MB.' });
+      try {
+        await picturesReady();
+        await database.run('INSERT INTO profile_pictures (user_id, mime, image) VALUES (?, ?, ?) ON CONFLICT(user_id) DO UPDATE SET mime = excluded.mime, image = excluded.image', req.authenticatedUser.id, png ? 'image/png' : 'image/jpeg', bytes);
+        return res.json({ message: 'Profile picture saved.' });
+      } catch (caught) { return next(caught); }
+    });
+  });
+  router.delete('/picture', requireSameOrigin, async (req, res, next) => {
+    try { await picturesReady(); await database.run('DELETE FROM profile_pictures WHERE user_id = ?', req.authenticatedUser.id); return res.json({ message: 'Profile picture removed.' }); }
+    catch (error) { return next(error); }
+  });
 
   router.get('/', async (request, response, next) => {
     try {

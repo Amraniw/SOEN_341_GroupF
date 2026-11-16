@@ -244,3 +244,15 @@
     margin-left: 0;
   }
 }
+.application-analytics { padding: 28px; margin-bottom: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); }
+.analytics-metrics, .analytics-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-block: 28px; }
+.analytics-metrics > div { padding: 20px; background: var(--canvas); border-radius: 10px; }
+.analytics-metrics strong { display: block; font-size: 32px; color: var(--brand); }
+.analytics-metrics span { color: var(--muted); }
+.analytics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.analytics-bar { display: grid; grid-template-columns: 110px minmax(0, 1fr) 32px; align-items: center; gap: 12px; margin-block: 14px; }
+.analytics-bar meter { width: 100%; accent-color: var(--brand); }
+.analytics-history { max-height: 280px; overflow: auto; padding-left: 24px; }
+.analytics-history li { padding: 12px 0; border-bottom: 1px solid var(--border); }
+.application-card summary { cursor: pointer; color: var(--brand); margin-block: 16px; }
+@media (max-width: 700px) { .analytics-grid, .analytics-metrics { grid-template-columns: 1fr; } .application-analytics { padding: 20px; } }

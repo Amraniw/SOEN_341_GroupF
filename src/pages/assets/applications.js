@@ -12,6 +12,13 @@ if (session) {
   const feedback = document.querySelector('#applications-feedback');
   let applications = [];
   let statuses = [];
+  const analytics = document.createElement('section');
+  analytics.className = 'application-analytics';
+  analytics.setAttribute('aria-label', 'Application analytics');
+  analytics.innerHTML = `<div class="applications-toolbar"><div><p class="eyebrow">YOUR SEARCH, IN PERSPECTIVE</p><h2>Application insights</h2></div><label class="application-filter">Submitted within<select id="analytics-range"><option value="30">Last 30 days</option><option value="90">Last 90 days</option><option value="all">All time</option></select></label><button type="button" class="button button-secondary" id="analytics-refresh">Refresh</button></div><p>Submission metrics and the list below follow this range. Recent activity shows status events in the same period. Dates use UTC.</p><div id="analytics-content" aria-live="polite"></div>`;
+  document.querySelector('.application-overview').before(analytics);
+  const range = analytics.querySelector('#analytics-range');
+  const insights = analytics.querySelector('#analytics-content');
 
   function statusBadge(application) {
     const className = application.status.replaceAll('_', '-');
@@ -30,7 +37,7 @@ if (session) {
   function card(application) {
     return `<li class="application-card">
       <div class="application-card-top">${companyMark(application.job.company)}<div class="application-card-title"><p>${escapeHtml(application.job.company)}</p><h3>${escapeHtml(application.job.title)}</h3><span>${escapeHtml(application.job.location)}</span></div>${statusBadge(application)}</div>
-      ${timeline(application)}
+      <details data-history="${application.id}"><summary>View status history</summary><div class="actual-history"></div></details>
       <div class="application-card-footer"><span>Applied ${escapeHtml(formatDateTime(application.appliedAt))}</span><span>Updated ${escapeHtml(formatDateTime(application.updatedAt))}</span><a class="text-link" href="/workspace/jobs/${application.jobId}">View job →</a></div>
     </li>`;
   }
@@ -57,12 +64,16 @@ if (session) {
     feedback.hidden = true;
     status.textContent = 'Loading applications…';
     try {
-      const result = await request('/applications', undefined, 'GET');
+      insights.textContent = 'Loading insights…';
+      const result = await request(`/applications/analytics?range=${range.value}`, undefined, 'GET');
       applications = result.items;
       statuses = result.statuses;
+      const peak = Math.max(1, ...result.activity.map((item) => item.count));
+      insights.innerHTML = `<div class="analytics-metrics"><div><strong>${result.total}</strong><span>Submitted in range</span></div><div><strong>${result.active}</strong><span>Currently active</span></div><div><strong>${result.statuses.find((s) => s.id === 'offered').count}</strong><span>Offers</span></div></div><div class="analytics-grid"><section><h3>Current status breakdown</h3><p>Current outcomes of applications submitted in this range.</p>${result.statuses.map((s) => `<div class="analytics-bar"><span>${escapeHtml(s.name)}</span><meter min="0" max="${Math.max(1, result.total)}" value="${s.count}" aria-label="${escapeHtml(s.name)}"></meter><strong>${s.count}</strong></div>`).join('')}</section><section><h3>Applications over time</h3><p>Monthly submission totals within the selected range.</p>${result.activity.length ? result.activity.map((a) => `<div class="analytics-bar"><span>${escapeHtml(a.month)}</span><meter min="0" max="${peak}" value="${a.count}" aria-label="Applications in ${escapeHtml(a.month)}"></meter><strong>${a.count}</strong></div>`).join('') : '<p>No submissions in this period.</p>'}</section></div><section><h3>Recent activity</h3><p>Latest 100 recorded status events in this period.</p><ol class="analytics-history">${result.history.map((h) => `<li><strong>${escapeHtml(h.title)}</strong> · ${escapeHtml(h.company)}<br>${escapeHtml(h.statusLabel)} · ${escapeHtml(formatDateTime(h.changedAt))}</li>`).join('') || '<li>No status activity in this period.</li>'}</ol></section>`;
       filter.innerHTML = '<option value="">All statuses</option>' + statuses.map(({ id, name }) => `<option value="${escapeHtml(id)}">${escapeHtml(name)}</option>`).join('');
       render();
     } catch (error) {
+      insights.textContent = 'Insights are unavailable. Use Try again below.';
       total.textContent = '—';
       status.textContent = 'Applications could not be loaded.';
       list.innerHTML = '';
@@ -74,6 +85,19 @@ if (session) {
   }
 
   filter.addEventListener('change', render);
+  range.addEventListener('change', loadApplications);
+  analytics.querySelector('#analytics-refresh').addEventListener('click', loadApplications);
+  list.addEventListener('toggle', async (event) => {
+    const detail = event.target.closest('details[data-history]');
+    if (!detail?.open || detail.dataset.loaded) return;
+    const target = detail.querySelector('.actual-history');
+    target.textContent = 'Loading history…';
+    try {
+      const result = await request(`/applications/${detail.dataset.history}`, undefined, 'GET');
+      target.innerHTML = `<ol>${result.application.history.map((h) => `<li>${escapeHtml(h.statusLabel)} · ${escapeHtml(formatDateTime(h.changedAt))}</li>`).join('')}</ol>`;
+      detail.dataset.loaded = 'true';
+    } catch { target.textContent = 'History could not be loaded. Close and reopen to retry.'; }
+  }, true);
   document.addEventListener('click', (event) => {
     const summaryFilter = event.target.closest('[data-status-filter]');
     if (summaryFilter) {

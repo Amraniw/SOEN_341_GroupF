@@ -1,4 +1,5 @@
 import { session } from './workspace.js';
+import { refreshPictures, setupPictureControls } from './profile-picture.js';
 import { request } from './api.js';
 import { clearDisplaySession } from './session.js';
 import {
@@ -36,6 +37,8 @@ function isValidWebsite(value) {
 if (session) {
   const { user } = session;
   document.querySelector('#profile-avatar').textContent = initials(user.name);
+  setupPictureControls(document.querySelector('#profile-avatar'), initials(user.name));
+  refreshPictures();
   document.querySelector('#profile-name').textContent = user.name;
   document.querySelector('#profile-email').textContent = user.email;
   document.querySelector('#account-name').textContent = user.name;
