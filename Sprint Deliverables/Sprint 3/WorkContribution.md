@@ -10,6 +10,7 @@
 - **Time spent:** Approximately 6 hours.
 
 
+
 ### Wassim Amrani
 
 - **Work completed:** Created and configured the Sprint 3 GitHub Project board, including disabling automatic issue imports. Implemented Feature 2 – Application Analytics and History Dashboard, adding application statistics, status breakdowns, monthly activity charts, date filters, recent activity, and detailed application history. Also implemented profile picture upload, removal, and display in the user account and workspace header. Improved the profile picture interface and fixed an upload routing issue.
@@ -53,18 +54,22 @@ Around 10 commits, mostly done for work on the notification system
 
 ### Massi Sadek
 
-- **Work completed:** 
-- **Issues worked on:** 
-- **Pull requests / commits:**
-- **Reviews or testing performed:**
-- **Time spent:** 
+- **Work completed:**  Reviewed and validated the Recruiter Job Posting Management functionality (US-09), originally implemented during Sprint 2, to ensure it remained fully functional after Sprint 3 integration. Conducted repository and code audits, verified recruiter authorization, posting creation, editing, listing, closing/reopening, frontend/backend integration, and application preservation. Coordinated responsibilities to avoid duplicating or interfering with teammates' work.
+
+- **Issues worked on:** US-09 (Recruiter Job Posting Management), Feature 1 (Recruiter Dashboard and Posting Management), regression testing, integration verification, and Sprint 3 AI documentation.
+
+- **Pull requests / commits:**  Original Job Posting Management implementation: commit a436fa9 (Sprint 2). Sprint 3 validation performed on branch feature/us-09-job-posting-management, based on commit 34cfaf0. No new production code changes were required.
+
+- **Reviews or testing performed:** Conducted implementation and test coverage reviews using Codex. Executed targeted recruiter API, dashboard UI, application tracking, and job-alert integration tests. All 51 test executions passed (50 distinct tests, 0 functional failures). Verified authorization, ownership isolation, safe deletion, application persistence, and compatibility with recent team changes. Confirmed that the repository remained unchanged after testing.
+
+- **Time spent:** 3 to 4 hours
 
 
 ### Suheil Almouhassel
 
-- **Work completed:** 
-- **Issues worked on:** 
-- **Pull requests / commits:**
-- **Reviews or testing performed:**
-- **Time spent:** 
+- **Work completed:** xtended the existing Resume Management system to support multiple PDF uploads, default-resume selection, individual resume deletion, and persistent SQLite storage. Also reviewed and improved the Recruiter Dashboard and Job Posting Management interface, fixing eight usability issues related to form validation, error handling, posting status visibility, confirmation messages, dark-mode compatibility, and accessibility.
+- **Issues worked on:** US-04 (Multiple Resume Management enhancement, #104), US-09 (Recruiter Job Posting Management), and Sprint 3 Recruiter Dashboard improvements.
+- **Pull requests / commits:** Implemented and pushed Multiple Resume Management on branch recruiter-dashboard, commit c07d9e7. Additional Recruiter Dashboard improvements were implemented on the same branch.
+- **Reviews or testing performed:** Conducted code reviews, automated testing, and browser verification for both features. Added 12 automated tests for Multiple Resume Management and 5 tests for Recruiter Dashboard improvements. Verified resume uploads, default selection, individual deletion, posting management, form validation, authorization, and dark-mode functionality. All 183 automated tests and 19 browser checks passed.
+- **Time spent:** 4-5 hours
 

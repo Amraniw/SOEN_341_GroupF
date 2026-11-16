@@ -67,6 +67,10 @@ function createRecruiterRouter(database) {
   router.patch('/jobs/:id/applications/:applicationId/status', async (req, res) => {
     if (!/^[1-9]\d*$/.test(req.params.applicationId) || !Number.isSafeInteger(Number(req.params.applicationId))) return res.status(400).json({ error: 'Choose a valid application.' });
     if (!isObject(req.body) || Object.keys(req.body).length !== 1 || !APPLICATION_STATUS_IDS.includes(req.body.status)) return res.status(400).json({ error: 'Choose a valid application status.' });
+    const current = await database.get('SELECT a.status FROM applications a JOIN jobs j ON j.id = a.job_id WHERE a.id = ? AND j.id = ? AND j.recruiter_id = ?', req.params.applicationId, req.jobId, req.authenticatedUser.id);
+    if (!current) return res.status(404).json({ error: 'This application could not be found.' });
+    const stages = ['applied', 'under_review', 'interview', 'offered'];
+    if (current.status !== req.body.status && (['offered', 'rejected'].includes(current.status) || (req.body.status !== 'rejected' && stages.indexOf(req.body.status) < stages.indexOf(current.status)))) return res.status(409).json({ error: 'Applications move forward through review and interview to a final offer or rejection.' });
     const result = await database.run(`UPDATE applications SET status = ? WHERE id = ? AND job_id = ? AND EXISTS (SELECT 1 FROM jobs WHERE id = applications.job_id AND recruiter_id = ?)`, req.body.status, Number(req.params.applicationId), req.jobId, req.authenticatedUser.id);
     if (!result.changes) return res.status(404).json({ error: 'This application could not be found.' });
     return res.json({ message: 'Application status updated.', status: req.body.status });
