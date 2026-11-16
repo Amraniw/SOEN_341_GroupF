@@ -10,6 +10,7 @@
 - **Time spent:** Approximately 6 hours.
 
 
+
 ### Wassim Amrani
 
 - **Work completed:** Created and configured the Sprint 3 GitHub Project board, including disabling automatic issue imports. Implemented Feature 2 – Application Analytics and History Dashboard, adding application statistics, status breakdowns, monthly activity charts, date filters, recent activity, and detailed application history. Also implemented profile picture upload, removal, and display in the user account and workspace header. Improved the profile picture interface and fixed an upload routing issue.

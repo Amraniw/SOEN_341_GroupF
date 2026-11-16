@@ -83,13 +83,16 @@ describe('Feature 4 Phase 02: secure recruiter posting API', () => {
     const beforeRepeat = await database.get('SELECT COUNT(*) AS count FROM application_status_history WHERE application_id = ?', application.id);
     await mutation(recruiter, 'patch', `${path}/${application.id}/status`, { status: 'interview' }).expect(200);
     assert.equal((await database.get('SELECT COUNT(*) AS count FROM application_status_history WHERE application_id = ?', application.id)).count, beforeRepeat.count);
-    for (const status of ['under_review', 'offered', 'rejected']) {
+    await mutation(recruiter, 'patch', `${path}/${application.id}/status`, { status: 'under_review' }).expect(409);
+    for (const status of ['offered']) {
       await mutation(recruiter, 'patch', `${path}/${application.id}/status`, { status }).expect(200);
       const account = await seeker.agent.get(`/api/applications/${application.id}`).expect(200);
       assert.equal(account.body.application.status, status);
       const notes = await seeker.agent.get('/api/notifications').expect(200);
       assert.ok(notes.body.items.some((item) => item.type === 'application_update' && item.message.includes(job.title)));
     }
+    await mutation(recruiter, 'patch', `${path}/${application.id}/status`, { status: 'interview' }).expect(409);
+    await mutation(recruiter, 'patch', `${path}/${application.id}/status`, { status: 'rejected' }).expect(409);
   });
   test('recruiter receives the exact submitted PDF and other recruiters cannot read it', async () => {
     const pdf = Buffer.from('%PDF-1.4\n1 0 obj\n<<>>\nendobj\n%%EOF\n');
