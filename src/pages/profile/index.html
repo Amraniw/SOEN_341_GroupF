@@ -14,6 +14,54 @@
     <style>
       /* Profile-only rules. The shared .form-field styles cover inputs but not
          textareas; colours use the theme tokens so dark mode still applies. */
+      .employment-jobs {
+        display: grid;
+        gap: 10px;
+        margin: 12px 0;
+        padding: 0;
+        list-style: none;
+      }
+      .employment-job {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px 16px;
+        padding: 14px 16px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        background: var(--surface);
+      }
+      .employment-job strong,
+      .employment-job span {
+        display: block;
+      }
+      .employment-job span {
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .employment-confirm {
+        display: grid;
+        gap: 6px;
+        margin-top: 14px;
+        padding: 16px 18px;
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--brand);
+        border-radius: var(--radius-md);
+        background: var(--brand-soft);
+      }
+      .employment-confirm p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .employment-confirm .profile-actions {
+        justify-content: flex-start;
+        margin-top: 8px;
+      }
+      #employment-message:empty {
+        display: none;
+      }
       .profile-form {
         display: grid;
         gap: 14px;
@@ -59,6 +107,7 @@
       }
     </style>
     <script type="module" src="/assets/profile.js"></script>
+    <script type="module" src="/assets/profile-employment.js"></script>
 
   </head>
   <body data-page="profile">
@@ -105,6 +154,88 @@
                   ></p>
                   <p class="break-word" id="profile-email"></p>
                   <span class="badge badge-neutral">CareerConnect member</span>
+                </div>
+              </section>
+              <section
+                class="panel"
+                id="employment-panel"
+                aria-labelledby="employment-heading"
+                hidden
+              >
+                <div class="panel-heading">
+                  <h2 id="employment-heading">Employment</h2>
+                  <span
+                    class="badge badge-neutral"
+                    id="employment-badge"
+                    hidden
+                  ></span>
+                </div>
+                <p id="employment-loading" role="status">
+                  Loading your employment status…
+                </p>
+                <div id="employment-error" hidden>
+                  <p id="employment-error-message" role="alert"></p>
+                  <button
+                    class="button button-secondary"
+                    type="button"
+                    id="employment-retry"
+                  >
+                    Try again
+                  </button>
+                </div>
+                <div id="employment-body" hidden>
+                  <p id="employment-message" role="status" tabindex="-1"></p>
+                  <ul
+                    class="employment-jobs"
+                    id="employment-jobs"
+                    aria-label="Your current jobs"
+                    hidden
+                  ></ul>
+                  <p>
+                    <a
+                      class="text-link"
+                      id="employment-browse"
+                      href="/workspace/jobs/"
+                      hidden
+                      >Browse open jobs →</a
+                    >
+                  </p>
+                  <div class="profile-actions" id="employment-actions" hidden>
+                    <button
+                      class="button button-secondary"
+                      type="button"
+                      id="employment-unemployed"
+                    >
+                      I’m no longer employed
+                    </button>
+                  </div>
+                  <div
+                    class="employment-confirm"
+                    id="employment-confirm"
+                    role="group"
+                    aria-labelledby="employment-confirm-title"
+                    hidden
+                  >
+                    <strong id="employment-confirm-title"></strong>
+                    <p id="employment-confirm-text"></p>
+                    <p id="employment-confirm-error" role="alert" hidden></p>
+                    <div class="profile-actions">
+                      <button
+                        class="button"
+                        type="button"
+                        id="employment-confirm-yes"
+                      >
+                        Yes, continue
+                      </button>
+                      <button
+                        class="button button-secondary"
+                        type="button"
+                        id="employment-confirm-no"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </section>
               <section

@@ -20,6 +20,10 @@ if (session) {
   document.querySelector('.application-overview').before(analytics);
   const range = analytics.querySelector('#analytics-range');
   const insights = analytics.querySelector('#analytics-content');
+  // Accept/decline state: which offer is awaiting confirmation, and any error to show.
+  let offerConfirm = null;
+  let offerBusy = false;
+  const offerErrors = {};
 
   function statusBadge(application) {
     const className = application.status.replaceAll('_', '-');
@@ -35,10 +39,49 @@ if (session) {
     return `<div class="application-timeline" aria-label="Application progress">${path.map((stage, index) => `<span class="timeline-step ${index <= current ? 'is-complete' : ''} ${index === current ? 'is-current' : ''}"><i aria-hidden="true"></i><span>${escapeHtml(statuses.find(({ id }) => id === stage)?.name || stage)}</span></span>`).join('<span class="timeline-connector" aria-hidden="true"></span>')}</div>`;
   }
 
+  // The accept/decline area on an application that has an offer. Both answers are
+  // final, so each asks for a confirmation first.
+  function offerPanel(application) {
+    if (application.quitAt) {
+      return `<div class="offer-panel is-declined" role="status"><strong>You left this job</strong><p>You left this position on ${escapeHtml(formatDateTime(application.quitAt))}. You can apply for it again from the job page.</p></div>`;
+    }
+    if (application.offerResponse === 'accepted') {
+      return '<div class="offer-panel is-accepted" role="status"><strong>Offer accepted</strong><p>Congratulations! Your profile now shows you as employed.</p></div>';
+    }
+    if (application.offerResponse === 'declined') {
+      return `<div class="offer-panel is-declined" role="status"><strong>Offer declined</strong><p>You turned down this offer on ${escapeHtml(formatDateTime(application.offerRespondedAt))}.</p></div>`;
+    }
+    if (application.status !== 'offered') return '';
+
+    const error = offerErrors[application.id]
+      ? `<p class="offer-error" role="alert">${escapeHtml(offerErrors[application.id])}</p>`
+      : '';
+    if (offerConfirm?.id === application.id) {
+      const accepting = offerConfirm.response === 'accepted';
+      return `<div class="offer-panel" role="group" aria-label="Confirm your response">
+        <strong>${accepting ? 'Accept this offer?' : 'Decline this offer?'}</strong>
+        <p>${accepting ? 'Your profile will be marked as employed. This can’t be undone.' : 'This can’t be undone.'}</p>${error}
+        <div class="offer-actions">
+          <button class="button" type="button" data-offer-confirm ${offerBusy ? 'disabled aria-busy="true"' : ''}>${accepting ? 'Yes, accept offer' : 'Yes, decline offer'}</button>
+          <button class="button button-secondary" type="button" data-offer-cancel ${offerBusy ? 'disabled' : ''}>Cancel</button>
+        </div>
+      </div>`;
+    }
+    return `<div class="offer-panel" role="group" aria-label="Respond to your offer">
+      <strong>You have an offer</strong>
+      <p>Accept it to take the job, or decline to pass.</p>${error}
+      <div class="offer-actions">
+        <button class="button" type="button" data-offer-choice="accepted" data-application-id="${application.id}">Accept offer</button>
+        <button class="button button-secondary" type="button" data-offer-choice="declined" data-application-id="${application.id}">Decline offer</button>
+      </div>
+    </div>`;
+  }
+
   function card(application) {
     return `<li class="application-card">
       <div class="application-card-top">${companyMark(application.job.company)}<div class="application-card-title"><p>${escapeHtml(application.job.company)}</p><h3>${escapeHtml(application.job.title)}</h3><span>${escapeHtml(application.job.location)}</span></div>${statusBadge(application)}</div>
       <details data-history="${application.id}"><summary>View status history</summary><div class="actual-history"></div></details>
+      ${offerPanel(application)}
       <div class="application-card-footer"><span>Applied ${escapeHtml(formatDateTime(application.appliedAt))}</span><span>Updated ${escapeHtml(formatDateTime(application.updatedAt))}</span><a class="text-link" href="/workspace/jobs/${application.jobId}">View job →</a></div>
     </li>`;
   }
@@ -57,6 +100,25 @@ if (session) {
       feedback.innerHTML = applications.length
         ? '<div class="empty-state"><h3>No applications have this status.</h3><p>Choose another status to see the rest of your applications.</p><button class="button button-secondary" type="button" data-clear-application-filter>Show all applications</button></div>'
         : '<div class="empty-state"><h3>Your next opportunity starts here.</h3><p>When you apply for a job, it will appear here with its latest status.</p><a class="button" href="/workspace/jobs/">Explore jobs</a></div>';
+    }
+  }
+
+  async function submitOffer() {
+    if (!offerConfirm || offerBusy) return;
+    const { id, response } = offerConfirm;
+    offerBusy = true;
+    delete offerErrors[id];
+    render();
+    try {
+      const result = await request(`/applications/${id}/offer`, { response }, 'PATCH');
+      applications = applications.map((application) => (application.id === id ? result.application : application));
+      offerConfirm = null;
+    } catch (error) {
+      offerErrors[id] = error.message;
+    } finally {
+      offerBusy = false;
+      render();
+      list.querySelector('[data-offer-confirm], [data-offer-choice]')?.focus();
     }
   }
 
@@ -115,6 +177,21 @@ if (session) {
       render();
     } else if (event.target.closest('[data-retry-applications]')) {
       loadApplications();
+    } else if (event.target.closest('[data-offer-choice]')) {
+      const choice = event.target.closest('[data-offer-choice]');
+      const id = Number(choice.dataset.applicationId);
+      offerConfirm = { id, response: choice.dataset.offerChoice };
+      delete offerErrors[id];
+      render();
+      list.querySelector('[data-offer-confirm]')?.focus();
+    } else if (event.target.closest('[data-offer-cancel]')) {
+      const id = offerConfirm?.id;
+      offerConfirm = null;
+      if (id !== undefined) delete offerErrors[id];
+      render();
+      list.querySelector('[data-offer-choice]')?.focus();
+    } else if (event.target.closest('[data-offer-confirm]')) {
+      submitOffer();
     }
   });
 
