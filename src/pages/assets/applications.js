@@ -1,24 +1,24 @@
 import { request } from './api.js';
 import { companyMark } from './job-shared.js';
-import { escapeHtml, formatDateTime } from './ui.js';
+import { escapeHtml, formatDate, formatDateTime } from './ui.js';
 import { session } from './workspace.js';
 import { renderActivity, renderHistory } from './application-visuals.mjs';
 
 if (session) {
   const list = document.querySelector('#application-list');
   const status = document.querySelector('#applications-status');
-  const total = document.querySelector('#application-total');
   const summary = document.querySelector('#application-summary');
   const filter = document.querySelector('#application-filter');
   const feedback = document.querySelector('#applications-feedback');
   let applications = [];
   let statuses = [];
   let loadGeneration = 0;
+  const expandedApplications = new Set();
   const analytics = document.createElement('section');
   analytics.className = 'application-analytics';
   analytics.setAttribute('aria-label', 'Application analytics');
-  analytics.innerHTML = `<div class="applications-toolbar"><div><p class="eyebrow">YOUR SEARCH, IN PERSPECTIVE</p><h2>Application insights</h2></div><label class="application-filter">Submitted within<select id="analytics-range"><option value="30">Last 30 days</option><option value="90">Last 90 days</option><option value="all">All time</option></select></label><button type="button" class="button button-secondary" id="analytics-refresh">Refresh</button></div><p>Submission metrics and the list below follow this range. Recent activity shows status events in the same period. Dates use UTC.</p><div id="analytics-content" aria-live="polite"></div>`;
-  document.querySelector('.application-overview').before(analytics);
+  analytics.innerHTML = `<div class="applications-toolbar"><div><h2>At a glance</h2><p>Applications submitted in your selected period.</p></div><div class="analytics-controls"><label class="application-filter">Submitted within<select id="analytics-range"><option value="30">Last 30 days</option><option value="90">Last 90 days</option><option value="all">All time</option></select></label><button type="button" class="button button-secondary" id="analytics-refresh">Refresh</button></div></div><div id="analytics-content" aria-live="polite"></div>`;
+  document.querySelector('.application-overview').prepend(analytics);
   const range = analytics.querySelector('#analytics-range');
   const insights = analytics.querySelector('#analytics-content');
   // Accept/decline state: which offer is awaiting confirmation, and any error to show.
@@ -29,15 +29,6 @@ if (session) {
   function statusBadge(application) {
     const className = application.status.replaceAll('_', '-');
     return `<span class="application-status status-${escapeHtml(className)}">${escapeHtml(application.statusLabel)}</span>`;
-  }
-
-  function timeline(application) {
-    const path = ['applied', 'under_review', 'interview', 'offered'];
-    if (application.status === 'rejected') {
-      return `<div class="application-timeline application-timeline-rejected"><span class="timeline-dot is-complete"></span><span>Applied</span><span class="timeline-line"></span><span class="timeline-dot is-rejected"></span><strong>Rejected</strong></div>`;
-    }
-    const current = Math.max(0, path.indexOf(application.status));
-    return `<div class="application-timeline" aria-label="Application progress">${path.map((stage, index) => `<span class="timeline-step ${index <= current ? 'is-complete' : ''} ${index === current ? 'is-current' : ''}"><i aria-hidden="true"></i><span>${escapeHtml(statuses.find(({ id }) => id === stage)?.name || stage)}</span></span>`).join('<span class="timeline-connector" aria-hidden="true"></span>')}</div>`;
   }
 
   // The accept/decline area on an application that has an offer. Both answers are
@@ -79,22 +70,34 @@ if (session) {
   }
 
   function card(application) {
-    return `<li class="application-card">
-      <div class="application-card-top">${companyMark(application.job.company)}<div class="application-card-title"><p>${escapeHtml(application.job.company)}</p><h3>${escapeHtml(application.job.title)}</h3><span>${escapeHtml(application.job.location)}</span></div>${statusBadge(application)}</div>
-      <details data-history="${application.id}"><summary>View status history</summary><div class="actual-history"></div></details>
-      ${offerPanel(application)}
-      <div class="application-card-footer"><span>Applied ${escapeHtml(formatDateTime(application.appliedAt))}</span><span>Updated ${escapeHtml(formatDateTime(application.updatedAt))}</span><a class="text-link" href="/workspace/jobs/${application.jobId}">View job →</a></div>
+    const description = (application.job.summary || '').replace(/\s+/g, ' ').trim();
+    const expanded = expandedApplications.has(String(application.id));
+    return `<li class="application-card" data-application="${application.id}">
+      <div class="application-row">
+        <button class="application-toggle" type="button" data-toggle-application="${application.id}" aria-expanded="${expanded}" aria-controls="application-details-${application.id}" aria-label="${escapeHtml(application.job.title)} at ${escapeHtml(application.job.company)}">
+          ${companyMark(application.job.company)}
+          <span class="application-card-title"><strong class="application-role">${escapeHtml(application.job.title)}</strong><span class="application-title-meta"><span class="application-company">${escapeHtml(application.job.company)}<span class="application-location">${escapeHtml(application.job.location)}</span></span><span class="application-source" title="${application.job.isDemo ? 'Educational demo posting' : 'User-created posting'}">${application.job.isDemo ? 'Demo' : 'User application'}</span><span class="application-date" title="${escapeHtml(formatDateTime(application.appliedAt))}">Applied ${escapeHtml(formatDate(application.appliedAt))}</span></span></span>
+          ${statusBadge(application)}<span class="application-expand-icon" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m4 6 4 4 4-4"/></svg></span>
+        </button>
+        <a class="text-link application-job-link" href="/workspace/jobs/${application.jobId}">View job <span aria-hidden="true">↗</span></a>
+      </div>
+      <div class="application-panel ${expanded ? 'is-expanded' : ''}" id="application-details-${application.id}" aria-hidden="${!expanded}" ${expanded ? '' : 'inert'}>
+        <div class="application-panel-inner"><div class="application-panel-content">
+          ${description ? `<p class="application-description">${escapeHtml(description)}</p>` : ''}
+          <div class="application-journey">${renderHistory(application.history || [], escapeHtml, formatDateTime)}</div>
+          ${offerPanel(application)}
+        </div></div>
+      </div>
     </li>`;
   }
 
   function render() {
     const selected = filter.value;
     const visible = selected ? applications.filter(({ status: value }) => value === selected) : applications;
-    total.textContent = String(applications.length);
     status.textContent = selected
       ? `${visible.length} ${visible.length === 1 ? 'application' : 'applications'} with this status`
       : `${applications.length} ${applications.length === 1 ? 'application' : 'applications'} total`;
-    summary.innerHTML = statuses.map(({ id, name }) => `<button type="button" class="application-summary-item ${selected === id ? 'is-active' : ''}" data-status-filter="${escapeHtml(id)}"><strong>${applications.filter(({ status: value }) => value === id).length}</strong><span>${escapeHtml(name)}</span></button>`).join('');
+    summary.innerHTML = statuses.map(({ id, name }) => `<button type="button" class="application-summary-item ${selected === id ? 'is-active' : ''}" aria-pressed="${selected === id}" data-status-filter="${escapeHtml(id)}"><strong>${applications.filter(({ status: value }) => value === id).length}</strong><span>${escapeHtml(name)}</span></button>`).join('');
     list.innerHTML = visible.map(card).join('');
     feedback.hidden = visible.length > 0;
     if (!visible.length) {
@@ -112,14 +115,14 @@ if (session) {
     render();
     try {
       const result = await request(`/applications/${id}/offer`, { response }, 'PATCH');
-      applications = applications.map((application) => (application.id === id ? result.application : application));
+      applications = applications.map((application) => (application.id === id ? { ...result.application, history: application.history } : application));
       offerConfirm = null;
     } catch (error) {
       offerErrors[id] = error.message;
     } finally {
       offerBusy = false;
       render();
-      list.querySelector('[data-offer-confirm], [data-offer-choice]')?.focus();
+      (list.querySelector(`[data-application="${id}"] [data-offer-confirm], [data-application="${id}"] [data-offer-choice]`) || list.querySelector(`[data-toggle-application="${id}"]`))?.focus();
     }
   }
 
@@ -132,27 +135,19 @@ if (session) {
       insights.textContent = 'Loading insights…';
       const [result, yearly] = await Promise.all([
         request(`/applications/analytics?range=${range.value}`, undefined, 'GET'),
-        request('/applications/analytics?range=all', undefined, 'GET'),
+        request('/applications', undefined, 'GET'),
       ]);
       if (generation !== loadGeneration) return;
       applications = result.items;
       statuses = result.statuses;
-      const peak = Math.max(1, ...result.activity.map((item) => item.count));
-      insights.innerHTML = `<div class="analytics-metrics"><div><strong>${result.total}</strong><span>Submitted in range</span></div><div><strong>${result.active}</strong><span>Currently active</span></div><div><strong>${result.statuses.find((s) => s.id === 'offered').count}</strong><span>Offers</span></div></div><div class="analytics-grid"><section><h3>Current status breakdown</h3><p>Current outcomes of applications submitted in this range.</p>${result.statuses.map((s) => `<div class="analytics-bar"><span>${escapeHtml(s.name)}</span><meter min="0" max="${Math.max(1, result.total)}" value="${s.count}" aria-label="${escapeHtml(s.name)}"></meter><strong>${s.count}</strong></div>`).join('')}</section><section><h3>Applications over time</h3><p>Monthly submission totals within the selected range.</p>${result.activity.length ? result.activity.map((a) => `<div class="analytics-bar"><span>${escapeHtml(a.month)}</span><meter min="0" max="${peak}" value="${a.count}" aria-label="Applications in ${escapeHtml(a.month)}"></meter><strong>${a.count}</strong></div>`).join('') : '<p>No submissions in this period.</p>'}</section></div><section><h3>Recent activity</h3><p>Latest 100 recorded status events in this period.</p><ol class="analytics-history">${result.history.map((h) => `<li><strong>${escapeHtml(h.title)}</strong> · ${escapeHtml(h.company)}<br>${escapeHtml(h.statusLabel)} · ${escapeHtml(formatDateTime(h.changedAt))}</li>`).join('') || '<li>No status activity in this period.</li>'}</ol></section>`;
+      const selectedStatus = filter.value;
+      insights.innerHTML = `<div class="analytics-metrics"><div><strong>${result.total}</strong><span>Submitted</span></div><div><strong>${result.active}</strong><span>Active applications</span></div><div><strong>${result.statuses.find((s) => s.id === "offered")?.count || 0}</strong><span>Offers</span></div></div>${renderActivity(yearly.items, "all", escapeHtml)}`;
       filter.innerHTML = '<option value="">All statuses</option>' + statuses.map(({ id, name }) => `<option value="${escapeHtml(id)}">${escapeHtml(name)}</option>`).join('');
-      const activityHeading = [...insights.querySelectorAll('h3')].find((heading) => heading.textContent === 'Recent activity');
-      const oldChart = [...insights.querySelectorAll('h3')].find((heading) => heading.textContent === 'Applications over time');
-      if (oldChart) {
-        oldChart.closest('section').remove();
-        insights.querySelector('.analytics-grid').insertAdjacentHTML('afterend', renderActivity(yearly.items, 'all', escapeHtml));
-      }
-      if (activityHeading) activityHeading.nextElementSibling.textContent = 'Latest status for each application updated in this period.';
-      analytics.querySelector('.applications-toolbar + p').textContent = 'Submission metrics and the list below follow this range. Recent activity shows each application’s latest status. Dates use UTC.';
+      filter.value = statuses.some(({ id }) => id === selectedStatus) ? selectedStatus : "";
       render();
     } catch (error) {
       if (generation !== loadGeneration) return;
       insights.textContent = 'Insights are unavailable. Use Try again below.';
-      total.textContent = '—';
       status.textContent = 'Applications could not be loaded.';
       list.innerHTML = '';
       feedback.innerHTML = `<div class="empty-state" role="alert"><h3>We couldn’t load your applications.</h3><p>${escapeHtml(error.message)}</p><button class="button button-secondary" type="button" data-retry-applications>Try again</button></div>`;
@@ -162,20 +157,56 @@ if (session) {
     }
   }
 
+  list.addEventListener('click', (event) => {
+    const toggle = event.target.closest('[data-toggle-application]');
+    if (!toggle) return;
+    const id = toggle.dataset.toggleApplication;
+    const expanded = !expandedApplications.has(id);
+    if (expanded) expandedApplications.add(id);
+    else expandedApplications.delete(id);
+    toggle.setAttribute('aria-expanded', String(expanded));
+    const panel = document.getElementById(toggle.getAttribute('aria-controls'));
+    panel.classList.toggle('is-expanded', expanded);
+    panel.setAttribute('aria-hidden', String(!expanded));
+    panel.inert = !expanded;
+  });
+
   filter.addEventListener('change', render);
   range.addEventListener('change', loadApplications);
   analytics.querySelector('#analytics-refresh').addEventListener('click', loadApplications);
-  list.addEventListener('toggle', async (event) => {
-    const detail = event.target.closest('details[data-history]');
-    if (!detail?.open || detail.dataset.loaded) return;
-    const target = detail.querySelector('.actual-history');
-    target.textContent = 'Loading history…';
-    try {
-      const result = await request(`/applications/${detail.dataset.history}`, undefined, 'GET');
-      target.innerHTML = renderHistory(result.application.history, escapeHtml, formatDateTime);
-      detail.dataset.loaded = 'true';
-    } catch { target.textContent = 'History could not be loaded. Close and reopen to retry.'; }
-  }, true);
+  const tooltip = document.createElement('div');
+  tooltip.id = 'activity-tooltip';
+  tooltip.className = 'activity-tooltip';
+  tooltip.setAttribute('role', 'tooltip');
+  tooltip.hidden = true;
+  document.body.append(tooltip);
+  let tooltipDay = null;
+  function hideTooltip() {
+    tooltipDay?.removeAttribute('aria-describedby');
+    tooltipDay = null;
+    tooltip.hidden = true;
+  }
+  function showTooltip(day) {
+    hideTooltip();
+    tooltipDay = day;
+    tooltip.textContent = day.dataset.dayLabel;
+    tooltip.hidden = false;
+    day.setAttribute('aria-describedby', tooltip.id);
+    const rect = day.getBoundingClientRect();
+    const width = tooltip.offsetWidth;
+    const height = tooltip.offsetHeight;
+    tooltip.style.left = `${Math.max(8, Math.min(rect.left + rect.width / 2 - width / 2, document.documentElement.clientWidth - width - 8))}px`;
+    tooltip.style.top = `${rect.top > height + 12 ? rect.top - height - 8 : rect.bottom + 8}px`;
+  }
+  analytics.addEventListener('pointerover', (event) => { const day = event.target.closest('[data-day-label]'); if (day) showTooltip(day); });
+  analytics.addEventListener('pointerout', (event) => { if (event.target.closest('[data-day-label]')) hideTooltip(); });
+  analytics.addEventListener('focusin', (event) => { const day = event.target.closest('[data-day-label]'); if (day) showTooltip(day); });
+  analytics.addEventListener('focusout', hideTooltip);
+  document.addEventListener('keydown', (event) => { if (event.key === 'Escape') hideTooltip(); });
+  window.addEventListener('scroll', hideTooltip, true);
+  window.addEventListener('resize', hideTooltip);
+  range.addEventListener('change', hideTooltip);
+  analytics.querySelector('#analytics-refresh').addEventListener('click', hideTooltip);
   document.addEventListener('click', (event) => {
     const day = event.target.closest('[data-day-label]');
     if (day) analytics.querySelector('.calendar-selection').textContent = day.dataset.dayLabel;
@@ -183,6 +214,7 @@ if (session) {
     if (summaryFilter) {
       filter.value = filter.value === summaryFilter.dataset.statusFilter ? '' : summaryFilter.dataset.statusFilter;
       render();
+      summary.querySelector(`[data-status-filter="${summaryFilter.dataset.statusFilter}"]`)?.focus();
     } else if (event.target.closest('[data-clear-application-filter]')) {
       filter.value = '';
       render();
@@ -194,13 +226,13 @@ if (session) {
       offerConfirm = { id, response: choice.dataset.offerChoice };
       delete offerErrors[id];
       render();
-      list.querySelector('[data-offer-confirm]')?.focus();
+      list.querySelector(`[data-application="${id}"] [data-offer-confirm]`)?.focus();
     } else if (event.target.closest('[data-offer-cancel]')) {
       const id = offerConfirm?.id;
       offerConfirm = null;
       if (id !== undefined) delete offerErrors[id];
       render();
-      list.querySelector('[data-offer-choice]')?.focus();
+      list.querySelector(`[data-application="${id}"] [data-offer-choice]`)?.focus();
     } else if (event.target.closest('[data-offer-confirm]')) {
       submitOffer();
     }

@@ -74,6 +74,13 @@
 .candidate-card > p { font-size:13px; margin-bottom:20px; }
 .candidate-card details { padding:16px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
 .candidate-card summary { font-weight:650; font-size:13px; }
+.candidate-profile-content { display:grid; gap:18px; padding-top:18px; }
+.candidate-profile-content p { white-space:pre-line; margin:0; font-size:13px; line-height:1.7; }
+.candidate-profile-content h3 { font-size:13px; margin-bottom:8px; }
+.candidate-profile-content ul { margin:0; padding-left:18px; }
+.candidate-profile-content .profile-records li { margin-bottom:12px; }
+.candidate-profile-content .profile-records span { display:block; font-size:12px; color:var(--muted); margin-top:4px; }
+.candidate-profile-content .profile-skill-list { display:flex; flex-wrap:wrap; gap:6px 22px; }
 .candidate-card form { justify-content:space-between; }
 .inline-candidate-review { margin-top:24px; padding-top:24px; border-top:1px solid var(--border); animation:applicants-reveal 180ms ease-out; }
 .inline-candidate-review[hidden] { display:none; }

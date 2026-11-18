@@ -22,6 +22,9 @@ test('analytics enforces identity, validates ranges and keeps accounts isolated'
     const all = (await agent.get('/api/applications/analytics?range=all').expect(200)).body;
     assert.equal(all.total, 1);
     assert.equal(all.active, 1);
+    assert.equal(all.items[0].job.summary, 'Description');
+    assert.equal(all.items[0].job.isDemo, false);
+    assert.deepEqual(all.items[0].history.map((event) => event.status), ['applied']);
     assert.deepEqual(all.activity, [{ month: '2020-01', count: 1 }]);
     assert.equal(all.statuses.reduce((sum, item) => sum + item.count, 0), 1);
     await db.run("UPDATE applications SET status = 'rejected' WHERE user_id = ?", user.id);
@@ -33,5 +36,15 @@ test('analytics enforces identity, validates ranges and keeps accounts isolated'
     const latest = (await agent.get('/api/applications/analytics?range=all').expect(200)).body;
     assert.equal(latest.history.length, 1);
     assert.equal(latest.history[0].status, 'interview');
+    assert.deepEqual(latest.items[0].history.map((event) => event.status), ['applied', 'rejected', 'interview']);
+    await db.run("UPDATE jobs SET demo_key = 'preview-demo', description = ? WHERE id = ?", 'Stored description '.repeat(30), job.id);
+    const demo = (await agent.get('/api/applications/analytics?range=all').expect(200)).body.items[0];
+    assert.equal(demo.job.isDemo, true);
+    assert.equal(demo.job.summary, 'Stored description '.repeat(30).slice(0, 240));
+    const other = await db.run("INSERT INTO users(name, email, password_hash) VALUES ('Other', 'other@example.test', 'test-only')");
+    await db.run('INSERT INTO applications(user_id, job_id) VALUES (?, ?)', other.lastID, job.id);
+    const privateResult = (await agent.get('/api/applications/analytics?range=all').expect(200)).body;
+    assert.equal(privateResult.items.length, 1);
+    assert.equal(privateResult.items[0].history.length, 3);
   } finally { await db.close(); }
 });

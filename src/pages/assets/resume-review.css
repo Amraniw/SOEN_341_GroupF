@@ -289,7 +289,9 @@ body[data-page='resume'] .workspace-main {
   line-height: 1.55;
 }
 
-.review-profile p { max-width: 68ch; }
+.review-profile { display:grid; grid-template-columns:17px minmax(0,1fr); column-gap:8px; }
+.review-profile h3 { grid-column:1 / -1; }
+.review-profile p { grid-column:2; max-width:none; min-width:0; }
 .review-section ul { padding-inline-start: 19px; }
 .review-section li + li { margin-block-start: 7px; }
 .review-section li::marker { color: var(--brand); }

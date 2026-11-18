@@ -1,68 +1,65 @@
 import { session } from './workspace.js';
 import { request } from './api.js';
 import { clearDisplaySession } from './session.js';
-import { escapeHtml, initials, icon, formatDate } from './ui.js';
+import { escapeHtml, icon } from './ui.js';
 
 if (session) {
   const { user } = session;
-  const setupCount = document.querySelector('#setup-count');
-  const setupProgress = document.querySelector('#setup-progress');
-  const resumeStep = document.querySelector('#resume-step');
-  const resumeSummary = document.querySelector('#resume-summary');
+  document.querySelector('#welcome-name').textContent = user.name.trim().split(/\s+/)[0];
 
-  document.querySelector('#welcome-name').textContent = user.name
-    .trim()
-    .split(/\s+/)[0];
-  document.querySelector('#account-summary').innerHTML =
-    `<div class="avatar">${escapeHtml(initials(user.name))}</div><div class="min-width-zero"><h2>${escapeHtml(user.name)}</h2><p class="break-word">${escapeHtml(user.email)}</p><span class="badge badge-neutral">CareerConnect member</span></div>`;
-
-  function renderResume(resume) {
-    const uploaded = Boolean(resume);
-    const readiness = uploaded ? 100 : 60;
-
-    setupCount.textContent = `${readiness}% complete`;
-    setupProgress.value = readiness;
-    setupProgress.textContent = `${readiness}%`;
-    setupProgress.setAttribute(
-      'aria-label',
-      `Profile readiness: ${readiness} percent`
-    );
-
-    if (uploaded) {
-      resumeStep.innerHTML =
-        `<span class="step-icon complete">${icon('check')}</span><div><h3>Resume uploaded</h3><p>Saved securely to your account.</p></div><a class="text-link" href="/resume/index.html">Manage resume ${icon('arrow')}</a>`;
-      document.querySelector('#next-title').textContent =
-        'Your next chapter starts here.';
-      document.querySelector('#next-copy').textContent =
-        'Your account and resume are ready. Keep your current experience on file as your career grows.';
-      document.querySelector('#next-action').innerHTML =
-        `Manage resume ${icon('arrow')}`;
-      resumeSummary.innerHTML =
-        `<span class="badge badge-success">Resume ready</span><h3 class="break-word">${escapeHtml(resume.originalName)}</h3><p>Uploaded ${escapeHtml(formatDate(resume.uploadedAt))}</p><a class="text-link" href="/resume/index.html">View or delete resume ${icon('arrow')}</a>`;
+  async function loadOverview() {
+    const results = await Promise.allSettled([
+      request('/applications', undefined, 'GET'),
+      request('/resumes', undefined, 'GET'),
+      request('/profile', undefined, 'GET'),
+    ]);
+    if (results.some((result) => result.status === 'rejected' && result.reason.status === 401)) {
+      clearDisplaySession();
+      location.replace('/auth/login.html?reason=expired');
       return;
     }
+    const [applicationResult, resumeResult, profileResult] = results;
+    let applications;
+    let resumes;
+    if (applicationResult.status === 'fulfilled') {
+      applications = applicationResult.value.items;
+      document.querySelector('#overview-active').textContent = applications.filter((item) => ['applied', 'under_review', 'interview'].includes(item.status)).length;
+      document.querySelector('#overview-applications').textContent = applications.length
+        ? 'Follow every opportunity from submission to its latest status. Revisit role details and see how each application is progressing.'
+        : 'Find a role that fits, then follow its progress here. Your applications and status history stay together as your search grows.';
+    } else {
+      document.querySelector('#overview-applications').textContent = 'Application summary unavailable. Open Applications to try again.';
+    }
+    if (resumeResult.status === 'fulfilled') {
+      resumes = resumeResult.value.items;
+      const defaultResume = resumes.find((item) => item.isDefault);
+      document.querySelector('#overview-resumes').textContent = resumes.length;
+      const resumeSummary = document.querySelector('#overview-resume');
+      resumeSummary.classList.toggle('overview-default-resume', Boolean(defaultResume));
+      resumeSummary.textContent = defaultResume ? `Default · ${defaultResume.originalName}` : 'No resume saved yet.';
+      if (defaultResume) resumeSummary.title = 'Default resume: ' + defaultResume.originalName;
+    } else {
+      document.querySelector('#overview-resume').textContent = 'Resume summary unavailable. Open Manage resumes to try again.';
+    }
+    document.querySelector('#overview-profile').textContent = profileResult.status === 'fulfilled'
+      ? profileResult.value.profile?.headline || 'Professional profile not created yet.'
+      : 'Your professional profile is unavailable right now.';
 
-    resumeStep.innerHTML =
-      `<span class="step-icon">2</span><div><h3>Add your resume</h3><p>Upload a PDF of your experience.</p></div><a class="text-link" href="/resume/index.html">Get started ${icon('arrow')}</a>`;
-    resumeSummary.innerHTML =
-      `<span class="icon-tile">${icon('file')}</span><h3>Make your experience count.</h3><p>Upload a PDF to raise your profile readiness from 60% to 100%.</p><a class="text-link" href="/resume/index.html">Upload resume ${icon('arrow')}</a>`;
-  }
-
-  async function loadCurrentResume() {
-    try {
-      const result = await request('/resumes/current', undefined, 'GET');
-      renderResume(result.resume);
-    } catch (error) {
-      if (error.status === 401) {
-        clearDisplaySession();
-        location.replace('/auth/login.html?reason=expired');
-        return;
-      }
-      setupCount.textContent = 'Status unavailable';
-      resumeSummary.innerHTML =
-        `<span class="badge badge-neutral">Unable to refresh</span><h3>Resume status unavailable</h3><p>${escapeHtml(error.message)}</p><a class="text-link" href="/dashboard/index.html">Try again ${icon('arrow')}</a>`;
+    let next;
+    if (applications?.some((item) => item.status === 'offered' && !item.offerResponse && !item.quitAt)) {
+      next = ['An offer is ready for your review.', 'See the role and choose your next step in Applications.', '/applications/index.html', 'Review applications'];
+    } else if (resumes?.length === 0) {
+      next = ['Bring your experience into focus.', 'Upload your first resume, then use AI Resume Review for focused feedback.', '/resume/index.html', 'Add a resume'];
+    } else if (applications?.some((item) => item.status === 'interview')) {
+      next = ['Your search is moving forward.', 'Check your interview-stage applications and keep track of each opportunity.', '/applications/index.html', 'View applications'];
+    }
+    if (next) {
+      document.querySelector('#next-title').textContent = next[0];
+      document.querySelector('#next-copy').textContent = next[1];
+      const action = document.querySelector('#next-action');
+      action.href = next[2];
+      action.innerHTML = `${escapeHtml(next[3])} ${icon('arrow')}`;
     }
   }
-
-  loadCurrentResume();
+  loadOverview();
 }

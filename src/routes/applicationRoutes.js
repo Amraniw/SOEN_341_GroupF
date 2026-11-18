@@ -33,6 +33,8 @@ function publicApplication(row) {
       categoryName: row.category_name,
       employmentType: row.employment_type,
       workplaceType: row.workplace_type,
+      summary: row.job_summary,
+      isDemo: Boolean(row.demo_key),
     },
   };
 }
@@ -40,7 +42,8 @@ function publicApplication(row) {
 const APPLICATION_SELECT = `
   SELECT a.id, a.user_id, a.job_id, a.status, a.applied_at, a.updated_at,
          a.offer_response, a.offer_responded_at, a.quit_at,
-         j.title, j.company, j.location, j.category,
+         j.title, j.company, j.location, j.category, j.demo_key,
+         substr(j.description, 1, 240) AS job_summary,
          c.name AS category_name, j.employment_type, j.workplace_type
   FROM applications a
   JOIN jobs j ON j.id = a.job_id
@@ -60,11 +63,20 @@ function createApplicationRouter(database) {
     try {
       const cutoff = range === 'all' ? '0000-01-01' : new Date(Date.now() - (Number(range) - 1) * 86400000).toISOString().slice(0, 10);
       const rows = await database.all(`${APPLICATION_SELECT} WHERE a.user_id = ? AND date(a.applied_at) >= ? ORDER BY a.applied_at DESC, a.id DESC`, request.authenticatedUser.id, cutoff);
+      const events = await database.all(`SELECT h.application_id, h.status, h.changed_at
+        FROM application_status_history h JOIN applications a ON a.id = h.application_id
+        WHERE a.user_id = ? AND date(a.applied_at) >= ?
+        ORDER BY datetime(h.changed_at), h.id`, request.authenticatedUser.id, cutoff);
+      const histories = new Map();
+      for (const event of events) {
+        if (!histories.has(event.application_id)) histories.set(event.application_id, []);
+        histories.get(event.application_id).push({ status: event.status, statusLabel: applicationStatusName(event.status), changedAt: event.changed_at });
+      }
       const history = await database.all(`SELECT a.id AS application_id, a.status, a.updated_at AS changed_at, j.title, j.company FROM applications a JOIN jobs j ON j.id = a.job_id WHERE a.user_id = ? AND date(a.updated_at) >= ? ORDER BY datetime(a.updated_at) DESC, a.id DESC LIMIT 100`, request.authenticatedUser.id, cutoff);
       const counts = APPLICATION_STATUSES.map(({ id, name }) => ({ id, name, count: rows.filter((row) => row.status === id).length }));
       const months = new Map();
       for (const row of rows) { const month = row.applied_at.slice(0, 7); months.set(month, (months.get(month) || 0) + 1); }
-      return response.json({ range, cutoff, total: rows.length, active: rows.filter((row) => ['applied', 'under_review', 'interview'].includes(row.status)).length, statuses: counts, activity: [...months].sort(([a], [b]) => a.localeCompare(b)).map(([month, count]) => ({ month, count })), items: rows.map(publicApplication), history: history.map((row) => ({ applicationId: row.application_id, status: row.status, statusLabel: applicationStatusName(row.status), changedAt: row.changed_at, title: row.title, company: row.company })) });
+      return response.json({ range, cutoff, total: rows.length, active: rows.filter((row) => ['applied', 'under_review', 'interview'].includes(row.status)).length, statuses: counts, activity: [...months].sort(([a], [b]) => a.localeCompare(b)).map(([month, count]) => ({ month, count })), items: rows.map((row) => ({ ...publicApplication(row), history: histories.get(row.id) || [] })), history: history.map((row) => ({ applicationId: row.application_id, status: row.status, statusLabel: applicationStatusName(row.status), changedAt: row.changed_at, title: row.title, company: row.company })) });
     } catch (error) { return next(error); }
   });
 
