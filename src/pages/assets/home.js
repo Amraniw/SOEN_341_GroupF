@@ -18,7 +18,7 @@ initPublicHeader({
     const role = session?.user.role;
     const recruiter = role === 'recruiter';
     const home = workspaceHome(role);
-    const label = recruiter ? 'Recruiter dashboard' : 'Your workspace';
+    const label = recruiter ? 'Recruiter workspace' : 'Your workspace';
     primaryLinks.forEach((link) => {
       setEntry(link, session ? home : '/auth/signup.html', session ? label : 'Create account');
     });

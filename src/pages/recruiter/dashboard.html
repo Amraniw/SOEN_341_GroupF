@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Create and manage your CareerConnect job postings." />
-    <title>Recruiter dashboard | CareerConnect</title>
+    <title>Manage postings | CareerConnect</title>
     <link rel="icon" href="/assets/brand.svg" type="image/svg+xml" />
     <script src="/assets/theme.js"></script>
     <link rel="stylesheet" href="/assets/styles.css" />
@@ -19,18 +19,18 @@
       <div class="workspace-layout">
         <aside class="workspace-sidebar" id="workspace-sidebar" aria-label="Workspace navigation"></aside>
         <main class="workspace-main recruiter-main" id="main" tabindex="-1">
-          <div class="page-heading recruiter-heading">
-            <div><p class="eyebrow">YOUR RECRUITING WORKSPACE</p><h1>Recruiter dashboard</h1><p>Create opportunities. Keep every posting up to date.</p></div>
+          <div class="page-heading recruiter-heading recruiter-posting-hero">
+            <div><p class="eyebrow">YOUR RECRUITING WORKSPACE</p><h1>Manage postings</h1><p>Publish roles and review the people who apply.</p></div>
             <button class="button" type="button" id="new-posting">Create posting</button>
           </div>
-          <section aria-labelledby="overview-heading" id="recruiter-overview" aria-busy="true">
-            <h2 id="overview-heading">At a glance</h2>
+          <section class="panel recruiter-posting-summary" aria-labelledby="overview-heading" id="recruiter-overview" aria-busy="true">
+            <h2 id="overview-heading">Posting snapshot</h2>
             <p id="overview-state" role="status" aria-live="polite">Loading your overview…</p>
             <dl class="recruiter-stats">
-              <div class="panel"><dt>Total postings</dt><dd id="stat-total">—</dd></div>
-              <div class="panel"><dt>Open postings</dt><dd id="stat-open">—</dd></div>
-              <div class="panel"><dt>Closed postings</dt><dd id="stat-closed">—</dd></div>
-              <div class="panel"><dt>Applications received</dt><dd id="stat-applications">—</dd></div>
+              <div><dt>Total postings</dt><dd id="stat-total">—</dd></div>
+              <div><dt>Open postings</dt><dd id="stat-open">—</dd></div>
+              <div><dt>Closed postings</dt><dd id="stat-closed">—</dd></div>
+              <div><dt>Applications received</dt><dd id="stat-applications">—</dd></div>
             </dl>
           </section>
           <section class="panel recruiter-editor" id="posting-editor" aria-labelledby="editor-heading" hidden>
@@ -43,9 +43,25 @@
             </form>
           </section>
           <section id="postings" aria-labelledby="postings-heading">
-            <div class="recruiter-heading"><div><h2 id="postings-heading" tabindex="-1">My job postings</h2><p id="posting-state" role="status" aria-live="polite">Loading postings…</p></div><button class="button button-secondary" type="button" id="posting-retry">Refresh dashboard</button></div>
+            <div class="recruiter-heading">
+              <div><h2 id="postings-heading" tabindex="-1">My job postings</h2><p id="posting-state" role="status" aria-live="polite">Loading postings…</p></div>
+              <div class="recruiter-posting-tools">
+                <label for="posting-filter">Show postings</label>
+                <select id="posting-filter" disabled>
+                  <option value="">All postings</option>
+                  <option value="open">Open</option>
+                  <option value="closed">Closed</option>
+                  <option value="applicants">With applicants</option>
+                </select>
+                <button class="button button-secondary" type="button" id="posting-retry">Refresh postings</button>
+              </div>
+            </div>
             <div id="mutation-notice" class="notice" role="status" tabindex="-1" hidden></div>
             <ol id="posting-list" class="recruiter-postings" aria-busy="true"></ol>
+            <div class="recruiter-empty" id="posting-filter-empty" hidden>
+              <p>No postings match this filter.</p>
+              <button class="button button-secondary" type="button" id="reset-posting-filter">Show all postings</button>
+            </div>
           </section>
           <footer class="workspace-footer"><span>© 2026 CareerConnect</span><span>Your next great hire starts here.</span></footer>
         </main>
@@ -54,8 +70,9 @@
     <dialog id="delete-dialog" aria-labelledby="delete-heading" aria-describedby="delete-copy delete-explanation">
       <h2 id="delete-heading">Permanently delete posting?</h2>
       <div id="delete-notice" class="notice" role="alert" tabindex="-1" hidden></div>
-      <p id="delete-copy"></p><p id="delete-explanation">Deleting removes it from your dashboard and from job search, and cannot be undone. To stop new applications but keep the posting, close it instead. You can reopen a closed posting at any time.</p>
-      <div class="recruiter-actions"><button class="button button-secondary" type="button" id="cancel-delete" autofocus>Keep posting</button><button class="button recruiter-danger" type="button" id="confirm-delete">Delete permanently</button></div>
+      <p id="delete-copy"></p>
+      <p id="delete-explanation">This removes the posting from your workspace and job search. This action cannot be undone.</p>
+      <div class="recruiter-actions"><button class="button button-secondary" type="button" id="cancel-delete" autofocus>Cancel</button><button class="button recruiter-delete-confirm" type="button" id="confirm-delete">Delete</button></div>
     </dialog>
   </body>
 </html>

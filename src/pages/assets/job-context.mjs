@@ -1,4 +1,4 @@
-import { workspaceHome } from './workspace-role.mjs';
+import { workspaceHome, workspaceAccount } from './workspace-role.mjs';
 
 export const FILTER_KEYS = ['q', 'location', 'category'];
 
@@ -37,7 +37,7 @@ export function workspaceReturnPath(next, origin, role) {
   try {
     const destination = new URL(next || workspaceHome(role), origin);
     const rolePages = role === 'recruiter'
-      ? ['/recruiter/dashboard', '/recruiter/dashboard/', '/recruiter/dashboard.html', '/profile/index.html']
+      ? [workspaceHome(role), workspaceAccount(role), '/recruiter/dashboard', '/recruiter/dashboard/', '/recruiter/dashboard.html', '/profile/index.html']
       : ['/dashboard/index.html', '/profile/index.html', '/resume/index.html', '/applications/index.html'];
     const allowed = destination.origin === origin && (
       /^\/workspace\/jobs(?:\/|$)/i.test(destination.pathname) ||

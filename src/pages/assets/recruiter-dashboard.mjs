@@ -18,6 +18,7 @@ export function createRecruiterDashboard({ document, request, formatDate, onUnau
   const fieldset = byId('editor-fields');
   const editor = byId('posting-editor');
   const list = byId('posting-list');
+  const filter = byId('posting-filter');
   const dialog = byId('delete-dialog');
   const controls = {};
   const listEditors = {};
@@ -26,6 +27,7 @@ export function createRecruiterDashboard({ document, request, formatDate, onUnau
   let busy = false;
   let loading = false;
   let generation = 0;
+  let postingRows = [];
 
   function element(tag, text, className) {
     const node = document.createElement(tag);
@@ -49,7 +51,7 @@ export function createRecruiterDashboard({ document, request, formatDate, onUnau
     for (const id of ['save-posting', 'cancel-edit', 'new-posting', 'confirm-delete', 'cancel-delete']) byId(id).disabled = value;
     byId('posting-retry').disabled = value || loading;
     for (const button of list.querySelectorAll('[data-management]')) {
-      button.disabled = value || button.getAttribute('data-has-applications') === 'true';
+      button.disabled = value;
     }
   }
   function action(text, handler, className = 'button button-secondary') {
@@ -207,12 +209,26 @@ export function createRecruiterDashboard({ document, request, formatDate, onUnau
     if (!editor.hidden) controls.title.focus();
   }
 
+  function filterPostings() {
+    const choice = filter.value;
+    let visible = 0;
+    for (const { job, item } of postingRows) {
+      item.hidden = Boolean(choice) && (choice === 'applicants' ? job.applicationCount === 0 : job.status !== choice);
+      if (!item.hidden) visible++;
+    }
+    byId('posting-state').textContent = choice && postingRows.length
+      ? `${visible} of ${postingRows.length} postings shown`
+      : `${visible} ${visible === 1 ? 'posting' : 'postings'}`;
+    byId('posting-filter-empty').hidden = !postingRows.length || visible > 0;
+  }
+
   function renderPostings(items) {
     if (!Array.isArray(items) || items.some((job) => !Number.isSafeInteger(job.id) || job.id < 1 || !['open', 'closed'].includes(job.status))) {
       throw new Error('The postings response was incomplete. Refresh to try again.');
     }
     list.replaceChildren();
-    byId('posting-state').textContent = `${items.length} ${items.length === 1 ? 'posting' : 'postings'}`;
+    postingRows = [];
+    filter.disabled = !items.length;
     if (!items.length) {
       const empty = element('li', undefined, 'recruiter-empty');
       empty.append(element('h3', 'Your next opportunity starts here.'), element('p', 'You have no job postings yet. Create your first posting to get started.'), action('Create first posting', newPosting, 'button'));
@@ -225,31 +241,40 @@ export function createRecruiterDashboard({ document, request, formatDate, onUnau
       const item = element('li');
       const card = element('article', undefined, `panel recruiter-card${closed ? ' recruiter-card-closed' : ''}`);
       const top = element('div', undefined, 'recruiter-card-top');
-      const identity = element('div');
-      identity.append(element('h3', job.title), element('p', `${job.company} · ${job.location}`));
+      const identity = element('div', undefined, 'recruiter-card-identity');
+      const mark = element('span', job.company.trim().slice(0, 2).toUpperCase(), 'recruiter-company-mark');
+      mark.setAttribute('aria-hidden', 'true');
+      const name = element('div');
+      name.append(element('h3', job.title), element('p', `${job.company} · ${job.location}`));
+      identity.append(mark, name);
       top.append(identity, element('span', closed ? 'Closed' : 'Open', `recruiter-status${closed ? ' recruiter-status-closed' : ''}`));
       const facts = element('div', undefined, 'recruiter-facts');
       const closing = job.closingDate
         ? [element('span', `${deadlinePassed ? 'Closing date passed:' : 'Closes'} ${closingDateLabel(job.closingDate)}`, deadlinePassed && !closed ? 'recruiter-warning' : undefined)]
         : [];
-      facts.append(element('span', job.categoryName), element('span', `Created ${formatDate(job.createdAt)}`), ...closing, element('span', `${job.applicationCount} ${job.applicationCount === 1 ? 'application' : 'applications'}`));
+      facts.append(element('span', job.categoryName || 'Category unavailable'), element('span', `Created ${formatDate(job.createdAt)}`), ...closing, element('span', `${job.applicationCount} ${job.applicationCount === 1 ? 'application' : 'applications'}`, 'recruiter-applicant-count'));
       const actions = element('div', undefined, 'recruiter-actions');
       const editButton = action('Edit', () => edit(job.id));
       editButton.setAttribute('aria-label', `Edit ${job.title}`);
       const lifecycle = action(closed ? 'Reopen posting' : 'Close posting', () => changeStatus(job));
       lifecycle.setAttribute('data-lifecycle', '');
       lifecycle.setAttribute('data-job-id', String(job.id));
-      const remove = action('Delete', () => askDelete(job), 'button recruiter-danger');
-      remove.disabled = job.applicationCount > 0;
-      remove.setAttribute('data-has-applications', String(job.applicationCount > 0));
-      remove.setAttribute('aria-label', `Delete ${job.title}`);
-      for (const button of [editButton, lifecycle, remove]) button.setAttribute('data-management', '');
-      actions.append(editButton, lifecycle, remove);
       const applicants = element('a', 'Review applicants', 'button button-secondary');
       applicants.href = `?applicants=${job.id}#candidate-review`;
       applicants.setAttribute('data-review-applicants', '');
       applicants.setAttribute('aria-expanded', 'false');
-      actions.append(applicants);
+      actions.append(applicants, editButton, lifecycle);
+      const buttons = [editButton, lifecycle];
+      if (job.applicationCount === 0) {
+        const remove = action('Delete', () => askDelete(job, remove), 'button recruiter-danger');
+        remove.setAttribute('aria-label', `Delete ${job.title}`);
+        buttons.push(remove);
+        actions.append(remove);
+      }
+      for (const button of buttons) {
+        button.setAttribute('data-management', '');
+        button.disabled = busy;
+      }
       if (job.status === 'open') {
         const view = element('a', 'View public posting', 'text-link');
         view.href = `/jobs/${job.id}`;
@@ -268,12 +293,15 @@ export function createRecruiterDashboard({ document, request, formatDate, onUnau
       if (notes.length) card.append(element('p', notes.join(' '), 'recruiter-card-note'));
       item.append(card);
       list.append(item);
+      postingRows.push({ job, item });
     }
+    filterPostings();
   }
 
   async function load() {
     const version = ++generation;
     loading = true;
+    filter.disabled = true;
     byId('posting-retry').disabled = true;
     byId('recruiter-overview').setAttribute('aria-busy', 'true');
     list.setAttribute('aria-busy', 'true');
@@ -288,13 +316,13 @@ export function createRecruiterDashboard({ document, request, formatDate, onUnau
         const values = { total: overview?.totalPostings, open: overview?.openPostings, closed: overview?.closedPostings, applications: overview?.totalApplications };
         if (Object.values(values).some((value) => !Number.isSafeInteger(value) || value < 0)) throw new Error('The overview response was incomplete. Refresh to try again.');
         for (const [key, value] of Object.entries(values)) byId(`stat-${key}`).textContent = String(value);
-        byId('overview-state').textContent = 'Your posting activity, up to date.';
+        byId('overview-state').textContent = '';
         byId('overview-state').setAttribute('role', 'status');
       }).catch((error) => {
         if (!current()) return;
         accessError(error);
         for (const key of ['total', 'open', 'closed', 'applications']) byId(`stat-${key}`).textContent = '—';
-        byId('overview-state').textContent = `Overview unavailable. ${error.message} Use Refresh dashboard to retry.`;
+        byId('overview-state').textContent = `Overview unavailable. ${error.message} Use Refresh postings to retry.`;
         byId('overview-state').setAttribute('role', 'alert');
       }),
       request('/recruiter/jobs', undefined, 'GET').then((result) => {
@@ -305,7 +333,9 @@ export function createRecruiterDashboard({ document, request, formatDate, onUnau
         if (!current()) return;
         accessError(error);
         list.replaceChildren();
-        byId('posting-state').textContent = `Postings unavailable. ${error.message} Use Refresh dashboard to retry.`;
+        postingRows = [];
+        byId('posting-filter-empty').hidden = true;
+        byId('posting-state').textContent = `Postings unavailable. ${error.message} Use Refresh postings to retry.`;
         byId('posting-state').setAttribute('role', 'alert');
       }),
     ]);
@@ -356,31 +386,39 @@ export function createRecruiterDashboard({ document, request, formatDate, onUnau
         ? `“${job.title}” is closed. It is hidden from job search and its existing applications are kept.`
         : `“${job.title}” is open again and visible in job search.`);
       await load();
+      setBusy(false);
       // The list was redrawn: keep keyboard focus on the posting that changed.
-      [...list.querySelectorAll('[data-lifecycle]')].find((button) => button.getAttribute('data-job-id') === String(job.id))?.focus();
+      const row = postingRows.find(({ job: candidate }) => candidate.id === job.id);
+      const control = row && !row.item.hidden ? row.item.querySelector('[data-lifecycle]') : byId('postings-heading');
+      control?.focus();
     } catch (error) {
       accessError(error);
       if (error.status === 404) { await postingGone(job.id); return; }
       notice(byId('mutation-notice'), error.message, true);
     } finally { setBusy(false); }
   }
-  function askDelete(job) {
-    if (busy) return;
+  function askDelete(job, opener) {
+    if (busy || dialog.open) return;
     if (job.applicationCount > 0) { notice(byId('mutation-notice'), 'Postings with applications must be closed instead of deleted.', true); return; }
-    deletion = job;
-    byId('delete-copy').textContent = `You are deleting “${job.title}”.`;
+    deletion = { job, opener };
+    byId('delete-copy').textContent = `Are you sure you want to remove “${job.title}”?`;
     byId('delete-notice').hidden = true;
     dialog.showModal();
+    byId('cancel-delete').focus();
   }
   function cancelDelete() {
     if (busy) return;
+    const opener = deletion?.opener;
     deletion = null;
     dialog.close();
+    (opener?.isConnected ? opener : byId('postings-heading')).focus();
   }
   async function confirmDelete() {
     if (busy || !deletion) return;
     setBusy(true);
-    const target = deletion;
+    const { job: target } = deletion;
+    byId('delete-notice').hidden = true;
+    byId('confirm-delete').textContent = 'Deleting…';
     try {
       await request(`/recruiter/jobs/${target.id}`, undefined, 'DELETE');
       if (original?.id === target.id) { original = null; editor.hidden = true; }
@@ -402,12 +440,21 @@ export function createRecruiterDashboard({ document, request, formatDate, onUnau
         dialog.close();
         await postingGone(target.id, 'This posting had already been deleted. Your list has been refreshed.', false);
       } else { notice(byId('delete-notice'), error.message, true); byId('delete-notice').focus(); }
-    } finally { setBusy(false); }
+    } finally {
+      setBusy(false);
+      byId('confirm-delete').textContent = 'Delete';
+    }
   }
 
   byId('new-posting').addEventListener('click', newPosting);
   byId('cancel-edit').addEventListener('click', cancelEdit);
   byId('posting-retry').addEventListener('click', load);
+  filter.addEventListener('change', filterPostings);
+  byId('reset-posting-filter').addEventListener('click', () => {
+    filter.value = '';
+    filterPostings();
+    filter.focus();
+  });
   byId('cancel-delete').addEventListener('click', cancelDelete);
   byId('confirm-delete').addEventListener('click', confirmDelete);
   dialog.addEventListener('cancel', (event) => { event.preventDefault(); cancelDelete(); });

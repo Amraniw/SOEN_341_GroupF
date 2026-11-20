@@ -16,7 +16,7 @@ if (await initJobShell()) {
   let currentJob;
 
   function recruiterNotice() {
-    return `<p>Applications are for job seekers. Manage your postings in your recruiter dashboard.</p><a class="button button-secondary" href="${RECRUITER_HOME}">Recruiter dashboard</a>`;
+    return `<p>Applications are for job seekers. You can manage postings from your recruiter workspace.</p><a class="button button-secondary" href="${RECRUITER_HOME}">Recruiter workspace</a>`;
   }
 
   function applicationStatus(application, confirmation = false) {

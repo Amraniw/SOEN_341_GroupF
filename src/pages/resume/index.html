@@ -69,11 +69,10 @@
             <span class="badge badge-neutral">PDF · Up to 5 MB</span>
           </div>
           <div class="resume-layout">
-            <div class="stack resume-management">
-              <section class="panel">
+            <section class="panel resume-management" aria-labelledby="resume-library-heading">
                 <div class="panel-heading">
-                  <h2>Upload resume</h2>
-                  <span data-icon="file"></span>
+                  <h2 id="resume-library-heading">Resume library</h2>
+                  <span class="badge badge-neutral" id="resume-count">Saved resumes</span>
                 </div>
                 <div id="upload-notice" role="alert" tabindex="-1" hidden></div>
                 <form id="resume-form">
@@ -82,15 +81,10 @@
                     id="drop-zone"
                     data-upload-state="empty"
                   >
-                    <span class="icon-tile" data-icon="upload"></span>
-                    <h3>Give your experience a home.</h3>
-                    <p id="file-help">
-                      Drop one PDF here, or choose a file.<br />PDF format only.
-                      Maximum file size: 5 MB.
-                    </p>
+                    <div><h3>Add a resume</h3><p id="file-help">Drop a PDF here · Up to 5 MB</p></div>
                     <label class="file-picker"
                       ><span class="button button-secondary"
-                        >Choose PDF <span data-icon="file"></span></span
+                        >Choose PDF</span
                       ><input
                         id="resume-file"
                         type="file"
@@ -126,22 +120,11 @@
                   </div>
                 </form>
                 <p class="help-note">
-                  Each upload is added to your saved resumes and becomes your
-                  default. You can choose a different default or delete any
-                  resume at any time.
+                  New uploads become your default for applications.
                 </p>
-              </section>
-              <section class="panel receipts-panel">
-                <div class="panel-heading">
-                  <h2>Saved resumes</h2>
-                  <span class="badge badge-neutral" id="resume-count"
-                    >Saved to your account</span
-                  >
-                </div>
-                <p>
-                  Your default resume is the one shown on your profile. Saved
-                  resumes remain here after you refresh or sign in again.
-                </p>
+              <div class="resume-library-list">
+                <h3>Saved resumes</h3>
+                <p id="resume-library-help" hidden>Choose a file below to select it for review.</p>
                 <div
                   id="resumes-notice"
                   role="status"
@@ -154,7 +137,7 @@
                 <div class="empty-state" id="receipt-empty" hidden>
                   <span class="icon-tile" data-icon="file"></span>
                   <div>
-                    <h3>No resume saved yet</h3>
+                    <h4>No resume saved yet</h4>
                     <p>
                       Choose a PDF above. Your saved resumes will appear here
                       after you upload them.
@@ -166,8 +149,8 @@
                   id="receipt-list"
                   aria-label="Saved resumes"
                 ></ul>
-              </section>
-              <details class="panel resume-tips">
+              </div>
+              <details class="resume-tips">
                 <summary>PDF upload tips</summary>
                 <ul class="upload-guidance">
                   <li>
@@ -202,7 +185,7 @@
                   </li>
                 </ul>
               </details>
-            </div>
+            </section>
             <section class="panel review-panel" id="resume-review" aria-labelledby="resume-review-title" hidden>
               <header class="review-header">
                 <span class="icon-tile" data-icon="applications"></span>
@@ -232,6 +215,15 @@
                   </span>
                 </p>
                 <div id="review-content">
+                  <section id="review-preview" class="review-preview" aria-labelledby="review-preview-title" hidden>
+                    <h3 id="review-preview-title">What your review covers</h3>
+                    <dl>
+                      <div><dt>Candidate profile</dt><dd>A short summary of the experience and skills your resume communicates.</dd></div>
+                      <div><dt>Aligned roles</dt><dd>Relevant CareerConnect postings you can open and explore.</dd></div>
+                      <div><dt>Strengths</dt><dd>Specific details already working in your favor.</dd></div>
+                      <div><dt>Areas to improve</dt><dd>Practical edits to make your experience clearer.</dd></div>
+                    </dl>
+                  </section>
                   <div id="review-loading" class="review-loading" aria-hidden="true" hidden>
                     <div class="review-skeleton-copy"><span></span><span></span><span></span></div>
                     <div class="review-skeleton-roles"><span></span><span></span><span></span></div>
@@ -244,6 +236,7 @@
                     <section class="review-section review-roles">
                       <h3><span data-icon="briefcase"></span>Aligned roles</h3>
                       <ul id="review-roles" role="list"></ul>
+                      <p id="review-no-matches" hidden><strong>Role not determined.</strong> No supported posting matched this review.</p>
                     </section>
                     <section class="review-section review-strengths">
                       <h3><span data-icon="check"></span>Strengths</h3>

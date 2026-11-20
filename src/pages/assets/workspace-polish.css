@@ -19,7 +19,7 @@
 .overview-launch { border:1px solid var(--border); border-radius:var(--radius-lg); background:var(--surface); overflow:hidden; }
 .overview-launch-heading { padding:24px 30px 20px; border-bottom:1px solid var(--border); }
 .overview-launch-heading h2 { margin:0; font-size:19px; letter-spacing:-.25px; }
-.overview-destinations { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); grid-auto-rows:1fr; }
+.overview-destinations { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
 .overview-destination { display:grid; grid-template-columns:42px minmax(0,1fr); align-items:stretch; gap:16px; min-width:0; padding:30px; }
 .overview-destination:nth-child(even) { border-left:1px solid var(--border); }
 .overview-destination:nth-child(-n+2) { border-bottom:1px solid var(--border); }
@@ -27,9 +27,9 @@
 .destination-icon .icon { width:21px; height:21px; }
 .overview-destination h3 { margin:9px 0 10px; font-size:18px; line-height:1.35; letter-spacing:-.2px; }
 .overview-destination p { margin:0; color:var(--muted); font-size:13px; line-height:1.7; overflow-wrap:anywhere; }
-.overview-destination > div { display:flex; flex-direction:column; min-width:0; }
+.overview-destination > div { min-width:0; }
 .overview-default-resume { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.destination-actions { display:flex; flex-wrap:wrap; gap:4px 20px; margin-top:auto; padding-top:22px; }
+.destination-actions { display:flex; flex-wrap:wrap; gap:4px 20px; margin-top:12px; }
 .destination-actions .text-link { min-height:36px; font-size:13px; gap:8px; }
 .destination-actions .icon { width:15px; transition:transform 160ms; }
 .destination-actions a:hover .icon { transform:translateX(3px); }
@@ -52,8 +52,6 @@
   .overview-destination { grid-template-columns:36px minmax(0,1fr); padding:24px 22px; gap:14px; }
   .destination-icon { width:36px; height:36px; border-radius:9px; }
   .overview-destination h3 { font-size:17px; margin-top:6px; }
-  .destination-actions { padding-top:18px; }
-  .overview-destinations { grid-auto-rows:auto; }
   .overview-destination:nth-child(even) { border-left:0; }
   .overview-destination:not(:last-child) { border-bottom:1px solid var(--border); }
 }

@@ -24,9 +24,10 @@ if (session) {
     if (applicationResult.status === 'fulfilled') {
       applications = applicationResult.value.items;
       document.querySelector('#overview-active').textContent = applications.filter((item) => ['applied', 'under_review', 'interview'].includes(item.status)).length;
-      document.querySelector('#overview-applications').textContent = applications.length
-        ? 'Follow every opportunity from submission to its latest status. Revisit role details and see how each application is progressing.'
-        : 'Find a role that fits, then follow its progress here. Your applications and status history stay together as your search grows.';
+      const [latest] = applications;
+      document.querySelector('#overview-applications').textContent = latest
+        ? `Latest update · ${latest.statusLabel} · ${latest.job.title}`
+        : 'No applications yet.';
     } else {
       document.querySelector('#overview-applications').textContent = 'Application summary unavailable. Open Applications to try again.';
     }

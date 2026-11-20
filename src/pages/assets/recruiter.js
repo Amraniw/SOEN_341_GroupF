@@ -15,34 +15,11 @@ if (session?.user.role === 'recruiter') {
       } else location.replace('/dashboard/index.html');
     },
   });
-  function showRecruiterSection() {
-    const postings = location.hash === '#postings';
-    document.querySelectorAll('#workspace-sidebar .nav-link').forEach((link) => {
-      const selected = postings
-        ? link.getAttribute('href') === '/recruiter/dashboard#postings'
-        : link.getAttribute('href') === '/recruiter/dashboard';
-      link.removeAttribute('aria-current');
-      link.querySelector('.active-dot')?.remove();
-      if (selected) {
-        link.setAttribute('aria-current', 'page');
-        const dot = document.createElement('span');
-        dot.className = 'active-dot';
-        link.append(dot);
-      }
-    });
-    if (postings) {
+  dashboard.load().then(() => {
+    if (location.hash === '#postings') {
       document.querySelector('#postings').scrollIntoView({ block: 'start' });
       document.querySelector('#postings-heading').focus({ preventScroll: true });
     }
-  }
-  window.addEventListener('hashchange', showRecruiterSection);
-  document.querySelector('#workspace-sidebar').addEventListener('click', (event) => {
-    const link = event.target.closest('a');
-    if (link?.getAttribute('href') === '/recruiter/dashboard#postings' && location.hash === '#postings') {
-      event.preventDefault();
-      showRecruiterSection();
-    }
   });
-  Promise.resolve(dashboard.load()).then(showRecruiterSection);
   setupCandidateReview();
 }

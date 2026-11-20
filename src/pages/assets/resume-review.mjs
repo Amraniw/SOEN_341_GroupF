@@ -15,7 +15,7 @@ function failureMessage(error) {
   }
 }
 
-export function createResumeReview({ document, request, formatDateTime, onUnauthorized }) {
+export function createResumeReview({ document, request, formatDateTime, onUnauthorized, onSelectionChange = () => {} }) {
   const panel = document.querySelector('#resume-review');
   const form = panel.querySelector('form');
   const select = panel.querySelector('select');
@@ -28,8 +28,10 @@ export function createResumeReview({ document, request, formatDateTime, onUnauth
   const output = panel.querySelector('#review-output');
   const content = output.querySelector('#review-content');
   const loading = content.querySelector('#review-loading');
+  const preview = content.querySelector('#review-preview');
   const result = panel.querySelector('#resume-review-result');
   const profile = result.querySelector('p');
+  const noMatches = result.querySelector('#review-no-matches');
   const lists = {
     alignedRoles: result.querySelector('#review-roles'),
     strengths: result.querySelector('#review-strengths'),
@@ -44,6 +46,10 @@ export function createResumeReview({ document, request, formatDateTime, onUnauth
     const resume = resumes.get(select.value);
     const feedback = resume && reviews.get(resume.id);
     const showFeedback = !pending && Boolean(feedback?.isResume);
+    const roles = Array.isArray(feedback?.alignedRoles) ? feedback.alignedRoles.filter((role) =>
+      Number.isSafeInteger(role?.id) && role.id > 0 &&
+      typeof role.title === 'string' && role.title.trim() && !/^undefined$/i.test(role.title.trim())
+    ) : [];
     const animate = transition && output.animate &&
       !document.defaultView.matchMedia('(prefers-reduced-motion: reduce)').matches;
     // Read the current height before cancelling an interrupted transition.
@@ -59,7 +65,10 @@ export function createResumeReview({ document, request, formatDateTime, onUnauth
     button.classList.toggle('is-busy', pending);
     content.setAttribute('aria-busy', String(pending));
     loading.hidden = !pending;
+    preview.hidden = pending || Boolean(feedback) || Boolean(error);
     result.hidden = !showFeedback;
+    noMatches.hidden = !showFeedback || roles.length > 0;
+    onSelectionChange(resume?.id, pending);
     result.classList.toggle('review-reveal', Boolean(animate && reveal && showFeedback));
 
     status.dataset.state = error ? 'error' : pending ? 'pending'
@@ -80,9 +89,22 @@ export function createResumeReview({ document, request, formatDateTime, onUnauth
 
     profile.textContent = result.hidden ? '' : feedback.candidateProfile;
     for (const [key, list] of Object.entries(lists)) {
-      list.replaceChildren(...(result.hidden ? [] : feedback[key].map((value) => {
+      const values = key === 'alignedRoles' ? roles : feedback?.[key];
+      list.replaceChildren(...(result.hidden ? [] : values.map((value) => {
         const item = document.createElement('li');
-        item.textContent = value;
+        if (key === 'alignedRoles') {
+          const link = document.createElement('a');
+          link.href = `/workspace/jobs/${value.id}`;
+          link.textContent = value.title;
+          const companyName = typeof value.company === 'string' ? value.company.trim() : '';
+          const details = [/^undefined$/i.test(companyName) ? '' : companyName, value.isDemo ? 'Demo posting' : ''].filter(Boolean);
+          if (details.length) {
+            const company = document.createElement('span');
+            company.textContent = details.join(' · ');
+            link.append(company);
+          }
+          item.append(link);
+        } else item.textContent = value;
         return item;
       })));
     }
@@ -147,6 +169,12 @@ export function createResumeReview({ document, request, formatDateTime, onUnauth
   panel.hidden = false;
   return {
     setResumes,
+    selectResume(id) {
+      if (pending || !resumes.has(String(id))) return;
+      select.value = String(id);
+      render('', { transition: true });
+      select.focus();
+    },
     showLoadError() {
       if (!resumes.size) render('Saved resumes could not be loaded. Refresh the page to try again.');
     },

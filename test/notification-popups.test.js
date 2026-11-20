@@ -84,6 +84,7 @@ describe('Notification popups and idle warning (pure logic)', () => {
       assert.equal(role.isWorkspaceHome(pathname, 'job_seeker'), false, pathname);
     }
     assert.equal(role.isWorkspaceHome('/recruiter/dashboard', 'recruiter'), true);
+    assert.equal(role.isWorkspaceHome('/recruiter/overview.html', 'recruiter'), true);
     assert.equal(role.isWorkspaceHome('/recruiter/dashboard.html', 'recruiter'), true);
     assert.equal(role.isWorkspaceHome('/dashboard/index.html', 'recruiter'), false);
   });

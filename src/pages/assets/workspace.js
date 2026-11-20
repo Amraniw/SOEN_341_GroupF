@@ -1,6 +1,6 @@
 import { resolveSession, signInUrl, signOut } from './session.js';
 import { escapeHtml, initials, icon } from './ui.js';
-import { workspaceHome, workspaceLinks, resolveWorkspaceAccess, isWorkspaceHome } from './workspace-role.mjs';
+import { workspaceHome, workspaceAccount, workspaceLinks, resolveWorkspaceAccess, isWorkspaceHome } from './workspace-role.mjs';
 import { initNotifications } from './notifications.js';
 
 async function loadWorkspaceSession() {
@@ -47,7 +47,7 @@ if (session) {
   document.querySelector('#workspace-header').innerHTML = `
     <a class="brand" href="${workspaceHome(session.user.role)}"><img src="/assets/brand.svg" width="36" height="36" alt="">CareerConnect<span class="brand-dot">.</span></a>
     <span class="workspace-label">${session.user.role === 'recruiter' ? 'RECRUITER WORKSPACE' : 'YOUR CAREER WORKSPACE'}</span>
-    <a class="account-link" href="/profile/index.html" aria-label="View my account"><span class="avatar avatar-small">${escapeHtml(initials(session.user.name))}</span><span class="account-name">${escapeHtml(session.user.name)}</span></a>
+    <a class="account-link" href="${workspaceAccount(session.user.role)}" aria-label="View my account"><span class="avatar avatar-small">${escapeHtml(initials(session.user.name))}</span><span class="account-name">${escapeHtml(session.user.name)}</span></a>
     <button class="button button-quiet signout-button" type="button" aria-label="Sign out">${icon('logout')}<span class="signout-label">Sign out</span></button>
     <button class="button button-quiet mobile-toggle" type="button" aria-expanded="false" aria-controls="workspace-sidebar" aria-label="Open navigation">${icon('menu')}</button>`;
   document.querySelector('#workspace-sidebar').innerHTML = `

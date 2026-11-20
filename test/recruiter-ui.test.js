@@ -96,8 +96,10 @@ describe('Phase 03 role-aware workspace integration', () => {
     const recruiter = role.workspaceLinks('recruiter');
     assert.ok(recruiter.some((link) => link[3] === '/recruiter/dashboard'));
     assert.ok(!recruiter.some((link) => ['applications', 'resume'].includes(link[0])));
-    assert.deepEqual(role.workspaceLinks('job_seeker').map((link) => link[0]), ['dashboard', 'jobs', 'applications', 'profile', 'resume']);
-    assert.equal(role.workspaceHome('recruiter'), '/recruiter/dashboard');
+    assert.deepEqual(role.workspaceLinks('job_seeker').map((link) => link[0]), ['dashboard', 'resume', 'jobs', 'applications', 'profile']);
+    assert.equal(recruiter[0][3], '/recruiter/overview.html');
+    assert.equal(role.workspaceHome('recruiter'), '/recruiter/overview.html');
+    assert.equal(role.workspaceAccount('recruiter'), '/recruiter/account.html');
     assert.equal(role.workspaceHome('job_seeker'), '/dashboard/index.html');
   });
   test('workspace gate uses server identity and redirects anonymous and non-recruiter visitors', async () => {
@@ -108,18 +110,21 @@ describe('Phase 03 role-aware workspace integration', () => {
       });
       assert.equal(result.redirect, expected);
     }
-    for (const path of ['/dashboard', '/dashboard/', '/dashboard/index.html']) assert.equal(role.workspaceRedirect(path, 'recruiter'), '/recruiter/dashboard');
+    for (const path of ['/dashboard', '/dashboard/', '/dashboard/index.html']) assert.equal(role.workspaceRedirect(path, 'recruiter'), '/recruiter/overview.html');
+    assert.equal(role.workspaceRedirect('/profile/index.html', 'recruiter'), '/recruiter/account.html');
+    for (const path of ['/recruiter/account.html', '/recruiter/overview.html']) assert.equal(role.workspaceRedirect(path, 'job_seeker'), '/dashboard/index.html');
     assert.equal(role.workspaceRedirect('/Recruiter/Dashboard', 'job_seeker'), '/dashboard/index.html');
     assert.equal(role.workspaceRedirect('/workspace/jobs/1', 'recruiter'), null);
     await assert.rejects(role.resolveWorkspaceAccess({ resolveSession: async () => { throw new Error('Offline'); } }), /Offline/);
   });
   test('login return paths respect roles and reject external or unauthorized destinations', () => {
     const origin = 'https://careerconnect.example';
-    assert.equal(navigation.workspaceReturnPath(null, origin, 'recruiter'), '/recruiter/dashboard');
+    assert.equal(navigation.workspaceReturnPath(null, origin, 'recruiter'), '/recruiter/overview.html');
+    assert.equal(navigation.workspaceReturnPath('/recruiter/account.html', origin, 'recruiter'), '/recruiter/account.html');
     assert.equal(navigation.workspaceReturnPath('/recruiter/dashboard#postings', origin, 'recruiter'), '/recruiter/dashboard');
     assert.equal(navigation.workspaceReturnPath('/workspace/jobs/7?q=data', origin, 'recruiter'), '/workspace/jobs/7?q=data');
     for (const path of ['/applications/index.html', '//evil.example/recruiter/dashboard', 'javascript:alert(1)']) {
-      assert.equal(navigation.workspaceReturnPath(path, origin, 'recruiter'), '/recruiter/dashboard');
+      assert.equal(navigation.workspaceReturnPath(path, origin, 'recruiter'), '/recruiter/overview.html');
     }
     assert.equal(navigation.workspaceReturnPath('/recruiter/dashboard', origin, 'job_seeker'), '/dashboard/index.html');
   });
@@ -212,6 +217,28 @@ describe('Phase 03 dashboard DOM behavior', () => {
     assert.equal(get('stat-total').textContent, '0');
     assert.equal(get('overview-state').getAttribute('role'), 'status');
   });
+  test('posting filters keep the same cards, report counts and reset an empty result', async () => {
+    const { dashboard, get, document } = fixture(responses([
+      job({ id: 1, title: 'Open role', applicationCount: 1 }),
+      job({ id: 2, title: 'Another role' }),
+    ]));
+    await dashboard.load();
+    const [open, other] = get('posting-list').children;
+    const filter = get('posting-filter');
+    filter.value = 'applicants';
+    await filter.fire('change');
+    assert.equal(open.hidden, false);
+    assert.equal(other.hidden, true);
+    assert.equal(get('posting-state').textContent, '1 of 2 postings shown');
+    filter.value = 'closed';
+    await filter.fire('change');
+    assert.equal(get('posting-filter-empty').hidden, false);
+    await get('reset-posting-filter').fire('click');
+    assert.equal(get('posting-list').children[0], open);
+    assert.equal(other.hidden, false);
+    assert.equal(get('posting-filter-empty').hidden, true);
+    assert.equal(document.activeElement, filter);
+  });
   test('structured list entries are keyboard buttons that add and remove real input values', async () => {
     const { dashboard, get } = fixture(responses([]));
     dashboard.newPosting();
@@ -288,7 +315,7 @@ describe('Phase 03 dashboard DOM behavior', () => {
     assert.equal(get('delete-dialog').open, false);
     assert.match(get('mutation-notice').textContent, /Close it instead/);
     const remove = get('posting-list').querySelectorAll('button').find((button) => button.textContent === 'Delete');
-    assert.equal(remove.disabled, true);
+    assert.equal(remove, undefined);
   });
   test('expired or forbidden API access is delegated to the existing authentication flow', async () => {
     for (const status of [401, 403]) {
