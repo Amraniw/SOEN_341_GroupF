@@ -51,6 +51,14 @@
           </p>
         </div>
 
+        <div class="home-preview-stage">
+        <details class="preview-guide" hidden>
+          <summary class="preview-mini-card">
+            <span class="preview-mini-icon" data-icon="check"></span>
+            <span><small>Preview tip</small><strong id="preview-tip-title">Try a keyword</strong></span>
+          </summary>
+          <p id="preview-tip-copy">Search for a title or company, then open a sample posting to see what the role involves.</p>
+        </details>
         <div class="product-preview">
           <div class="home-preview-header">
             <span class="home-preview-name"><span data-icon="applications"></span>Explore the workspace</span>
@@ -67,7 +75,10 @@
               <button type="button" role="tab" id="preview-tab-applications" aria-controls="preview-applications" aria-selected="false" tabindex="-1"><span data-icon="applications"></span>Applications</button>
             </div>
             <section class="home-preview-panel" id="preview-jobs" aria-labelledby="preview-jobs-title">
-              <h2 id="preview-jobs-title">Find jobs</h2>
+              <div class="preview-panel-heading">
+                <h2 id="preview-jobs-title">Find jobs</h2>
+                <span class="preview-result-count" id="preview-result-count" aria-hidden="true">2 sample roles</span>
+              </div>
               <div class="sample-search" data-preview-search-fallback><span data-icon="search"></span>Software</div>
               <label class="sample-search preview-search" hidden>
                 <span data-icon="search"></span>
@@ -139,9 +150,21 @@
                   <span class="sample-tail sample-status">Under review</span>
                 </li>
               </ul>
-              <p class="sample-note"><span data-icon="check"></span>See submission trends and recent status activity.</p>
+              <div class="preview-pipeline">
+                <p>Software Engineering Intern · Timeline</p>
+                <ol>
+                  <li>Applied</li>
+                  <li>Under review</li>
+                  <li aria-current="step">Interview</li>
+                </ol>
+              </div>
             </section>
           </div>
+        </div>
+        <button class="preview-mini-card preview-next" type="button" aria-controls="preview-resumes" hidden>
+          <span class="preview-mini-icon" data-icon="arrow"></span>
+          <span><small>Next in the preview</small><strong id="preview-next-title">Resumes</strong></span>
+        </button>
         </div>
       </section>
       </div>
