@@ -110,7 +110,13 @@ describe('Phase 03 role-aware workspace integration', () => {
       });
       assert.equal(result.redirect, expected);
     }
-    for (const path of ['/dashboard', '/dashboard/', '/dashboard/index.html']) assert.equal(role.workspaceRedirect(path, 'recruiter'), '/recruiter/overview.html');
+    for (const page of ['dashboard', 'applications', 'resume']) {
+      for (const suffix of ['', '/', '/index.html']) {
+        const path = `/${page}${suffix}`;
+        assert.equal(role.workspaceRedirect(path, 'recruiter'), '/recruiter/overview.html');
+        assert.equal(role.workspaceRedirect(path, 'job_seeker'), null);
+      }
+    }
     assert.equal(role.workspaceRedirect('/profile/index.html', 'recruiter'), '/recruiter/account.html');
     for (const path of ['/recruiter/account.html', '/recruiter/overview.html']) assert.equal(role.workspaceRedirect(path, 'job_seeker'), '/dashboard/index.html');
     assert.equal(role.workspaceRedirect('/Recruiter/Dashboard', 'job_seeker'), '/dashboard/index.html');

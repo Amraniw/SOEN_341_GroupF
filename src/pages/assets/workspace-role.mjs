@@ -17,7 +17,7 @@ export function isWorkspaceHome(pathname, role) {
 
 export function workspaceRedirect(pathname, role) {
   if (/^\/recruiter(?:\/|$)/i.test(pathname) && role !== 'recruiter') return '/dashboard/index.html';
-  if (/^\/dashboard(?:\/(?:index\.html)?)?$/i.test(pathname) && role === 'recruiter') return RECRUITER_HOME;
+  if (/^\/(?:dashboard|applications|resume)(?:\/(?:index\.html)?)?$/i.test(pathname) && role === 'recruiter') return RECRUITER_HOME;
   if (/^\/profile(?:\/(?:index\.html)?)?$/i.test(pathname) && role === 'recruiter') return workspaceAccount(role);
   return null;
 }

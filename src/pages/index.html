@@ -29,6 +29,7 @@
       </noscript>
     </header>
     <main id="main" class="landing-main" tabindex="-1">
+      <div class="home-hero-surface">
       <section class="container hero" aria-labelledby="home-title">
         <div class="hero-copy">
           <p class="eyebrow">YOUR CAREER WORKSPACE</p>
@@ -53,12 +54,11 @@
         <div class="product-preview">
           <div class="home-preview-header">
             <span class="home-preview-name"><span data-icon="applications"></span>Explore the workspace</span>
-            <span class="preview-caption">Illustrative data</span>
           </div>
           <div class="preview-window">
             <div class="preview-toolbar">
               <span class="home-preview-brand"><img src="/assets/brand.svg" width="23" height="23" alt="" />CareerConnect<span class="home-brand-period">.</span></span>
-              <span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="preview-caption">Illustrative data</span>
             </div>
             <div class="home-preview-tabs" role="tablist" aria-label="Workspace features" hidden>
               <button type="button" role="tab" id="preview-tab-jobs" aria-controls="preview-jobs" aria-selected="true"><span data-icon="search"></span>Jobs</button>
@@ -68,23 +68,39 @@
             </div>
             <section class="home-preview-panel" id="preview-jobs" aria-labelledby="preview-jobs-title">
               <h2 id="preview-jobs-title">Find jobs</h2>
-              <div class="sample-search"><span data-icon="search"></span>Software</div>
+              <div class="sample-search" data-preview-search-fallback><span data-icon="search"></span>Software</div>
+              <label class="sample-search preview-search" hidden>
+                <span data-icon="search"></span>
+                <span class="sr-only">Search example jobs</span>
+                <input id="preview-job-search" type="search" placeholder="Try “robotics” or “Amazon”" aria-controls="preview-job-results" />
+              </label>
               <ul class="sample-filters" aria-label="Example filters">
                 <li>Seattle, WA</li>
                 <li>Software Engineering</li>
               </ul>
-              <ul class="sample-rows">
+              <ul class="sample-rows preview-job-list" id="preview-job-results" aria-label="Example jobs">
                 <li>
-                  <span class="sample-icon" data-icon="briefcase"></span>
-                  <div><strong>Software Engineering Intern</strong><small>Amazon · Seattle, WA</small></div>
-                  <span class="sample-tail sample-status is-positive">Internship</span>
+                  <details name="preview-jobs">
+                    <summary>
+                      <span class="sample-icon" data-icon="briefcase"></span>
+                      <span><strong>Software Engineering Intern</strong><small>Amazon · Seattle, WA</small></span>
+                      <span class="sample-tail sample-status is-positive">Internship</span>
+                    </summary>
+                    <p>Build a small feature for a sample order service and write tests for failure paths.</p>
+                  </details>
                 </li>
                 <li>
-                  <span class="sample-icon" data-icon="briefcase"></span>
-                  <div><strong>Robotics Software Engineer</strong><small>NVIDIA · Seattle, WA</small></div>
-                  <span class="sample-tail sample-status">Full-time</span>
+                  <details name="preview-jobs">
+                    <summary>
+                      <span class="sample-icon" data-icon="briefcase"></span>
+                      <span><strong>Robotics Software Engineer</strong><small>NVIDIA · Seattle, WA</small></span>
+                      <span class="sample-tail sample-status">Full-time</span>
+                    </summary>
+                    <p>Prototype a perception pipeline and test how it handles noisy sensor readings.</p>
+                  </details>
                 </li>
               </ul>
+              <p class="preview-search-status" role="status" id="preview-search-status"></p>
             </section>
             <section class="home-preview-panel" id="preview-resumes" aria-labelledby="preview-resumes-title" hidden>
               <h2 id="preview-resumes-title">Saved resumes</h2>
@@ -128,6 +144,7 @@
           </div>
         </div>
       </section>
+      </div>
 
       <div class="home-workflow-surface">
         <section class="container home-workflow" id="how-it-works" aria-labelledby="workflow-title">
