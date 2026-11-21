@@ -86,7 +86,8 @@ if (session && panel && session.user.role === 'job_seeker') {
       (employed
         ? currentJobs.length ? '' : 'You’re currently employed.'
         : employmentStatus === 'unemployed' ? 'You’re looking for your next role.' : 'Your employment status isn’t set yet.');
-    el.browse.hidden = employed && currentJobs.length > 0;
+    el.browse.hidden = true;
+    panel.hidden = !employment.employmentStatus && !currentJobs.length;
     // The shortcut is only for being employed with no accepted job on record.
     el.actions.hidden = !(employed && currentJobs.length === 0);
     showOnly('body');

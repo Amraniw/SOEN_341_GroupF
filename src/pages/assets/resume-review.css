@@ -11,7 +11,7 @@ body[data-page='resume'] .workspace-main {
 
 @media (min-width: 1120px) {
   .resume-layout:has(.review-panel:not([hidden])) {
-    grid-template-columns: minmax(315px, 0.9fr) minmax(0, 1.55fr);
+    grid-template-columns: minmax(288px, 0.85fr) minmax(0, 1.8fr);
   }
 }
 
@@ -20,26 +20,62 @@ body[data-page='resume'] .workspace-main {
   min-width: 0;
 }
 
-@container (max-width: 470px) {
-  .resume-management .resume-receipt {
-    display: grid;
-    grid-template-columns: 42px minmax(0, 1fr);
-    align-items: start;
-    gap: 10px 12px;
-  }
-
-  .resume-management .resume-receipt-actions {
-    grid-column: 2;
-    margin-inline-start: 0;
-    flex-wrap: wrap;
-  }
-
-  .resume-management .resume-receipt .badge { margin-inline-start: 0; }
-  .resume-management .resume-receipt-actions button { white-space: nowrap; }
+.resume-management { padding: clamp(16px, 2.4vw, 24px); }
+.resume-management .drop-zone {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  padding: 12px;
+  text-align: start;
+  background: var(--canvas);
+  border-color: var(--border);
 }
-
-.resume-tips {
-  padding-block: 16px;
+.resume-management .drop-zone.drag-over { border-color: var(--brand); background: var(--brand-soft); }
+.resume-management .drop-zone h3, .resume-library-list > h3 { font-size: 14px; margin: 0; }
+.resume-management .drop-zone p, #resume-library-help { font-size: 12px; color: var(--muted); margin: 3px 0 0; }
+.resume-management .file-picker .button { min-height: 36px; padding: 7px 10px; font-size: 12px; }
+.resume-management .upload-actions { display: none; margin-top: 10px; }
+.resume-management .drop-zone:is([data-upload-state='selected'], [data-upload-state='uploading']) ~ .upload-actions { display: flex; }
+.resume-management .selected-file { margin-top: 10px; padding: 10px; }
+.resume-management .help-note { margin: 10px 0 0; border: 0; padding: 0; }
+.resume-library-list, .resume-tips { margin-top: 16px; padding-top: 13px; border-top: 1px solid var(--border); }
+.resume-library-list .receipt-list { margin: 9px -4px 0; }
+.resume-management .resume-receipt {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 5px 12px;
+  padding: 9px 7px;
+  align-items: center;
+  border-color: var(--border);
+}
+.resume-management .resume-receipt:hover, .resume-management .resume-receipt.is-selected { background: var(--brand-soft); }
+.resume-management .resume-receipt.is-selected { box-shadow: inset 3px 0 var(--brand); }
+.resume-management .resume-receipt h4 { margin: 0; font-size: 13px; }
+.resume-upload-date { font-size: 11px; color: var(--muted); white-space: nowrap; }
+.resume-select {
+  display: flex;
+  align-items: start;
+  gap: 5px;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.resume-select .icon { width: 14px; height: 17px; flex: none; color: var(--brand); }
+.resume-select span { min-width: 0; overflow-wrap: anywhere; }
+.resume-select:hover:not(:disabled) { color: var(--brand); }
+.resume-select:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.resume-management .resume-receipt-actions { grid-column: auto; margin: 0; gap: 5px; flex-wrap: wrap; }
+.resume-management .resume-receipt-actions button { min-height: 30px; padding: 4px 7px; }
+.resume-management .resume-receipt .badge { margin: 0; }
+@container (max-width: 390px) {
+  .resume-management .resume-receipt { grid-template-columns: minmax(0, 1fr); }
+  .resume-management .resume-receipt-actions { margin-inline-start: 19px; }
 }
 
 .resume-tips summary {
@@ -99,7 +135,7 @@ body[data-page='resume'] .workspace-main {
 
 .review-controls {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 158px;
+  grid-template-columns: minmax(0, 1fr) max-content;
   gap: 10px;
 }
 
@@ -148,7 +184,7 @@ body[data-page='resume'] .workspace-main {
   cursor: progress;
 }
 
-#review-action-label { grid-column: 2; grid-row: 1; }
+#review-action-label { grid-column: 2; grid-row: 1; white-space: nowrap; }
 
 .review-activity {
   grid-column: 1;
@@ -169,6 +205,13 @@ body[data-page='resume'] .workspace-main {
 .review-form p { margin-top: 8px; font-size: 12px; }
 
 #review-output { display: flow-root; }
+
+.review-preview { padding: 17px 0 23px; border-top: 1px solid var(--border); }
+.review-preview h3 { margin: 0 0 12px; font-size: 15px; }
+.review-preview dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0; }
+.review-preview dl > div { background: var(--canvas); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; }
+.review-preview dt { font-size: 13px; font-weight: 650; }
+.review-preview dd { margin: 4px 0 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
 
 .review-status {
   display: flex;
@@ -289,7 +332,9 @@ body[data-page='resume'] .workspace-main {
   line-height: 1.55;
 }
 
-.review-profile p { max-width: 68ch; }
+.review-profile { display:grid; grid-template-columns:17px minmax(0,1fr); column-gap:8px; }
+.review-profile h3 { grid-column:1 / -1; }
+.review-profile p { grid-column:2; max-width:none; min-width:0; }
 .review-section ul { padding-inline-start: 19px; }
 .review-section li + li { margin-block-start: 7px; }
 .review-section li::marker { color: var(--brand); }
@@ -302,14 +347,19 @@ body[data-page='resume'] .workspace-main {
   padding: 0;
 }
 
-.review-roles li {
-  padding: 5px 9px;
+.review-roles li a {
+  display: block;
+  padding: 7px 10px;
+  border: 1px solid transparent;
   border-radius: var(--radius-sm);
   background: var(--brand-soft);
   color: var(--brand);
   font-size: 13px;
   font-weight: 600;
 }
+.review-roles li a:hover, .review-roles li a:focus-visible { border-color: var(--brand); }
+.review-roles li span { display: block; color: var(--muted); font-size: 11px; }
+#review-no-matches { color: var(--muted); }
 
 .review-roles li + li { margin-block-start: 0; }
 
@@ -332,6 +382,7 @@ body[data-page='resume'] .workspace-main {
 
 @container (max-width: 390px) {
   .review-controls { grid-template-columns: minmax(0, 1fr); }
+  .review-preview dl { grid-template-columns: minmax(0, 1fr); }
   .review-status-file { display: block; }
   .review-status[data-state='complete'] .review-status-file::before { content: none; }
 }

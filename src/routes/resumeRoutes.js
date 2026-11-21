@@ -5,6 +5,7 @@ const { createAuthenticateUser } = require('../middleware/authenticateUser');
 const { requireSameOrigin } = require('../middleware/requireSameOrigin');
 const { createResumeAnalyzer, ResumeAnalysisError } = require('../services/resumeAnalysis');
 const { extractResumeText } = require('../services/resumeText');
+const { JOB_CATEGORIES } = require('../domain/jobs');
 const {
   DEFAULT_UPLOAD_DIRECTORY,
   createResumeUpload,
@@ -12,6 +13,9 @@ const {
 
 const PROJECT_ROOT = path.join(__dirname, '..', '..');
 const RESUME_NOT_FOUND = { error: 'This resume could not be found.' };
+const REVIEW_POSTING_LIMIT = 80;
+const reviewCategories = new Set(JOB_CATEGORIES.map(({ id }) => id));
+const categoryParameters = [...reviewCategories].map(() => '?').join(', ');
 const UNREADABLE_RESUME = {
   error: 'We could not read enough text in this PDF. Select a PDF with searchable text and try again.',
 };
@@ -226,8 +230,28 @@ function createResumeRouter(database, options = {}) {
       }
       if (!text) return response.status(422).json(UNREADABLE_RESUME);
 
-      const feedback = await analyzeResume(text);
-      return response.json({ resumeId, feedback });
+      const postings = await database.all(
+        `SELECT id, title, company, category, substr(description, 1, 400) AS description
+         FROM jobs WHERE status = 'open' AND category IN (${categoryParameters})
+         ORDER BY created_at DESC, id DESC LIMIT ?`,
+        ...reviewCategories,
+        REVIEW_POSTING_LIMIT
+      );
+      const feedback = await analyzeResume(text, postings);
+      const allowedIds = new Set(postings.map(({ id }) => String(id)));
+      const matchedIds = feedback.isResume && Array.isArray(feedback.alignedRoles)
+        ? [...new Set(feedback.alignedRoles.filter((id) => allowedIds.has(id)))].slice(0, 4)
+        : [];
+      const matches = matchedIds.length ? await database.all(
+        `SELECT id, title, company, category, demo_key AS demoKey FROM jobs
+         WHERE status = 'open' AND id IN (${matchedIds.map(() => '?').join(', ')})`,
+        matchedIds
+      ) : [];
+      const byId = new Map(matches.filter(({ title, company, category }) =>
+        reviewCategories.has(category) && title.trim() && !/^undefined$/i.test(title.trim()) && company.trim()
+      ).map(({ id, title, company, demoKey }) => [String(id), { id, title, company, isDemo: Boolean(demoKey) }]));
+      const alignedRoles = matchedIds.map((id) => byId.get(id)).filter(Boolean);
+      return response.json({ resumeId, feedback: { ...feedback, alignedRoles } });
     } catch (error) {
       if (error instanceof ResumeAnalysisError) {
         return response.status(error.status).json({ error: error.message, code: error.code });

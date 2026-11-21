@@ -18,7 +18,7 @@ initPublicHeader({
     const role = session?.user.role;
     const recruiter = role === 'recruiter';
     const home = workspaceHome(role);
-    const label = recruiter ? 'Recruiter dashboard' : 'Your workspace';
+    const label = recruiter ? 'Recruiter workspace' : 'Your workspace';
     primaryLinks.forEach((link) => {
       setEntry(link, session ? home : '/auth/signup.html', session ? label : 'Create account');
     });
@@ -74,3 +74,23 @@ tabs.forEach((tab, index) => {
   });
 });
 tabList.hidden = false;
+
+const sampleSearch = document.getElementById('preview-job-search');
+const sampleStatus = document.getElementById('preview-search-status');
+const sampleJobs = Array.from(document.querySelectorAll('#preview-job-results li'), (row) => ({
+  row,
+  searchable: row.textContent.toLowerCase().replace(/\s+/g, ' '),
+}));
+
+sampleSearch.addEventListener('input', () => {
+  const terms = sampleSearch.value.trim().toLowerCase().split(/\s+/);
+  const count = sampleJobs.reduce((total, { row, searchable }) => {
+    row.hidden = !terms.every((term) => searchable.includes(term));
+    return total + Number(!row.hidden);
+  }, 0);
+  sampleStatus.textContent = !count ? 'No example jobs match. Try “software”.' : sampleSearch.value.trim()
+    ? `${count} example ${count === 1 ? 'job' : 'jobs'} found.`
+    : '';
+});
+sampleSearch.closest('label').hidden = false;
+document.querySelector('[data-preview-search-fallback]').hidden = true;

@@ -234,11 +234,16 @@
     margin-top: 24px;
   }
   .workspace-header {
-    padding: 14px 20px;
-    gap: 10px;
+    padding: 14px 16px;
+    gap: 8px;
   }
   .workspace-header .brand {
-    font-size: 17px;
+    font-size: 0;
+    gap: 0;
+    flex-shrink: 0;
+  }
+  .workspace-header .account-link {
+    flex-shrink: 0;
   }
   .account-name {
     display: none;

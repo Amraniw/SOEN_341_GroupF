@@ -1,4 +1,6 @@
 import { session } from './workspace.js';
+import { renderProfileStory } from './profile-story.mjs';
+import { createProfileEditor } from './profile-editor.mjs';
 import { refreshPictures, setupPictureControls } from './profile-picture.js';
 import { request } from './api.js';
 import { clearDisplaySession } from './session.js';
@@ -49,6 +51,7 @@ if (session) {
 
   const form = document.querySelector('#profile-form');
   const fields = [...form.querySelectorAll('[data-label]')];
+  const collections = createProfileEditor({ form, escape: escapeHtml });
   const notice = document.querySelector('#profile-notice');
   const headline = document.querySelector('#profile-headline');
   const editButton = document.querySelector('#profile-edit');
@@ -81,26 +84,30 @@ if (session) {
   function renderProfile() {
     headline.textContent = profile?.headline || '';
     headline.hidden = !profile;
+    const contacts = document.querySelector('#profile-contact');
+    contacts.replaceChildren();
+    contacts.hidden = true;
     if (!profile) {
       showState('empty');
       return;
     }
 
-    document.querySelectorAll('[data-profile-value]').forEach((element) => {
-      const value = profile[element.dataset.profileValue];
-      element.classList.toggle('muted', !value);
-      if (element.dataset.profileValue === 'website' && isValidWebsite(value)) {
-        const link = document.createElement('a');
-        link.className = 'text-link break-word';
-        link.href = value;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        link.textContent = value;
-        element.replaceChildren(link);
-      } else {
-        element.textContent = value || 'Not added yet';
-      }
-    });
+    for (const value of [profile.location, profile.phone]) {
+      if (!value) continue;
+      const span = document.createElement('span');
+      span.textContent = value;
+      contacts.append(span);
+    }
+    if (isValidWebsite(profile.website)) {
+      const link = document.createElement('a');
+      link.href = profile.website;
+      link.textContent = profile.website;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      contacts.append(link);
+    }
+    contacts.hidden = !contacts.childElementCount;
+    document.querySelector('#profile-story').innerHTML = renderProfileStory(profile, escapeHtml);
     document.querySelector('#profile-updated').textContent =
       `Last updated ${formatDateTime(profile.updatedAt)}`;
     showState('view');
@@ -110,8 +117,11 @@ if (session) {
     const value = field.value.trim();
     if (!value)
       return field.required ? `${field.dataset.label} is required.` : '';
-    if (value.length > field.maxLength)
+    if (value.length > field.maxLength) {
+      if (['experience', 'education'].includes(field.name))
+        return 'These entries are too long. Shorten some details or remove an entry.';
       return `Use ${field.maxLength} characters or fewer.`;
+    }
     if (field.name === 'phone' && !isValidPhone(value))
       return 'Enter a phone number with 7 to 15 digits. You can use +, spaces, dashes, dots and parentheses.';
     if (field.name === 'website' && !isValidWebsite(value))
@@ -134,6 +144,7 @@ if (session) {
       field.removeAttribute('aria-invalid');
       document.getElementById(`${field.id}-error`).textContent = '';
     });
+    collections.load(profile);
     showState('edit');
     fields[0].focus();
   }
@@ -146,6 +157,7 @@ if (session) {
 
   function setSaving(saving) {
     form.setAttribute('aria-busy', String(saving));
+    collections.setBusy(saving);
     fields.forEach((field) => (field.disabled = saving));
     cancelButton.disabled = saving;
     saveButton.disabled = saving;
@@ -176,7 +188,9 @@ if (session) {
     const summary = document.querySelector('#profile-resume');
     const link = document.querySelector('#profile-resume-link');
     try {
-      const { resume } = await request('/resumes/current', undefined, 'GET');
+      const { items } = await request('/resumes', undefined, 'GET');
+      const resume = items.find((item) => item.isDefault);
+      document.querySelector('#resume-library-count').textContent = `${items.length} saved ${items.length === 1 ? 'resume' : 'resumes'}`;
       if (resume) {
         summary.innerHTML = `<ul class="receipt-list" aria-label="Default resume"><li class="resume-receipt">
           <span class="document-icon">${icon('file')}<span>PDF</span></span>
@@ -218,15 +232,18 @@ if (session) {
     event.preventDefault();
     if (saveButton.disabled) return;
     hideMessage(notice);
+    if (!collections.commit()) return;
     const valid = fields.map((field) => {
       field.dataset.touched = 'true';
       return validate(field);
     });
     if (valid.includes(false)) {
-      fields[valid.indexOf(false)].focus();
+      const invalid = fields[valid.indexOf(false)];
+      if (!collections.focus(invalid.name)) invalid.focus();
       return;
     }
 
+    if (!collections.validate()) return;
     const body = Object.fromEntries(
       fields.map((field) => [field.name, field.value.trim()])
     );

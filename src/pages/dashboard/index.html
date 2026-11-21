@@ -3,143 +3,74 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta
-      name="description"
-      content="CareerConnect — your professional account and resume, in one career workspace."
-    />
+    <meta name="description" content="Your CareerConnect workspace: applications, resumes, AI Resume Review, and your next opportunity." />
     <title>Overview | CareerConnect</title>
     <link rel="icon" href="/assets/brand.svg" type="image/svg+xml" />
     <script src="/assets/theme.js"></script>
     <link rel="stylesheet" href="/assets/styles.css" />
+    <link rel="stylesheet" href="/assets/workspace-polish.css" />
     <script type="module" src="/assets/dashboard.js"></script>
-    
   </head>
   <body data-page="dashboard">
     <a class="skip-link" href="#main">Skip to content</a>
-    <noscript
-      ><p class="noscript-message">
-        JavaScript is required to open your workspace. Enable it, then
-        <a href="/auth/login.html">sign in</a>.
-      </p></noscript
-    >
+    <noscript><p class="noscript-message">JavaScript is required to open your workspace. Enable it, then <a href="/auth/login.html">sign in</a>.</p></noscript>
     <div data-workspace hidden>
       <header class="workspace-header" id="workspace-header"></header>
       <div class="workspace-layout">
-        <aside
-          class="workspace-sidebar"
-          id="workspace-sidebar"
-          aria-label="Workspace navigation"
-        ></aside>
-        <main class="workspace-main" id="main" tabindex="-1">
-          <div class="breadcrumb">
-            <a href="/dashboard/index.html">Workspace</a
-            ><span aria-hidden="true">/</span><span>Overview</span>
-          </div>
-
-          <div class="page-heading page-heading-row">
-            <div>
-              <h1>Welcome, <span id="welcome-name"></span>.</h1>
-              <p>A little preparation today. More possibilities tomorrow.</p>
-            </div>
-            <span class="badge badge-neutral">Your career workspace</span>
-          </div>
-          <div class="dashboard-grid">
-            <div class="stack">
-              <section class="next-card">
-                <p class="eyebrow">YOUR NEXT STEP</p>
-                <h2 id="next-title">
-                  Good things start<br />with being prepared.
-                </h2>
-                <p id="next-copy">
-                  Bring your experience into focus. Add your resume to your
-                  account and get ready for your next opportunity.
-                </p>
-                <a class="button" id="next-action" href="/resume/index.html"
-                  >Upload resume <span data-icon="arrow"></span
-                ></a>
-              </section>
-              <section class="panel">
-                <div class="setup-header">
-                  <h2>Profile readiness</h2>
-                  <span id="setup-count">60% complete</span>
-                </div>
-                <progress
-                  id="setup-progress"
-                  max="100"
-                  value="60"
-                  aria-label="Profile readiness: 60 percent"
-                >
-                  60%
-                </progress>
-                <div class="setup-step">
-                  <span class="step-icon complete" data-icon="check"></span>
-                  <div>
-                    <h3>Create your account</h3>
-                    <p>Your career workspace is ready.</p>
-                  </div>
-                  <span class="badge badge-success">Complete</span>
-                </div>
-                <div class="setup-step" id="resume-step">
-                  <span class="step-icon">2</span>
-                  <div>
-                    <h3>Add your resume</h3>
-                    <p>Upload a PDF of your experience.</p>
-                  </div>
-                  <a class="text-link" href="/resume/index.html"
-                    >Get started <span data-icon="arrow"></span
-                  ></a>
-                </div>
-                <p class="help-note">
-                  Readiness is calculated from your account and the resume saved
-                  securely to it.
-                </p>
-              </section>
-            </div>
-            <div class="stack dashboard-secondary">
-              <section class="panel">
-                <div class="panel-heading">
-                  <h2>My account</h2>
-                  <span data-icon="user"></span>
-                </div>
-                <div class="account-summary" id="account-summary"></div>
-                <p>Your account details, all in one place.</p>
-                <a class="text-link" href="/profile/index.html"
-                  >View account <span data-icon="arrow"></span
-                ></a>
-              </section>
-              <section class="panel resume-summary">
-                <div class="panel-heading"><h2>My resume</h2></div>
-                <div id="resume-summary"></div>
-              </section>
-            </div>
-          </div>
-          <section class="roadmap">
-            <div class="roadmap-header">
-              <h2>More room to grow.</h2>
-              <span class="badge badge-upcoming">Coming later</span>
-            </div>
-            <div class="roadmap-grid">
-              <div class="roadmap-item">
-                <span data-icon="briefcase"></span>
-                <h3><a class="text-link" href="/workspace/jobs/">Find your next role</a></h3>
-                <p>Search opportunities by keyword, location, and category. Available now.</p>
-              </div>
-              <div class="roadmap-item">
-                <span data-icon="file"></span>
-                <h3><a class="text-link" href="/applications/index.html">Keep track of applications</a></h3>
-                <p>Follow every opportunity and its latest status in one place. Available now.</p>
-              </div>
-              <div class="roadmap-item">
-                <span data-icon="building"></span>
-                <h3>Get to know employers</h3>
-                <p>Discover the teams behind the work.</p>
-              </div>
+        <aside class="workspace-sidebar" id="workspace-sidebar" aria-label="Workspace navigation"></aside>
+        <main class="workspace-main overview-main" id="main" tabindex="-1">
+          <div class="breadcrumb"><a href="/dashboard/index.html">Workspace</a><span aria-hidden="true">/</span><span>Overview</span></div>
+          <div class="page-heading"><h1>Welcome, <span id="welcome-name"></span>.</h1><p>Your search, your progress, your next step.</p></div>
+          <section class="overview-next" aria-labelledby="next-title">
+            <div><p class="eyebrow">YOUR NEXT STEP</p><h2 id="next-title">Find your next opportunity.</h2><p id="next-copy">Explore open roles and keep your search moving.</p></div>
+            <a class="button" id="next-action" href="/workspace/jobs/">Find jobs <span data-icon="arrow"></span></a>
+          </section>
+          <section class="overview-snapshot" aria-labelledby="snapshot-heading">
+            <h2 id="snapshot-heading">Career snapshot</h2>
+            <div class="overview-stats">
+              <a href="/applications/index.html"><strong id="overview-active">—</strong><span>Active applications</span><span data-icon="arrow"></span></a>
+              <a href="/resume/index.html"><strong id="overview-resumes">—</strong><span>Saved resumes</span><span data-icon="arrow"></span></a>
             </div>
           </section>
-          <footer class="workspace-footer">
-            <span>© 2026 CareerConnect</span
-            ><span>A considered next step.</span>
-          </footer>
+          <section class="overview-launch" aria-labelledby="journey-heading">
+            <div class="overview-launch-heading"><h2 id="journey-heading">Continue your journey</h2><p>The tools to move from exploring possibilities to taking your next step.</p></div>
+            <div class="overview-destinations">
+              <article class="overview-destination">
+                <span class="destination-icon" data-icon="applications"></span>
+                <div>
+                  <h3>Applications</h3>
+                  <p>Follow each role from submission to its latest status. Open an application to revisit the posting and see its timeline.</p>
+                  <p class="destination-context" id="overview-applications" aria-live="polite">Loading your application summary…</p>
+                  <div class="destination-actions"><a class="text-link" href="/applications/index.html">View applications <span data-icon="arrow"></span></a></div>
+                </div>
+              </article>
+              <article class="overview-destination">
+                <span class="destination-icon" data-icon="file"></span>
+                <div><h3>Resumes &amp; AI Review</h3><p>Keep tailored versions of your resume in one library. Choose your default and use AI feedback to strengthen your next application.</p><p class="destination-context" id="overview-resume" aria-live="polite">Loading your resume summary…</p><div class="destination-actions"><a class="text-link" href="/resume/index.html">Manage resumes <span data-icon="arrow"></span></a><a class="text-link" href="/resume/index.html#resume-review">AI Review <span data-icon="arrow"></span></a></div></div>
+              </article>
+              <article class="overview-destination">
+                <span class="destination-icon" data-icon="briefcase"></span>
+                <div>
+                  <h3>Find jobs</h3>
+                  <p>Explore open roles and read through the responsibilities and qualifications to see where your experience fits.</p>
+                  <p class="destination-context">Looking for a specific company? Enter its name in Keywords and narrow the results by location.</p>
+                  <div class="destination-actions"><a class="text-link" href="/workspace/jobs/">Explore jobs <span data-icon="arrow"></span></a></div>
+                </div>
+              </article>
+              <article class="overview-destination">
+                <span class="destination-icon" data-icon="user"></span>
+                <div><h3>My account</h3><p>Bring your professional story together with your skills, experience, and education. Keep your contact details and career assets up to date.</p><p class="destination-context" id="overview-profile" aria-live="polite">Loading your profile…</p><div class="destination-actions"><a class="text-link" href="/profile/index.html">Manage profile <span data-icon="arrow"></span></a></div></div>
+              </article>
+            </div>
+            <section class="overview-prepare" aria-labelledby="prepare-heading">
+              <div class="prepare-intro"><p class="eyebrow">BEFORE YOU APPLY</p><h3 id="prepare-heading">Make your next application count.</h3><p>A little preparation makes your experience easier to understand. Review your resume and bring your professional profile up to date before your next application.</p></div>
+              <ol class="prepare-steps">
+                <li><span class="prepare-step-number" aria-hidden="true">1</span><a href="/resume/index.html#resume-review"><div><strong>Review your resume</strong><span>Get focused feedback on the experience you want to highlight.</span></div><span data-icon="arrow"></span></a></li>
+                <li><span class="prepare-step-number" aria-hidden="true">2</span><a href="/profile/index.html"><div><strong>Refresh your profile</strong><span>Check your headline, skills, and contact details.</span></div><span data-icon="arrow"></span></a></li>
+              </ol>
+            </section>
+          </section>
+          <footer class="workspace-footer"><span>© 2026 CareerConnect</span><span>A considered next step.</span></footer>
         </main>
       </div>
     </div>

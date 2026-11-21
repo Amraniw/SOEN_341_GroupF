@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Recruiter account | CareerConnect</title>
+    <link rel="icon" href="/assets/brand.svg" type="image/svg+xml" />
+    <script src="/assets/theme.js"></script>
+    <link rel="stylesheet" href="/assets/styles.css" />
+    <link rel="stylesheet" href="/assets/recruiter.css" />
+    <script type="module" src="/assets/recruiter-account.js"></script>
+  </head>
+  <body data-page="recruiter-account">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <noscript><p class="noscript-message">Enable JavaScript to open your recruiter account.</p></noscript>
+    <div data-workspace hidden>
+      <header class="workspace-header" id="workspace-header"></header>
+      <div class="workspace-layout">
+        <aside class="workspace-sidebar" id="workspace-sidebar" aria-label="Workspace navigation"></aside>
+        <main class="workspace-main recruiter-main" id="main" tabindex="-1">
+          <div class="page-heading">
+            <p class="eyebrow">YOUR RECRUITING WORKSPACE</p>
+            <h1>My account</h1>
+            <p>Manage your recruiter identity and professional details.</p>
+          </div>
+          <div class="recruiter-account-layout">
+            <section class="panel recruiter-identity" aria-labelledby="recruiter-name">
+              <div class="profile-identity recruiter-identity-header">
+                <span class="avatar" id="profile-avatar" aria-hidden="true"></span>
+                <div>
+                  <h2 id="recruiter-name"></h2>
+                  <p id="recruiter-headline"></p>
+                </div>
+              </div>
+              <dl class="recruiter-account-facts">
+                <div><dt>Account email</dt><dd id="recruiter-email"></dd></div>
+                <div><dt>Member since</dt><dd id="recruiter-member-since"></dd></div>
+                <div><dt>Companies on your postings</dt><dd id="recruiter-companies" aria-live="polite">Loading companies…</dd></div>
+              </dl>
+              <a class="text-link" href="/recruiter/dashboard#postings">Manage postings <span data-icon="arrow"></span></a>
+            </section>
+            <section class="panel recruiter-profile" aria-labelledby="recruiter-profile-heading">
+              <h2 id="recruiter-profile-heading">Recruiter profile</h2>
+              <p class="recruiter-state">Add your role, recruiting focus, and professional contact details.</p>
+              <form id="recruiter-profile-form">
+                <fieldset class="recruiter-form-grid" disabled>
+                  <legend class="sr-only">Recruiter profile details</legend>
+                  <div class="recruiter-field recruiter-field-wide"><label for="recruiter-role">Professional headline (required)</label><input id="recruiter-role" name="headline" maxlength="120" required /></div>
+                  <div class="recruiter-field"><label for="recruiter-location">Location</label><input id="recruiter-location" name="location" maxlength="100" /></div>
+                  <div class="recruiter-field"><label for="recruiter-phone">Professional phone</label><input id="recruiter-phone" name="phone" type="tel" maxlength="30" /></div>
+                  <div class="recruiter-field recruiter-field-wide"><label for="recruiter-website">Professional website</label><input id="recruiter-website" name="website" type="url" maxlength="200" placeholder="https://" /></div>
+                  <div class="recruiter-field recruiter-field-wide"><label for="recruiter-bio">Recruiting bio</label><textarea id="recruiter-bio" name="summary" rows="4" maxlength="1000"></textarea></div>
+                  <div class="recruiter-field-wide"><button class="button" type="submit">Save profile</button></div>
+                </fieldset>
+              </form>
+              <p id="recruiter-profile-status" class="recruiter-state" role="status">Loading your profile…</p>
+            </section>
+          </div>
+          <footer class="workspace-footer"><span>© 2026 CareerConnect</span></footer>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

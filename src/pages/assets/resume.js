@@ -20,8 +20,6 @@ if (session) {
   const upload = document.querySelector('#upload-button');
   const notice = document.querySelector('#upload-notice');
   const progress = document.querySelector('#upload-progress');
-  const dropTitle = drop.querySelector('h3');
-  const dropHelp = document.querySelector('#file-help');
   const listEmpty = document.querySelector('#receipt-empty');
   const list = document.querySelector('#receipt-list');
   const listNotice = document.querySelector('#resumes-notice');
@@ -32,9 +30,27 @@ if (session) {
   let busy = false;
   let selectionVersion = 0;
   let deleteConfirmationTimeout = null;
+  let reviewSelection;
+  let reviewPending = false;
   const review = session.user.role === 'job_seeker'
-    ? createResumeReview({ document, request, formatDateTime, onUnauthorized: expireSession })
+    ? createResumeReview({ document, request, formatDateTime, onUnauthorized: expireSession,
+      onSelectionChange(id, pending) {
+        reviewSelection = id;
+        reviewPending = pending;
+        syncReviewRows();
+      },
+    })
     : null;
+
+  function syncReviewRows() {
+    for (const button of list.querySelectorAll('[data-review-resume]')) {
+      const row = button.closest('[data-resume-id]');
+      const active = Number(row.dataset.resumeId) === reviewSelection;
+      row.classList.toggle('is-selected', active);
+      button.setAttribute('aria-pressed', String(active));
+      button.disabled = busy || reviewPending;
+    }
+  }
 
   function expireSession() {
     clearDisplaySession();
@@ -62,6 +78,7 @@ if (session) {
     list.querySelectorAll('button').forEach((button) => {
       button.disabled = value;
     });
+    syncReviewRows();
   }
 
   function isResume(value) {
@@ -79,12 +96,11 @@ if (session) {
       ? `<span class="badge badge-success">${icon('check')} Default</span>`
       : `<button class="resume-default-button" type="button" data-default-resume aria-label="Make ${name} your default resume">Make default</button>`;
     return `<li class="resume-receipt" data-resume-id="${resume.id}">
-      <span class="document-icon">${icon('file')}<span>PDF</span></span>
       <div class="min-width-zero">
-        <h3 class="break-word">${name}</h3>
-        <p>Uploaded ${escapeHtml(formatDate(resume.uploadedAt))}</p>
+        <h4 class="break-word">${review ? `<button type="button" class="resume-select" data-review-resume aria-pressed="false">${icon('file')}<span>${name}</span></button>` : name}</h4>
       </div>
       <div class="resume-receipt-actions">
+        <span class="resume-upload-date">${escapeHtml(formatDate(resume.uploadedAt))}</span>
         ${defaultAction}
         <button class="resume-delete-button" type="button" data-delete-resume data-label="Delete ${name}" aria-label="Delete ${name}">
           ${icon('trash')}<span data-delete-label>Delete</span>
@@ -110,6 +126,7 @@ if (session) {
       button.disabled = busy;
     });
     count.textContent = `${resumes.length} saved`;
+    document.querySelector('#resume-library-help').hidden = !review || !resumes.length;
     review?.setResumes(resumes);
   }
 
@@ -171,9 +188,6 @@ if (session) {
     upload.disabled = true;
     selected.classList.remove('is-uploaded');
     drop.dataset.uploadState = 'empty';
-    dropTitle.textContent = 'Give your experience a home.';
-    dropHelp.innerHTML =
-      'Drop one PDF here, or choose a file.<br>PDF format only. Maximum file size: 5 MB.';
   }
 
   async function selectFiles(files) {
@@ -311,7 +325,8 @@ if (session) {
     const id = Number(button.closest('[data-resume-id]')?.dataset.resumeId);
     const resume = resumes.find((item) => item.id === id);
     if (!resume) return;
-    if (button.hasAttribute('data-default-resume')) makeDefault(resume);
+    if (button.hasAttribute('data-review-resume')) review?.selectResume(id);
+    else if (button.hasAttribute('data-default-resume')) makeDefault(resume);
     else if (button.hasAttribute('data-delete-resume'))
       deleteResume(resume, button);
   });
@@ -348,9 +363,6 @@ if (session) {
       selected.classList.add('is-uploaded');
       selected.hidden = false;
       drop.dataset.uploadState = 'complete';
-      dropTitle.textContent = 'Resume saved to your account.';
-      dropHelp.innerHTML =
-        'Your profile readiness is now 100%.<br>This upload is now your default resume.';
       showMessage(
         notice,
         'Resume uploaded successfully. It is now your default resume and will remain available after refresh and future sign-ins.',

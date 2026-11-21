@@ -11,6 +11,8 @@ function element(children = {}) {
     addEventListener(name, listener) { events[name] = listener; },
     dispatch: (name) => events[name]({ preventDefault() {} }),
     replaceChildren(...nodes) { this.options = nodes; },
+    append(...nodes) { (this.children ||= []).push(...nodes); },
+    focus() { this.focused = true; },
     classList: { toggle() {} },
     setAttribute(name, value) { this.attributes[name] = value; },
   };
@@ -27,9 +29,10 @@ async function setup(request) {
   const statusFile = element();
   const status = element({ '#review-status-message': message, '#review-status-file': statusFile });
   const profile = element();
-  const result = element({ p: profile, '#review-roles': element(), '#review-strengths': element(), '#review-improvements': element() });
+  const result = element({ p: profile, '#review-roles': element(), '#review-no-matches': element(), '#review-strengths': element(), '#review-improvements': element() });
   const loading = element();
-  const content = element({ '#review-loading': loading });
+  const preview = element();
+  const content = element({ '#review-loading': loading, '#review-preview': preview });
   const output = element({ '#review-content': content });
   const panel = element({ form, select, button, '[role="status"]': status, '#review-output': output, '#resume-review-result': result });
   const document = { querySelector: () => panel, createElement: () => element() };
@@ -39,13 +42,24 @@ async function setup(request) {
     select.value = String(id);
     select.dispatch('change');
   }
-  return { review, form, select, button, label, loading, status, message, statusFile, profile, result, choose };
+  return { review, form, select, button, label, loading, preview, status, message, statusFile, profile, result, choose };
 }
 
 const valid = {
-  isResume: true, candidateProfile: 'Software candidate.', alignedRoles: ['Firmware Intern'],
+  isResume: true, candidateProfile: 'Software candidate.', alignedRoles: [{ id: 7, title: 'Firmware Intern', company: 'Sample Co.', isDemo: true }],
   strengths: ['C experience'], improvements: ['Add results'], nonResumeMessage: null,
 };
+
+test('legacy role strings and incomplete records show the fallback without broken links', async () => {
+  const ui = await setup(async () => ({ resumeId: 1, feedback: {
+    ...valid, alignedRoles: ['Firmware Intern', null, { id: 2 }, { id: 3, title: 'undefined' }],
+  } }));
+  ui.choose(1);
+  await ui.form.dispatch('submit');
+  assert.deepEqual(ui.result.querySelector('#review-roles').options, []);
+  assert.equal(ui.result.querySelector('#review-no-matches').hidden, false);
+  assert.equal(ui.profile.textContent, valid.candidateProfile);
+});
 
 test('review uses the explicit selection, blocks duplicates, and reuses feedback after switching', async () => {
   const calls = [];
@@ -53,7 +67,10 @@ test('review uses the explicit selection, blocks duplicates, and reuses feedback
   const response = new Promise((resolve) => { finish = resolve; });
   const ui = await setup((path, body) => { calls.push({ path, body }); return response; });
   assert.equal(ui.button.disabled, true);
-  ui.choose(1);
+  assert.equal(ui.preview.hidden, false);
+  ui.review.selectResume(1);
+  assert.equal(ui.select.value, '1');
+  assert.equal(ui.select.focused, true);
   const review = ui.form.dispatch('submit');
   await ui.form.dispatch('submit');
   assert.equal(ui.button.attributes['aria-disabled'], 'true');
@@ -68,6 +85,10 @@ test('review uses the explicit selection, blocks duplicates, and reuses feedback
   assert.equal(ui.button.attributes['aria-disabled'], 'false');
   assert.equal(ui.status.dataset.state, 'complete');
   assert.equal(ui.profile.textContent, valid.candidateProfile);
+  assert.equal(ui.preview.hidden, true);
+  const roleLink = ui.result.querySelector('#review-roles').options[0].children[0];
+  assert.equal(roleLink.href, '/workspace/jobs/7');
+  assert.equal(roleLink.children[0].textContent, 'Sample Co. · Demo posting');
   ui.choose(2);
   assert.equal(ui.result.hidden, true);
   ui.choose(1);

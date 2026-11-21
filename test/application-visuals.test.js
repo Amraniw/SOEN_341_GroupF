@@ -46,4 +46,24 @@ test('daily calendar includes empty days and counts multiple submissions on a UT
   assert.equal((html.match(/type="button"/g) || []).length, 365);
   for (const month of ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']) assert.ok(html.includes(month));
   assert.ok(html.includes('calendar-year">2026'));
+  const populated = renderActivity([{ appliedAt: '2026-11-15 12:00:00' }, { appliedAt: '2026-11-15 18:00:00' }], 'all', (v) => v, new Date('2026-11-16T12:00:00Z'));
+  assert.ok(populated.includes('Nov 15, 2026\n2 applications'));
+  assert.ok(populated.includes('Nov 16, 2026\nNo applications'));
+});
+
+test('horizontal history distinguishes upcoming stages, skipped stages and terminal outcomes', async () => {
+  const { renderHistory } = await import('../src/pages/assets/application-visuals.mjs');
+  const render = (statuses) => renderHistory(statuses.map((status) => ({ status, statusLabel: status, changedAt: '2026-11-16' })), String, String);
+  const reviewing = render(['applied', 'under_review']);
+  assert.equal((reviewing.match(/aria-current="step"/g) || []).length, 1);
+  assert.equal((reviewing.match(/event-future/g) || []).length, 2);
+  assert.equal((reviewing.match(/<time>/g) || []).length, 2);
+  const skipped = render(['applied', 'interview']);
+  assert.ok(!skipped.includes('Under Review'));
+  for (const outcome of ['offered', 'rejected']) {
+    const terminal = render(['applied', 'interview', outcome]);
+    assert.ok(!terminal.includes('event-future'));
+    assert.ok(terminal.includes(`${outcome}</strong><span class="event-current-label">Current`));
+  }
+  assert.ok(render([]).includes('No status history'));
 });

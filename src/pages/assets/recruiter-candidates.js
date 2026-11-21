@@ -1,5 +1,13 @@
 import { request } from './api.js';
 import { escapeHtml } from './ui.js';
+import { renderProfileStory } from './profile-story.mjs';
+
+function candidateProfile(candidate) {
+  const story = renderProfileStory(candidate, escapeHtml, { idPrefix: `candidate-${candidate.id}`, showMissing: false });
+  const identity = [candidate.headline, candidate.location].filter(Boolean).map(escapeHtml).join(' · ');
+  if (!story && !identity) return '<p>No professional profile has been added.</p>';
+  return `<details class="candidate-profile"><summary>View professional profile</summary><div class="candidate-profile-content">${identity ? `<p>${identity}</p>` : ''}${story}</div></details>`;
+}
 
 function mountCandidateReview(id, card) {
   if (!id || !/^[1-9]\d*$/.test(id)) return;
@@ -26,7 +34,7 @@ function mountCandidateReview(id, card) {
       statuses = data.statuses;
       if (form.elements.status.options.length === 1) for (const s of statuses) form.elements.status.add(new Option(s.name, s.id));
       notice.textContent = `${data.items.length} ${data.items.length === 1 ? 'applicant' : 'applicants'}`;
-      list.innerHTML = data.items.map((a) => `<article class="candidate-card"><h3>${escapeHtml(a.name)}</h3><p>${escapeHtml(a.email)}</p>${a.hasResume ? `<details><summary>Review submitted resume</summary><iframe title="Submitted resume for ${escapeHtml(a.name)}" loading="lazy" src="/api/recruiter/jobs/${id}/applications/${a.id}/resume#toolbar=0&navpanes=0" class="candidate-resume"></iframe></details>` : '<p>No resume was attached when this application was submitted.</p>'}<form data-application="${a.id}"><label>Application status<select name="status">${statuses.map((s) => `<option value="${s.id}" ${s.id === a.status ? 'selected' : ''}>${s.name}</option>`).join('')}</select></label><button class="button button-secondary">Save status</button><p role="status" aria-live="polite"></p></form></article>`).join('') || '<p>No applicants match these filters.</p>';
+      list.innerHTML = data.items.map((a) => `<article class="candidate-card"><h3>${escapeHtml(a.name)}</h3><p>${escapeHtml(a.email)}</p>${candidateProfile(a)}${a.hasResume ? `<details><summary>Review submitted resume</summary><iframe title="Submitted resume for ${escapeHtml(a.name)}" loading="lazy" src="/api/recruiter/jobs/${id}/applications/${a.id}/resume#toolbar=0&navpanes=0" class="candidate-resume"></iframe></details>` : '<p>No resume was attached when this application was submitted.</p>'}<form data-application="${a.id}"><label>Application status<select name="status">${statuses.map((s) => `<option value="${s.id}" ${s.id === a.status ? 'selected' : ''}>${s.name}</option>`).join('')}</select></label><button class="button button-secondary">Save status</button><p role="status" aria-live="polite"></p></form></article>`).join('') || '<p>No applicants match these filters.</p>';
     } catch (error) { if (current === generation) { list.innerHTML = ''; notice.textContent = `${error.message} Use Filter applicants to retry.`; } }
     finally { if (current === generation) list.setAttribute('aria-busy', 'false'); }
   }

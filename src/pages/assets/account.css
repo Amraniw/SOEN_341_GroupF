@@ -1,0 +1,210 @@
+/* Account hierarchy: professional identity, career setup, account settings. */
+.account-layout { display:grid; gap:28px; min-width:0; }
+.account-profile { border:1px solid var(--border); border-radius:var(--radius-lg); background:var(--surface); overflow:hidden; }
+.account-identity { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(260px,1fr); gap:32px; align-items:start; padding:28px; background:color-mix(in srgb,var(--brand-soft) 35%,var(--surface)); }
+.account-identity .profile-identity { display:grid; grid-template-columns:76px minmax(0,1fr); gap:5px 20px; align-content:start; padding:0; }
+.account-identity .profile-identity .avatar { grid-column:1; grid-row:1 / 5; width:76px; height:76px; margin:0; border:3px solid var(--surface); font-size:26px; background:var(--brand-soft); color:var(--brand); }
+.account-identity .profile-identity h2 { grid-column:2; margin:0; font-size:28px; line-height:1.25; letter-spacing:-.6px; }
+.account-identity .profile-identity p { grid-column:2; margin:0; color:var(--muted); font-size:12px; line-height:1.6; }
+.account-identity .profile-identity .profile-headline { color:var(--ink); font-size:13px; margin:2px 0; }
+.account-identity .profile-identity > .badge { grid-column:2; justify-self:start; margin-top:6px; font-size:10px; }
+.account-identity .picture-editor { margin:0; padding:0 0 0 28px; border-top:0; border-left:1px solid var(--border); min-width:0; }
+.account-identity .picture-editor-heading { display:block; margin-bottom:10px; }
+.account-identity .picture-editor-heading h3 { font-size:12px; margin-bottom:4px; }
+.account-identity .picture-editor-heading p { display:none; }
+.account-identity .picture-format { display:block; font-size:10px; }
+.account-identity .picture-editor-actions { gap:12px; }
+.account-identity .picture-editor .button { min-height:36px; padding:7px 12px; }
+.account-professional { padding:28px; border-top:1px solid var(--border); min-width:0; }
+.account-professional > .panel-heading { align-items:center; gap:16px; margin-bottom:24px; padding-bottom:18px; border-bottom:1px solid var(--border); }
+.account-professional > .panel-heading h2 { margin:0; padding-left:12px; border-left:3px solid var(--brand); font-size:22px; letter-spacing:-.4px; }
+.account-professional #profile-notice.notice-success { padding:8px 12px; margin:0 0 20px; border:0; border-left:2px solid var(--brand); border-radius:0; background:transparent; color:var(--brand); font-size:12px; }
+.account-professional #profile-edit { min-height:36px; padding:8px 14px; font-size:12px; }
+.account-professional #profile-empty { display:flex; align-items:center; justify-content:space-between; gap:24px; padding:4px 0 2px; }
+.account-professional .empty-state { padding:0; margin:0; border:0; background:transparent; gap:14px; }
+.account-professional .empty-state h3 { margin:0 0 6px; font-size:15px; }
+.account-professional .empty-state p { margin:0; font-size:12px; max-width:440px; line-height:1.7; }
+.account-professional .empty-state .icon-tile { width:40px; height:40px; flex-shrink:0; background:var(--brand-soft); border:0; }
+.account-professional #profile-empty .profile-actions { margin:0; flex-shrink:0; }
+.account-professional #profile-create { font-size:12px; padding:10px 15px; }
+.account-professional #profile-updated { margin:16px 0 0; padding:0; border:0; font-size:10px; }
+.account-professional .profile-form { grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px 24px; }
+.account-professional .profile-form .form-field:has(textarea), .account-professional .profile-form > .profile-actions { grid-column:1 / -1; }
+.account-career, .account-settings { padding:24px 28px; border:1px solid var(--border); border-radius:var(--radius-lg); background:var(--surface); min-width:0; }
+.account-settings { background:color-mix(in srgb,var(--canvas) 20%,var(--surface)); }
+.account-career > .account-region-heading, .account-settings > .account-region-heading { padding-bottom:14px; border-bottom:1px solid var(--border); }
+.account-region-heading { margin-bottom:20px; }
+.account-region-heading h2 { margin:0 0 5px; font-size:18px; }
+.account-region-heading p { margin:0; color:var(--muted); font-size:12px; }
+.account-career-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:28px; }
+.account-career-item { min-width:0; }
+.account-career-item + .account-career-item { border-left:1px solid var(--border); padding-left:28px; }
+.account-career-item .panel-heading { margin-bottom:14px; gap:12px; }
+.account-career-item h3 { margin:0; font-size:14px; }
+.account-career-item p { color:var(--muted); font-size:12px; line-height:1.65; }
+.account-career-item .text-link { font-size:12px; }
+.account-career-item .help-note { margin:0; padding:0; }
+.account-career-item #employment-body > p:last-of-type { margin-bottom:0; }
+.account-career-item .employment-job { padding:12px; background:var(--canvas); }
+.account-career-item .employment-job strong { font-size:13px; overflow-wrap:anywhere; }
+.account-career-item .employment-job span { font-size:11px; }
+.account-career-item .employment-job .button, .account-career-item .profile-actions .button { min-height:36px; padding:8px 12px; font-size:12px; }
+.account-career-item .receipt-list { margin:0; }
+.account-career-item .resume-receipt { display:grid; grid-template-columns:32px minmax(0,1fr); gap:12px; padding:0; border:0; background:transparent; }
+.account-career-item .resume-receipt .document-icon { width:32px; height:40px; }
+.account-career-item .resume-receipt h3 { font-size:12px; line-height:1.5; }
+.account-career-item .resume-receipt p { margin:4px 0 0; font-size:10px; }
+.account-career-item .resume-receipt > .badge { grid-column:2; justify-self:start; margin-left:0; }
+.account-career-item #employment-actions { justify-content:flex-start; }
+.account-career-item #profile-resume-link { margin-top:12px; }
+.account-career-item .empty-state { margin:0; padding:0; border:0; gap:12px; }
+.account-career-item .empty-state .icon-tile { width:32px; height:36px; }
+.account-career-item .empty-state h3 { font-size:13px; }
+.account-settings .account-region-heading h2 { color:var(--muted); font-size:16px; }
+.account-settings-grid { display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr); gap:40px; }
+.account-settings-item { min-width:0; }
+.account-settings-item .panel-heading { margin-bottom:6px; gap:12px; }
+.account-settings-item h3 { font-size:13px; margin:0; }
+.account-settings-item .badge { background:transparent; border:1px solid var(--border); font-size:9px; }
+.account-settings-item .details-list { margin:0; }
+.account-settings-item .details-list > div { grid-template-columns:110px minmax(0,1fr); padding:12px 0; gap:14px; }
+.account-settings-item .details-list dt, .account-settings-item .details-list dd { font-size:11px; overflow-wrap:anywhere; }
+.account-settings-item .help-note { margin:12px 0 0; border:0; padding:0; font-size:11px; line-height:1.7; }
+.account-settings-item .text-link { font-size:12px; }
+.account-access { padding-left:28px; border-left:1px solid var(--border); }
+.account-access .help-note { margin:12px 0; max-width:340px; }
+.account-layout :is(a,button):focus-visible { outline:2px solid var(--brand); outline-offset:4px; }
+@media(max-width:1000px) {
+  .account-identity { grid-template-columns:1fr; gap:20px; }
+  .account-identity .picture-editor { border-left:0; border-top:1px solid var(--border); padding:18px 0 0; }
+  .account-identity .picture-editor-heading { display:flex; justify-content:space-between; gap:16px; }
+  .account-professional #profile-empty { align-items:start; flex-direction:column; gap:18px; }
+}
+@media(max-width:700px) {
+  .account-layout { gap:24px; }
+  .account-identity, .account-professional, .account-career { padding:20px; }
+  .account-identity .profile-identity { grid-template-columns:56px minmax(0,1fr); gap:5px 14px; }
+  .account-identity .profile-identity .avatar { width:56px; height:56px; font-size:21px; }
+  .account-identity .profile-identity h2 { font-size:23px; }
+  .account-professional > .panel-heading h2 { font-size:18px; }
+  .account-professional .profile-details, .account-professional .profile-form, .account-career-grid, .account-settings-grid { grid-template-columns:1fr; }
+  .account-professional .profile-details > div:has([data-profile-value='summary']) { grid-column:auto; }
+  .account-career-item + .account-career-item { border-left:0; border-top:1px solid var(--border); padding:20px 0 0; }
+  .account-settings-grid { gap:24px; }
+  .account-access { padding:20px 0 0; border-left:0; border-top:1px solid var(--border); }
+  .account-identity .picture-editor-heading { flex-wrap:wrap; gap:4px; }
+  .account-professional > .panel-heading { flex-wrap:wrap; }
+  .account-settings-item .details-list > div { grid-template-columns:90px minmax(0,1fr); gap:10px; }
+}
+@media(prefers-reduced-motion:reduce) { .account-layout * { animation:none !important; transition:none !important; } }
+
+/* Stored professional content has its own hierarchy, without placeholder rows. */
+.account-identity .profile-identity .avatar { grid-row:1 / 6; }
+.account-identity .profile-contact { grid-column:2; display:flex; flex-wrap:wrap; gap:4px 14px; min-width:0; margin-top:3px; font-size:12px; color:var(--muted); }
+.profile-contact > * { min-width:0; overflow-wrap:anywhere; }
+.profile-contact a { color:var(--brand); text-decoration:none; }
+.profile-contact a:hover { text-decoration:underline; }
+.profile-story { display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); gap:28px 32px; align-items:start; }
+.profile-story-section { min-width:0; grid-column:span 6; }
+.profile-story-section h3 { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; margin:0 0 14px; color:var(--brand); }
+.profile-story-summary { grid-column:span 8; }
+.profile-story-skills { grid-column:span 4; padding:18px; background:var(--canvas); border-left:2px solid var(--border); border-radius:0 8px 8px 0; }
+.profile-story:not(:has(.profile-story-skills)) .profile-story-summary, .profile-story:not(:has(.profile-story-summary)) .profile-story-skills { grid-column:1 / -1; }
+.profile-story-experience, .profile-story-education { border-top:1px solid var(--border); padding-top:20px; }
+.profile-story-experience h3, .profile-story-education h3 { color:var(--muted); }
+.profile-about { white-space:pre-line; overflow-wrap:anywhere; font-size:14px; line-height:1.9; max-width:none; margin:0; color:var(--ink); }
+.profile-skill-list { display:flex; flex-wrap:wrap; gap:8px; padding:0; margin:0; list-style:none; }
+.profile-skill-list li { padding:5px 10px; border:1px solid var(--border); border-radius:5px; background:var(--surface); color:var(--ink); font-size:12px; line-height:1.5; max-width:100%; overflow-wrap:anywhere; }
+.profile-records { list-style:none; margin:0; padding:0; }
+.profile-records li { position:relative; padding:0 0 20px 20px; border-left:1px solid var(--border); }
+.profile-records li:last-child { padding-bottom:0; }
+.profile-records li::before { content:''; position:absolute; width:7px; height:7px; left:-4px; top:8px; background:var(--brand); border:2px solid var(--surface); box-shadow:0 0 0 2px var(--brand-soft); border-radius:50%; }
+.profile-records p { margin:0; font-size:13px; line-height:1.8; white-space:pre-line; overflow-wrap:anywhere; color:var(--muted); }
+.profile-records p::first-line { color:var(--ink); font-weight:650; }
+.profile-missing { grid-column:1 / -1; margin:0; padding:12px 14px; background:var(--canvas); border-left:2px solid var(--border); border-radius:0 6px 6px 0; color:var(--muted); font-size:12px; line-height:1.7; }
+.account-career .account-career-grid { grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); align-items:start; gap:32px; }
+.asset-count { color:var(--muted); font-size:10px; }
+.account-career-item .resume-receipt > .badge { display:none; }
+.account-career-item .panel-heading { flex-wrap:wrap; justify-content:flex-start; gap:8px 14px; }
+.account-career-item .panel-heading > [data-icon] { margin-left:auto; }
+.career-asset-tools { display:grid; gap:4px; min-width:0; border-left:1px solid var(--border); padding-left:28px; }
+.career-asset-tools a { display:flex; gap:12px; align-items:center; padding:10px 8px; border-radius:8px; color:var(--ink); text-decoration:none; transition:background 160ms; }
+.career-asset-tools a:hover, .career-asset-tools a:focus-visible { background:var(--brand-soft); }
+.career-asset-tools a > [data-icon] { display:flex; flex-shrink:0; color:var(--brand); }
+.career-asset-tools a > [data-icon]:last-child { margin-left:auto; transition:transform 160ms; }
+.career-asset-tools a:hover > [data-icon]:last-child { transform:translateX(3px); }
+.career-asset-tools strong { display:block; font-size:12px; margin-bottom:4px; }
+.career-asset-tools div > span { font-size:11px; color:var(--muted); }
+.account-career #employment-panel { border-top:1px solid var(--border); padding-top:16px; margin-top:18px; }
+.account-career #employment-panel .panel-heading { margin-bottom:8px; }
+.account-career #employment-body { display:flex; flex-wrap:wrap; align-items:center; gap:8px 18px; }
+.account-career #employment-message { margin:0; }
+.account-career #employment-body > p:has(#employment-browse[hidden]) { display:none; }
+.account-career #employment-actions { justify-content:flex-start; margin:0; }
+.account-career #employment-jobs, .account-career #employment-confirm { width:100%; }
+.account-career #employment-jobs { margin:0; }
+.account-career .employment-job { padding:10px 0; border:0; border-radius:0; background:transparent; }
+.account-settings .account-region-heading { margin-bottom:12px; }
+.account-settings .details-list > div { padding-block:9px; }
+.account-settings-item .help-note { max-width:460px; }
+@media(max-width:700px) {
+  .profile-story, .account-career .account-career-grid { grid-template-columns:1fr; gap:22px; }
+  .profile-story-section, .profile-story-summary, .profile-story-skills { grid-column:1 / -1; }
+  .profile-about { font-size:14px; }
+  .account-career, .account-settings { padding:20px; }
+  .career-asset-tools { padding:14px 0 0; border-left:0; border-top:1px solid var(--border); }
+}
+@media(prefers-reduced-motion:reduce) { .account-layout * { transition:none !important; } }
+
+/* Profile collections keep editing explicit while retaining the existing fields. */
+.account-professional .profile-story-summary, .account-professional .profile-story-skills { grid-column:1 / -1; }
+.account-professional .profile-story-skills { padding:0; border:0; border-radius:0; background:transparent; }
+.account-professional .profile-story-section h3 { font-size:14px; letter-spacing:0; text-transform:none; margin-bottom:14px; color:var(--ink); }
+.account-professional .profile-story-experience, .account-professional .profile-story-education { padding-top:22px; }
+.account-professional .profile-story-experience h3, .account-professional .profile-story-education h3 { font-size:16px; }
+.profile-record-title { display:block; font-size:15px; font-weight:650; color:var(--ink); line-height:1.5; overflow-wrap:anywhere; }
+.profile-record-organization { display:block; margin-top:3px; font-size:13px; color:var(--ink); overflow-wrap:anywhere; }
+.profile-record-dates { display:block; margin:6px 0; font-size:11px; color:var(--muted); }
+.profile-records p { margin-top:7px; }
+.account-professional .profile-records p::first-line { font-weight:400; }
+.profile-collection { grid-column:1 / -1; padding-top:18px; border-top:1px solid var(--border); min-width:0; }
+.collection-label { font-size:14px; font-weight:650; color:var(--ink); }
+.collection-editor { min-width:0; }
+.editable-skills { display:flex; flex-wrap:wrap; gap:8px; padding:0; margin:0 0 10px; list-style:none; }
+.editable-skills:empty { margin:0; }
+.editable-skills li { display:inline-flex; align-items:center; gap:7px; padding:3px 4px 3px 10px; border:1px solid var(--border); border-radius:6px; background:var(--brand-soft); color:var(--ink); min-width:0; max-width:100%; }
+.editable-skills li > span { font-size:12px; overflow-wrap:anywhere; min-width:0; }
+.editable-skills button { display:grid; place-items:center; width:28px; height:28px; flex-shrink:0; border:0; border-radius:4px; background:transparent; color:var(--brand); font-size:19px; cursor:pointer; }
+.editable-skills button:hover { background:var(--surface); }
+.skill-entry { display:flex; gap:10px; }
+.skill-entry input { flex:1; min-width:0; }
+.profile-collection .button { min-height:38px; padding:8px 13px; font-size:12px; }
+.collection-status { color:var(--muted); font-size:11px; }
+.collection-status:empty { display:none; }
+.structured-entries { display:grid; gap:16px; margin-bottom:12px; }
+.structured-entry { position:relative; min-width:0; padding:18px; margin:0; border:1px solid var(--border); border-radius:10px; background:var(--canvas); }
+.structured-entry legend { padding:0 7px; font-size:12px; font-weight:650; color:var(--ink); }
+.entry-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+.entry-field { display:grid; gap:6px; min-width:0; }
+.entry-field label { font-size:11px; }
+.entry-field:has(textarea), .entry-field.entry-wide { grid-column:1 / -1; }
+.entry-field input, .skill-entry input { width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--ink); font:inherit; font-size:13px; min-height:40px; }
+.entry-field input:focus-visible, .skill-entry input:focus-visible { outline:2px solid var(--brand); outline-offset:2px; }
+.entry-field input:disabled { color:var(--muted); background:var(--canvas); }
+.entry-field small { color:var(--muted); font-size:11px; }
+.entry-remove { display:block; margin:0 0 12px auto; padding:4px 0 4px 10px; border:0; background:transparent; color:var(--muted); font:inherit; font-size:11px; cursor:pointer; }
+.entry-remove:hover { color:var(--error); }
+.entry-error { color:var(--error); font-size:12px; margin:10px 0 0; }
+.entry-error:empty { display:none; }
+.entry-present { grid-column:1 / -1; display:flex; align-items:center; gap:8px; font-size:12px; }
+.entry-present input { width:16px; height:16px; accent-color:var(--brand); }
+.collection-actions { display:flex; align-items:center; flex-wrap:wrap; gap:12px; }
+.collection-status .text-link { font-size:12px; border:0; background:transparent; padding:4px; cursor:pointer; }
+@media(max-width:600px) {
+  .entry-grid { grid-template-columns:1fr; }
+  .structured-entry { padding:14px; }
+  .skill-entry { flex-wrap:wrap; }
+  .skill-entry input { flex-basis:180px; }
+}
+
+.profile-record-organization { font-weight:400; }
