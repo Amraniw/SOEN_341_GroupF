@@ -1,6 +1,7 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const express = require('express');
+const { findDefaultResume } = require('../database/resumes');
 const { createAuthenticateUser } = require('../middleware/authenticateUser');
 const { requireSameOrigin } = require('../middleware/requireSameOrigin');
 const { createResumeAnalyzer, ResumeAnalysisError } = require('../services/resumeAnalysis');
@@ -63,21 +64,6 @@ function createResumeRouter(database, options = {}) {
     };
   }
 
-  // The default is the resume the user chose. Without a choice (accounts from
-  // before resume collections, or after the chosen resume is deleted) it is the
-  // most recently uploaded resume, which is the resume /current always returned.
-  function findDefaultResume(userId) {
-    return database.get(
-      `SELECT r.id, r.original_name, r.uploaded_at
-       FROM resumes r
-       LEFT JOIN default_resumes d ON d.user_id = r.user_id AND d.resume_id = r.id
-       WHERE r.user_id = ?
-       ORDER BY d.resume_id IS NOT NULL DESC, r.uploaded_at DESC, r.id DESC
-       LIMIT 1`,
-      userId
-    );
-  }
-
   // Newest first, with the default marked.
   async function listResumes(userId) {
     const rows = await database.all(
@@ -87,7 +73,7 @@ function createResumeRouter(database, options = {}) {
        ORDER BY uploaded_at DESC, id DESC`,
       userId
     );
-    const defaultResume = await findDefaultResume(userId);
+    const defaultResume = await findDefaultResume(database, userId);
     return rows.map((row) => toPublicResume(row, row.id === defaultResume?.id));
   }
 
@@ -116,7 +102,7 @@ function createResumeRouter(database, options = {}) {
   // Returns the default resume, so existing consumers keep receiving the active one.
   router.get('/current', authenticateUser, async (request, response, next) => {
     try {
-      const resume = await findDefaultResume(request.authenticatedUser.id);
+      const resume = await findDefaultResume(database, request.authenticatedUser.id);
       return response.json({ resume: resume ? toPublicResume(resume, true) : null });
     } catch (error) {
       return next(error);
@@ -322,7 +308,7 @@ function createResumeRouter(database, options = {}) {
 
       await removeFile(path.join(uploadDirectory, resume.stored_name));
 
-      const defaultResume = await findDefaultResume(userId);
+      const defaultResume = await findDefaultResume(database, userId);
       return response.json({
         message: 'Resume deleted successfully.',
         defaultResume: defaultResume ? toPublicResume(defaultResume, true) : null,

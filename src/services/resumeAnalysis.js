@@ -95,14 +95,14 @@ function normalizeFeedback(value, postings) {
   return { isResume: true, candidateProfile, alignedRoles, strengths, improvements, nonResumeMessage: null };
 }
 
-function createResumeAnalyzer({
+function createStructuredAnalyzer({
   apiKey = process.env.OPENAI_API_KEY,
   model = process.env.OPENAI_RESUME_MODEL?.trim() || DEFAULT_MODEL,
   fetchResponse = fetch,
 } = {}) {
-  return async function analyzeResume(text, postings = []) {
+  return async function analyze({ feature, action = 'request', instructions, input, format, validate }) {
     if (!apiKey?.trim()) {
-      throw new ResumeAnalysisError(503, 'AI resume review requires server setup. Ask the site administrator to enable it.');
+      throw new ResumeAnalysisError(503, `${feature} requires server setup. Ask the site administrator to enable it.`, 'ai_not_configured');
     }
 
     const signal = AbortSignal.timeout(PROVIDER_TIMEOUT_MS);
@@ -116,11 +116,11 @@ function createResumeAnalyzer({
           model,
           ...(model === DEFAULT_MODEL ? { reasoning: { effort: 'none' } } : {}),
           store: false,
-          instructions: `${instructions}\n\nAllowed job categories (ID and label): ${JSON.stringify(JOB_CATEGORIES)}. Only match roles from the supplied postings in these categories. If no postings are supplied, return an empty alignedRoles array.`,
-          input: [{ role: 'user', content: JSON.stringify({ resumeText: text, postings }) }],
+          instructions,
+          input: [{ role: 'user', content: JSON.stringify(input) }],
           tools: [],
           max_output_tokens: 1600,
-          text: { format: postingFormat(postings) },
+          text: { format },
         }),
       });
       receivedResponse = true;
@@ -135,7 +135,7 @@ function createResumeAnalyzer({
           throw new ResumeAnalysisError(502, 'The configured OpenAI model is unavailable. Ask the site administrator to check it.', 'ai_model_unavailable');
         }
         if (response.status === 429) {
-          throw new ResumeAnalysisError(503, 'OpenAI rate or usage limits blocked this review. Try again later or contact the site administrator.', 'ai_usage_limit');
+          throw new ResumeAnalysisError(503, `OpenAI rate or usage limits blocked this ${action}. Try again later or contact the site administrator.`, 'ai_usage_limit');
         }
         throw new Error('AI request failed.');
       }
@@ -145,18 +145,31 @@ function createResumeAnalyzer({
         .flatMap((item) => item.content);
       if (content.some((item) => item.type === 'refusal')) throw new Error('AI declined the review.');
       const output = content.filter((item) => item.type === 'output_text').map((item) => item.text).join('');
-      return normalizeFeedback(JSON.parse(output), postings);
+      return validate(JSON.parse(output));
     } catch (error) {
       if (error instanceof ResumeAnalysisError) throw error;
       if (signal.aborted || error.name === 'TimeoutError') {
-        throw new ResumeAnalysisError(504, 'AI resume review took too long. Please try again.');
+        throw new ResumeAnalysisError(504, `${feature} took too long. Please try again.`, 'ai_timeout');
       }
       if (!receivedResponse && error instanceof TypeError) {
         throw new ResumeAnalysisError(502, 'The server could not connect to OpenAI. Please try again.', 'ai_connection');
       }
-      throw new ResumeAnalysisError(502, 'AI resume review could not be completed. Please try again.');
+      const code = receivedResponse && error instanceof SyntaxError ? 'ai_invalid_output' : undefined;
+      throw new ResumeAnalysisError(502, `${feature} could not be completed. Please try again.`, code);
     }
   };
 }
 
-module.exports = { createResumeAnalyzer, ResumeAnalysisError };
+function createResumeAnalyzer(options) {
+  const analyze = createStructuredAnalyzer(options);
+  return (resumeText, postings = []) => analyze({
+    feature: 'AI resume review',
+    action: 'review',
+    instructions: `${instructions}\n\nAllowed job categories (ID and label): ${JSON.stringify(JOB_CATEGORIES)}. Only match roles from the supplied postings in these categories. If no postings are supplied, return an empty alignedRoles array.`,
+    input: { resumeText, postings },
+    format: postingFormat(postings),
+    validate: (value) => normalizeFeedback(value, postings),
+  });
+}
+
+module.exports = { createResumeAnalyzer, createStructuredAnalyzer, ResumeAnalysisError, NON_RESUME_MESSAGE };

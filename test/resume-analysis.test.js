@@ -7,6 +7,7 @@ const request = require('supertest');
 const { createApp } = require('../src/app');
 const { initializeDatabase } = require('../src/database/database');
 const { createResumeAnalyzer } = require('../src/services/resumeAnalysis');
+const { createJobMatcher, shortlistJobs } = require('../src/services/jobMatching');
 const { JOB_CATEGORIES } = require('../src/domain/jobs');
 
 const feedback = {
@@ -60,8 +61,11 @@ let directory;
 let selectedId;
 let defaultId;
 const calls = [];
+const matchCalls = [];
 let blockNextReview;
+let replyToMatching;
 const endpoint = (id) => `/api/resumes/${id}/ai-feedback`;
+const matchesEndpoint = '/api/job-matches';
 
 async function register(email, role = 'job_seeker') {
   const agent = request.agent(app);
@@ -81,7 +85,7 @@ before(async () => {
   directory = await fs.mkdtemp(path.join(os.tmpdir(), 'careerconnect-ai-review-'));
   database = await initializeDatabase(':memory:');
   await database.run(`INSERT INTO jobs (id, title, company, location, category, description, status, demo_key) VALUES
-    (1, 'Firmware Intern', 'Company One', 'Toronto', 'engineering', 'Build embedded firmware.', 'open', NULL),
+    (1, 'Firmware Intern', 'Company One', 'Toronto', 'engineering', 'Build embedded firmware. Debug hardware using oscilloscopes. Develop automated tests. ROS 2 experience preferred.', 'open', NULL),
     (2, 'Embedded Intern', 'Company Two', 'Toronto', 'engineering', 'Test embedded systems.', 'open', 'test-demo'),
     (3, 'Closed Role', 'Company Three', 'Toronto', 'engineering', 'Test embedded systems.', 'closed', NULL)`);
   const analyzeResume = createResumeAnalyzer({ apiKey: 'test-only', model: 'test-model', async fetchResponse(url, options) {
@@ -98,7 +102,19 @@ before(async () => {
     if (text.includes('Provider failure')) throw new Error('private provider request data');
     return providerResponse(feedback);
   } });
-  app = createApp(database, { uploadDirectory: directory, analyzeResume });
+  const recommendJobs = createJobMatcher({ apiKey: 'test-only', model: 'test-model', async fetchResponse(url, options) {
+    const payload = JSON.parse(options.body);
+    const input = JSON.parse(payload.input[0].content);
+    matchCalls.push({ payload, input });
+    assert.equal(url, 'https://api.openai.com/v1/responses');
+    assert.equal(options.headers.Authorization, 'Bearer test-only');
+    assert.equal(payload.store, false);
+    assert.deepEqual(payload.tools, []);
+    assert.match(payload.instructions, /untrusted data/);
+    assert.deepEqual(payload.text.format.schema.properties.matches.items.properties.jobId.enum, input.postings.map(({ id }) => id));
+    return providerResponse(await replyToMatching(input));
+  } });
+  app = createApp(database, { uploadDirectory: directory, analyzeResume, recommendJobs });
   seeker = await register('owner@example.test');
   otherUser = await register('second@example.test');
   recruiter = await register('recruiter@example.test', 'recruiter');
@@ -279,4 +295,174 @@ test('distinguishes OpenAI authentication, model, usage limit, and network error
     throw new TypeError('fetch failed');
   } });
   await assert.rejects(disconnected('text'), { status: 502, code: 'ai_connection' });
+});
+
+const defaultResumeLines = ['EMBEDDED SOFTWARE ENGINEER', 'Built embedded firmware for flight controls.',
+  'Used oscilloscopes to debug prototypes and wrote automated tests.', 'Contact private@example.test 514-555-0133'];
+const firmwareMatch = {
+  jobId: '1', alignment: 'strong',
+  reasons: [
+    { resumeEvidence: 'embedded firmware for flight controls', postingEvidence: 'Build embedded firmware' },
+    { resumeEvidence: 'Used oscilloscopes to debug prototypes', postingEvidence: 'Debug hardware using oscilloscopes' },
+    { resumeEvidence: 'wrote automated tests', postingEvidence: 'Develop automated tests' },
+  ],
+  consideration: 'ROS 2 experience',
+};
+
+test('job matching uses the chosen default, sends only a shortlist, and outputs verified evidence and database metadata', async () => {
+  const applicant = await register('matcher@example.test');
+  const chosen = await upload(applicant, 'Chosen', pdf(defaultResumeLines));
+  await upload(applicant, 'Newer', pdf(['Unselected sales and account management resume']));
+  await applicant.put(`/api/resumes/${chosen}/default`).send({}).expect(200);
+  await database.run(`INSERT INTO jobs (id, title, company, location, category, description, status, closing_date)
+    VALUES (20, 'Expired', 'Company', 'Toronto', 'engineering', 'Build embedded firmware.', 'open', '2000-01-01')`);
+  try {
+    replyToMatching = async () => ({ isResume: true, matches: [
+      { ...firmwareMatch, jobId: '99999' }, { ...firmwareMatch, jobId: '3' },
+      { ...firmwareMatch, jobId: '20' },
+      { ...firmwareMatch, company: 'Fabricated company', reasons: [
+        { resumeEvidence: 'Invented certification', postingEvidence: 'Build embedded firmware' },
+        ...firmwareMatch.reasons,
+      ] },
+      firmwareMatch,
+    ] });
+    const { body } = await applicant.post(matchesEndpoint).send({}).expect('Cache-Control', 'no-store').expect(200);
+    assert.deepEqual(body, {
+      resume: { id: chosen, originalName: 'Chosen.pdf' }, outcome: 'matched', matches: [{
+        job: { id: 1, title: 'Firmware Intern', company: 'Company One', location: 'Toronto', workplaceType: null, isDemo: false },
+        alignment: 'strong',
+        summary: 'The role calls for work such as “Build embedded firmware”. Your resume shows relevant experience, including “embedded firmware for flight controls”.',
+        strengths: firmwareMatch.reasons.map(({ resumeEvidence }) => resumeEvidence),
+        consideration: 'Consider how you would demonstrate “ROS 2 experience” when applying.',
+      }],
+    });
+    const { input } = matchCalls.at(-1);
+    assert.match(input.resumeText, /Built embedded firmware/);
+    assert.doesNotMatch(input.resumeText, /Unselected|private@example\.test|514-555-0133/);
+    assert.deepEqual(input.postings.map(({ id }) => id).sort(), ['1', '2']);
+    assert.ok(input.postings.every((posting) => Object.keys(posting).length === 3));
+  } finally {
+    await database.run('DELETE FROM jobs WHERE id = 20');
+  }
+});
+
+test('job matching rejects repeated evidence and omits unsupported considerations', async () => {
+  const applicant = await register('evidence@example.test');
+  await upload(applicant, 'Firmware', pdf(defaultResumeLines));
+  const [first, second] = firmwareMatch.reasons;
+  replyToMatching = async () => ({ isResume: true, matches: [{
+    ...firmwareMatch, reasons: [first, { ...first, resumeEvidence: 'embedded firmware' }, second],
+  }] });
+  const repeated = await applicant.post(matchesEndpoint).send({}).expect(502);
+  assert.equal(repeated.body.code, 'ai_invalid_output');
+
+  replyToMatching = async () => ({ isResume: true, matches: [{ ...firmwareMatch, consideration: 'Invented qualification' }] });
+  const verified = await applicant.post(matchesEndpoint).send({}).expect(200);
+  assert.equal(verified.body.matches[0].strengths.length, 3);
+  assert.equal(verified.body.matches[0].consideration, null);
+});
+
+test('shortlisting caps the catalog sent to AI and prioritizes experience in titles or structured requirements', () => {
+  const unrelated = Array.from({ length: 25 }, (_, id) => ({ id, title: 'Sales', description: 'Manage customer accounts' }));
+  const postings = shortlistJobs([...unrelated, {
+    id: 100, title: 'Engineering internship', description: 'Join our team.',
+    details: JSON.stringify({ qualifications: ['Embedded firmware'] }),
+  }], 'Built embedded firmware.');
+  assert.equal(postings.length, 24);
+  assert.equal(postings[0].id, '100');
+  assert.match(postings[0].description, /Embedded firmware/);
+});
+
+test('job matching rejects unauthenticated users, recruiters, cross-origin requests and resume overrides without calling AI', async () => {
+  const start = matchCalls.length;
+  await request(app).post(matchesEndpoint).send({}).expect(401);
+  await recruiter.post(matchesEndpoint).send({}).expect(403);
+  await seeker.post(matchesEndpoint).set('Origin', 'https://unrelated.example').send({}).expect(403);
+  await seeker.post(matchesEndpoint).send({ resumeId: selectedId }).expect(400);
+  await seeker.post(`${matchesEndpoint}?resumeId=${selectedId}`).send({}).expect(400);
+  const { body } = await otherUser.post(matchesEndpoint).send({}).expect(409);
+  assert.equal(body.code, 'no_resume');
+  assert.equal(matchCalls.length, start);
+});
+
+test('missing, unreadable and non-resume defaults return different recovery states', async () => {
+  const applicant = await register('documents@example.test');
+  const missing = await upload(applicant, 'Missing', pdf(defaultResumeLines));
+  const row = await database.get('SELECT stored_name FROM resumes WHERE id = ?', missing);
+  await fs.unlink(path.join(directory, row.stored_name));
+  const start = matchCalls.length;
+  const missingResponse = await applicant.post(matchesEndpoint).send({}).expect(409);
+  assert.equal(missingResponse.body.code, 'resume_missing');
+  await upload(applicant, 'Unreadable', pdf());
+  const unreadable = await applicant.post(matchesEndpoint).send({}).expect(422);
+  assert.match(unreadable.body.error, /searchable text/);
+  assert.equal(matchCalls.length, start);
+  await upload(applicant, 'Invoice', pdf(['INVOICE for office computer repair']));
+  replyToMatching = async () => ({ isResume: false, matches: [] });
+  const nonResume = await applicant.post(matchesEndpoint).send({}).expect(422);
+  assert.match(nonResume.body.error, /does not appear to be a resume/);
+});
+
+test('job matching separates empty, stale and malformed recommendations and allows retries after provider failures', async () => {
+  const applicant = await register('retry-matches@example.test');
+  await upload(applicant, 'Firmware', pdf(defaultResumeLines));
+  replyToMatching = async () => ({ isResume: true, matches: [] });
+  const empty = await applicant.post(matchesEndpoint).send({}).expect(200);
+  assert.equal(empty.body.outcome, 'no_matches');
+
+  replyToMatching = async () => { throw new TypeError('private provider exception'); };
+  const offline = await applicant.post(matchesEndpoint).send({}).expect(502);
+  assert.equal(offline.body.code, 'ai_connection');
+  assert.doesNotMatch(offline.body.error, /private/);
+
+  replyToMatching = async () => ({ isResume: true, matches: [{ ...firmwareMatch, jobId: 'missing' }] });
+  const invalid = await applicant.post(matchesEndpoint).send({}).expect(502);
+  assert.equal(invalid.body.code, 'ai_invalid_output');
+
+  replyToMatching = async () => {
+    await database.run("UPDATE jobs SET status = 'closed' WHERE id = 1");
+    return { isResume: true, matches: [firmwareMatch] };
+  };
+  try {
+    const stale = await applicant.post(matchesEndpoint).send({}).expect(200);
+    assert.deepEqual(stale.body.matches, []);
+    assert.equal(stale.body.outcome, 'stale_matches');
+  } finally {
+    await database.run("UPDATE jobs SET status = 'open' WHERE id = 1");
+  }
+
+  const start = matchCalls.length;
+  await database.run("UPDATE jobs SET status = 'closed' WHERE id IN (1, 2)");
+  try {
+    const noOpenJobs = await applicant.post(matchesEndpoint).send({}).expect(200);
+    assert.equal(noOpenJobs.body.outcome, 'no_open_jobs');
+    assert.equal(matchCalls.length, start);
+  } finally {
+    await database.run("UPDATE jobs SET status = 'open' WHERE id IN (1, 2)");
+  }
+});
+
+test('job matching rejects a second concurrent run and drops results if the default changes mid-request', { timeout: 5000 }, async () => {
+  const applicant = await register('changing-default@example.test');
+  await upload(applicant, 'First', pdf(defaultResumeLines));
+  let complete;
+  let markStarted;
+  const hold = new Promise((resolve) => { complete = resolve; });
+  const started = new Promise((resolve) => { markStarted = resolve; });
+  replyToMatching = async () => {
+    markStarted();
+    await hold;
+    return { isResume: true, matches: [firmwareMatch] };
+  };
+  const first = applicant.post(matchesEndpoint).send({}).then((response) => response);
+  try {
+    await Promise.race([started, first]);
+    await applicant.post(matchesEndpoint).send({}).expect(429);
+    await upload(applicant, 'Second', pdf(['Curriculum vitae for a new role in data science']));
+  } finally {
+    complete();
+    const response = await first;
+    assert.equal(response.status, 409);
+    assert.equal(response.body.code, 'resume_changed');
+  }
 });

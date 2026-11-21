@@ -1,9 +1,15 @@
-import { escapeHtml } from './ui.js';
+import { escapeHtml, icon, initials } from './ui.js';
 import { jobCard } from './job-card.js';
 import { FILTER_KEYS, searchState, searchParams, jobsUrl, fetchJobs } from './job-shared.js';
 import { initJobShell } from './job-shell.js';
+import { request } from './api.js';
+import { initJobMatches } from './job-matches.mjs';
 
-if (await initJobShell()) {
+const shell = await initJobShell();
+if (shell) {
+  if (shell.user?.role === 'job_seeker') {
+    initJobMatches({ document, request, icon, initials, open: matchMedia('(min-width: 1180px)').matches });
+  }
   const form = document.querySelector('#job-search');
   const category = document.querySelector('#job-category');
   const list = document.querySelector('#job-list');
