@@ -1,71 +1,77 @@
-# Sprint 3 Master Checklist
-**Deadline:** November 15, 2026
+# Sprint 4 Master Checklist
+**Deadline:** November 30, 2026
 
 ## 1. Sprint Planning
-- [x] Define Sprint 3 goal and backlog
-- [x] Identify and prioritize Sprint 3 user stories
-- [x] Estimate effort, team capacity, and risks
-- [x] Review and update user story tasks
-- [x] Assign tasks and set target completion dates
-- [x] Complete Sprint 3 Work Plan
+- [ ] Define Sprint 4 goals and backlog
+- [ ] Prioritize user stories and estimate effort
+- [ ] Assign tasks and completion dates
+- [ ] Complete Sprint 4 Work Plan
 
 ## 2. GitHub Project Management
-- [x] Organize Sprint 3 issues and labels
-- [x] Update GitHub Project board
-- [x] Maintain backlog and task assignments
-- [x] Track task progress throughout the sprint
+- [ ] Organize Sprint 4 issues and labels
+- [ ] Update GitHub Project board
+- [ ] Track progress and close completed issues
 
-## 3. Acceptance Testing
-- [x] Create at least 1 acceptance test per Sprint 3 user story
-- [x] Review and complete previous acceptance tests
-- [x] Store acceptance tests as GitHub Issues
-- [x] Label and link tests to corresponding user stories
-- [x] Execute acceptance tests and document results
+## 3. Feature Implementation
+- [ ] Complete US-12 AI Job Recommendations
+- [ ] Complete US-19 Application Analytics Dashboard
+- [ ] Verify US-17 AI Resume Feedback and US-18 AI Candidate Ranking
+- [ ] Finalize and integrate all previous features
+- [ ] Resolve remaining bugs
 
-## 4. Feature Implementation
-- [x] Complete US-08 Recruiter Application Dashboard
-- [x] Complete US-10 Job-Seeker Application Dashboard
-- [x] Implement US-16 Notifications and Reminders
-- [x] Begin US-17 AI-Powered Resume Feedback
-- [x] Review and integrate previous sprint features
-- [x] Test frontend and backend integration
+## 4. AI Feature Validation
+- [ ] Validate at least two AI-enhanced features
+- [ ] Document inputs, prompts, outputs, and limitations
+- [ ] Test relevance, privacy, and failure handling
+- [ ] Document validation results
 
-## 5. Unit Testing
-- [x] Implement unit tests for all Sprint 3 features
-- [x] Review existing unit tests
-- [x] Integrate unit tests into the CI pipeline
-- [x] Execute unit tests and resolve failures
+## 5. Acceptance and Unit Testing
+- [ ] Finalize all acceptance tests
+- [ ] Implement unit tests for application code
+- [ ] Execute tests and resolve failures
+- [ ] Automate tests through CI/CD
 
-## 6. Continuous Integration (CI)
-- [x] Maintain GitHub Actions workflow
-- [x] Automate unit test execution
-- [x] Verify pipeline execution on push/pull request
-- [x] Resolve pipeline failures
-- [x] Prepare CI pipeline demonstration
+## 6. Continuous Integration (CI/CD)
+- [ ] Update GitHub Actions workflows
+- [ ] Automate testing and static analysis
+- [ ] Verify execution on push/pull requests
+- [ ] Resolve pipeline failures
 
-## 7. Project Documentation
-- [x] Maintain meeting minutes
-- [x] Maintain individual AI usage logs
-- [x] Document AI output validation and decisions
-- [x] Upload individual Sprint 3 AI Log PDF reports
-- [x] Maintain detailed team member contribution records
-- [x] Include time spent and links to commits, PRs, and issues
+## 7. Code Review
+- [ ] Create pull requests for Sprint 4 features
+- [ ] Ensure each PR is reviewed by another member
+- [ ] Address review comments
+- [ ] Merge approved changes
 
-## 8. Sprint 3 Report
-- [x] Summarize sprint objectives
-- [x] Summarize implemented features
-- [x] Describe team innovation and original features
-- [x] Document challenges and resolutions
-- [x] Summarize team contributions
-- [x] Include GitHub repository link
-- [x] Finalize one-page Sprint 3 Summary Report
+## 8. Static Analysis and Maintenance
+- [ ] Run static analysis and identify issues
+- [ ] Fix bugs, vulnerabilities, and code smells
+- [ ] Refactor code and enforce coding standards
+- [ ] Document findings and link corrective commits
 
-## 9. Final Evaluation
-- [x] Verify all required features are functional
-- [x] Review GitHub issues, tasks, and project board
-- [x] Verify acceptance tests and unit tests
-- [x] Verify CI pipeline execution
-- [x] Ensure all documentation is uploaded to GitHub
-- [x] Prepare demonstration of implemented features
-- [x] Confirm all members can explain their contributions
-- [x] Submit Sprint 3 Summary Report
+## 9. Repository Organization
+- [ ] Organize source code, tests, and configuration files
+- [ ] Organize documentation, meeting minutes, and AI logs
+- [ ] Update README and setup instructions
+
+## 10. Project Documentation
+- [ ] Maintain meeting minutes
+- [ ] Upload individual Sprint 4 AI Log PDFs
+- [ ] Maintain detailed contribution records
+- [ ] Document AI validation and technical decisions
+
+## 11. Sprint 4 Report
+- [ ] Summarize objectives and completed features
+- [ ] Describe quality assurance and maintenance work
+- [ ] Present AI innovations and original features
+- [ ] Document challenges and resolutions
+- [ ] Summarize contributions and include repository link
+- [ ] Finalize Sprint 4 Summary Report
+
+## 12. Final Evaluation
+- [ ] Verify all required features and AI functionality
+- [ ] Verify tests, CI/CD, static analysis, and code reviews
+- [ ] Ensure GitHub repository and documentation are complete
+- [ ] Prepare final demonstration
+- [ ] Confirm all members can explain their contributions
+- [ ] Submit Sprint 4 Summary Report
