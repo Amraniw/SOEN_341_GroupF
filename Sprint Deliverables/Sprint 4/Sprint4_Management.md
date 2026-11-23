@@ -1,83 +1,52 @@
-# Sprint 3 Project Management
+# Sprint 4 Project Management
 
 ## 1. Sprint Planning
 
 ### Sprint Goal
 
-The goal of this sprint is to complete the remaining core functionalities of the CareerConnect web application while strengthening software quality through testing and Continuous Integration (CI).
-
-The main focus is to complete the Recruiter Application Dashboard and Job-Seeker Application Dashboard, implement Notifications and Reminders, and begin developing AI-Powered Resume Feedback.
-
-Sprint 3 will also focus on implementing unit tests, executing acceptance tests, maintaining the CI pipeline, and refining the functionalities developed during previous sprints.
+Prepare CareerConnect for the final demonstration by validating the completed implementation across the job-seeker and recruiter workflows. Focus on the six issues in the Sprint 4 milestone, with regression testing for the core workflows and targeted validation for AI job recommendations.
 
 ### Sprint Backlog
 
-| User Story | Description |
-|---|---|
-| US-08 Recruiter Application Dashboard | Allows recruiters to review applicants, access their profiles and resumes, and update application statuses. |
-| US-10 Job-Seeker Application Dashboard | Allows job seekers to view application history, track statuses, and monitor application activity. |
-| US-16 Notifications and Reminders | Allows users to receive in-app notifications for application updates, interview invitations, deadlines, and recruiter activities. |
-| US-17 AI-Powered Resume Feedback | Allows job seekers to receive AI-assisted recommendations to improve their uploaded resumes. |
-
-Features implemented during previous sprints will also be reviewed, integrated, and tested to ensure proper functionality.
+| Issue | Title | Sprint 4 scope |
+|---|---|---|
+| #195 | US-19 — Application Analytics Dashboard | Verify that the job-seeker dashboard shows accurate application totals, status breakdowns, and activity over time for the selected date range. Check the empty state. |
+| #200 | User Authentication and Profile Management | Verify registration, login, logout, session restoration, and role-specific access. Test profile editing for both roles and résumé upload, default selection, and removal for job seekers. |
+| #201 | Job Search and Listings | Verify that users can browse available postings, combine search and filters, and open a listing's details. Check empty results and closed postings. |
+| #202 | Job Application Submission and Tracking | Verify that job seekers can submit an application, see a confirmation, and follow status changes in their history. Check duplicate submissions and verify that recruiter updates appear on the job-seeker side. |
+| #204 | Notifications and Analytics | Verify that application updates, interview invitations, deadline reminders, and recruiter activity reach the intended users. Check notification read state and confirm dashboard figures reflect the underlying application records. |
+| #17 | US-12 - AI Job Recommendations | Verify that a job seeker can request matches using their default résumé and receive relevant open postings with evidence from the résumé and job descriptions. Test missing or unreadable résumés, no matches, and provider failures. |
 
 ### Priorities
 
-| User Story | Priority | Why |
-|---|---|---|
-| Recruiter Application Dashboard | High | Completes the recruiter application management functionality required for Sprint 3. |
-| Job-Seeker Application Dashboard | High | Ensures application history, status tracking, and analytics are accessible to job seekers. |
-| Notifications and Reminders | High | Required Sprint 3 functionality that improves communication and user awareness. |
-| AI-Powered Resume Feedback | Medium | Introduces the mandatory Generative AI functionality, with development continuing into Sprint 4. |
+Validate authentication and profiles, listings, and application tracking together first. These workflows provide the accounts, postings, and application history needed to verify notifications and dashboard metrics. Use #195 to validate the dashboard itself and #204 to validate notification behavior and how it relates to application activity. Test #17 alongside the core flows using representative résumés and postings.
 
-### Effort Estimation
+### Effort and Team Capacity
 
-The effort needed for each user story is estimated using a scale from 1 to 5. A value of 1 represents low effort, while 5 represents high complexity and development effort.
-
-| User Story | Estimated Effort |
-|---|---|
-| Recruiter Application Dashboard | 4 |
-| Job-Seeker Application Dashboard | 2 |
-| Notifications and Reminders | 4 |
-| AI-Powered Resume Feedback | 4 |
-
-The Recruiter Application Dashboard requires frontend and backend integration, application retrieval, and status management. Notifications and Reminders require event handling and notification storage. AI-Powered Resume Feedback introduces additional complexity through AI integration and resume processing.
-
-The Job-Seeker Application Dashboard requires less effort because most of its functionality was already implemented during Sprint 2.
-
-### Team Capacity
-
-The team consists of 6 members. As in previous sprints, members will coordinate their development, testing, and documentation responsibilities to complete the assigned tasks.
-
-| Pair | Task |
-|---|---|
-| 1 | Front-end: Recruiter dashboard, job-seeker analytics, notifications, and AI feedback interfaces. |
-| 2 | Back-end: Application management, notification logic, database integration, and AI processing. |
-| 3 | Documentation and Testing: Sprint planning, acceptance tests, unit tests, CI maintenance, and project documentation. |
-
-All team members will participate in reviewing, testing, and integrating the completed functionalities.
+Use the 1–5 effort scale from Sprint 3, where 1 is low effort and 5 is high complexity. Record estimates, owners, and target dates in the work plan once the team allocates capacity for validation, reviews, and demo preparation.
 
 ### Risks
 
-- Not completing all required features before the Sprint 3 evaluation.
-- Difficulties integrating frontend and backend components.
-- Application status synchronization and notification delivery issues.
-- Challenges integrating Generative AI functionality.
-- Insufficient unit test or acceptance test coverage.
-- Continuous Integration pipeline failures.
-- Communication and coordination issues between team members.
+| Risk | Mitigation |
+|---|---|
+| A recruiter update appears in one view but is missing from the application timeline, notification list, or analytics. | Run one application through both roles and check all three views against the resulting history. |
+| Filters or date ranges produce misleading listings or dashboard totals. | Use known records with dates on either side of the selected range and verify the expected results. |
+| AI recommendations include unsupported evidence or depend on provider availability. | Verify recommendations against the résumé and postings, use mocked responses for repeatable failure tests, and check provider availability before the demonstration. |
 
-## 2. Sprint 3 Work Plan
+## 2. Sprint 4 Work Plan
 
-| Issue # | Issue Title | Issue Type | Responsible Member | Target Date | Priority | Status |
-|---|---|---|---|---|---|---|
-| #8 | Recruiter Application Dashboard | User Story | Suheil, Massi, Wassim | November 13 | High | Completed |
-| #10 | Job-Seeker Application Dashboard | User Story | Wassim | November 12 | High | Completed |
-| #116 | Notifications and Reminders | User Story | Adam, Carla | November 13 | High | Completed |
-| #123 | AI-Powered Resume Feedback | User Story | Rayane | November 14 | Medium | Completed |
-| #113 | Acceptance Tests | Task | Wassim, Rayane | November 13 | High | Completed |
-| - | Unit Testing | Task | To Confirm | November 14 | High | Completed |
-| - | Continuous Integration Pipeline | Task | Everyone | November 14 | High | Completed |
-| - | Sprint Planning and Documentation | Task | Rayane, Carla | November 14 | High | Completed |
+| Issue | Title | Responsible member | Target date | Effort (1–5) | Status |
+|---|---|---|---|---|---|
+| #195 | US-19 — Application Analytics Dashboard | | | | Open |
+| #200 | User Authentication and Profile Management | | | | Open |
+| #201 | Job Search and Listings | | | | Open |
+| #202 | Job Application Submission and Tracking | | | | Open |
+| #204 | Notifications and Analytics | | | | Open |
+| #17 | US-12 - AI Job Recommendations | | | | Open |
 
-This section summarizes the main GitHub issues planned for Sprint 3. Each user story is broken down into smaller tasks in the GitHub repository, where responsibilities, deadlines, and progress will be tracked.
+### Quality and Demo Preparation
+
+- Record acceptance test results on the relevant issue and run automated regression tests through CI.
+- Review any Sprint 4 changes through pull requests. Record static analysis findings and link fixes to the relevant reports.
+- Validate AI Résumé Review alongside AI Job Recommendations for the demo. Document the inputs, model configuration, expected outputs, limitations, privacy considerations, and failure handling for both features.
+- Keep meeting minutes, contribution records, and AI usage logs current for the evaluation.
