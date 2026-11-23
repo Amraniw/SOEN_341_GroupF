@@ -6,6 +6,7 @@ const multer = require('multer');
 const { createAuthRouter } = require('./routes/authRoutes');
 const { createResumeRouter } = require('./routes/resumeRoutes');
 const { createJobRouter } = require('./routes/jobRoutes');
+const { createJobMatchRouter } = require('./routes/jobMatchRoutes');
 const { createApplicationRouter } = require('./routes/applicationRoutes');
 const { createRecruiterRouter } = require('./routes/recruiterRoutes');
 const { createProfileRouter } = require('./routes/profileRoutes');
@@ -36,6 +37,10 @@ function createApp(database, options = {}) {
   app.use(express.json({ limit: '10kb' }));
   app.use('/api', createAuthRouter(database));
   app.use('/api/jobs', createJobRouter(database));
+  app.use('/api/job-matches', createJobMatchRouter(database, {
+    uploadDirectory: options.uploadDirectory,
+    recommendJobs: options.recommendJobs,
+  }));
   app.use('/api/applications', createApplicationRouter(database));
   app.use('/api/recruiter', createRecruiterRouter(database));
   app.use(

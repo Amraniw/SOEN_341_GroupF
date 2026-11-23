@@ -31,5 +31,5 @@ export async function initJobShell() {
   workspace.append(header, layout);
   layout.append(sidebar, main);
   const { session } = await import('./workspace.js');
-  return Boolean(session);
+  return session;
 }
