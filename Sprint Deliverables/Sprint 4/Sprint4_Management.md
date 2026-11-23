@@ -4,11 +4,11 @@
 
 ### Sprint Goal
 
-The goal of this sprint is to validate the completed CareerConnect features and prepare the application for the final demonstration.
+Sprint 4 focuses on validating the completed CareerConnect implementation and preparing for the final demonstration with tested workflows and documented results.
 
-The main focus is to verify authentication and profiles, job search and listings, application submission and tracking, notifications, the application analytics dashboard, and AI job recommendations.
+The six milestone issues cover account and profile management, job discovery, application submission and tracking, notifications, the application analytics dashboard, and AI job recommendations. The team will verify the job-seeker and recruiter workflows end to end, from publishing a listing to reviewing an application and communicating its status.
 
-Sprint 4 will also focus on running unit and acceptance tests, maintaining the CI pipeline, reviewing changes, and addressing findings from static analysis.
+The team will run unit and acceptance tests, maintain the test pipeline, review Sprint 4 changes through pull requests, and address static analysis findings. The final demonstration will cover both AI Job Recommendations and AI Résumé Review, including how they handle invalid inputs and provider failures.
 
 ### Sprint Backlog
 
@@ -21,7 +21,7 @@ Sprint 4 will also focus on running unit and acceptance tests, maintaining the C
 | Notifications and Analytics | Verify that users receive the expected in-app updates and reminders and that analytics reflect recorded application activity. |
 | US-12 - AI Job Recommendations | Verify that job seekers receive relevant open job recommendations based on their default résumé and that the feature handles missing résumés and provider errors. |
 
-Features implemented during previous sprints will also be reviewed, integrated, and tested to ensure proper functionality.
+Regression testing will cover the recruiter posting and applicant workflows that support the six milestone issues. For both AI features, the team will document output relevance, limitations, privacy considerations, and failure handling.
 
 ### Priorities
 
@@ -36,7 +36,7 @@ Features implemented during previous sprints will also be reviewed, integrated, 
 
 ### Effort Estimation
 
-The effort needed for each user story is estimated using a scale from 1 to 5. A value of 1 represents low effort, while 5 represents high complexity and development effort.
+Estimates use a 1–5 scale for the remaining Sprint 4 work. A 1 represents a straightforward validation task, and a 5 represents extensive cross-role testing or investigation.
 
 | User Story | Estimated Effort |
 |---|---|
@@ -51,7 +51,7 @@ Application tracking, notifications, and analytics share application data, so th
 
 ### Team Capacity
 
-The team consists of 6 members. As in previous sprints, members will coordinate their development, testing, and documentation responsibilities to complete the assigned tasks.
+The six-person team will divide Sprint 4 validation across the frontend, backend, and documentation and testing work below. Pair assignments will be recorded once the team allocates the work.
 
 | Pair | Task |
 |---|---|
@@ -59,7 +59,7 @@ The team consists of 6 members. As in previous sprints, members will coordinate 
 | 2 | Back-end work covers authentication, search, application status updates, notification delivery, analytics, and AI matching. |
 | 3 | Documentation and testing cover acceptance tests, unit tests, CI, static analysis, and sprint records. |
 
-All team members will participate in reviewing, testing, and integrating the completed functionalities.
+All team members will participate in testing, peer review, and preparing evidence for the final demonstration.
 
 ### Risks
 
@@ -82,4 +82,4 @@ All team members will participate in reviewing, testing, and integrating the com
 | #204 | Notifications and Analytics | Task | | | High | Open |
 | #17 | US-12 - AI Job Recommendations | User Story | | | High | Open |
 
-This section summarizes the GitHub issues in the Sprint 4 milestone. Responsibilities, deadlines, and progress will be tracked in the GitHub repository.
+The work plan follows the six GitHub issues in the Sprint 4 milestone. The team will track owners, target dates, acceptance test results, and review evidence in the corresponding issues and pull requests.
